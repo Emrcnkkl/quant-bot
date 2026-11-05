@@ -1,12 +1,865 @@
 {
   "surum": "rsi-macd-supertrend-only",
-  "guncelleme_utc": null,
-  "parametre_araligi": {},
-  "kurallar": "RSI, MACD ve SuperTrend kullanılır. İlk otomatik tarama henüz çalıştırılmadı.",
+  "guncelleme_utc": "2026-11-05T02:07+00:00",
+  "parametre_araligi": {
+    "rsi_periyotlari": [
+      7,
+      10,
+      14
+    ],
+    "rsi_al": 30,
+    "rsi_sat": 70,
+    "macd_hizli_yavas": [
+      [
+        8,
+        21
+      ],
+      [
+        12,
+        26
+      ]
+    ],
+    "macd_sinyal": 9,
+    "supertrend_periyot_carpan": [
+      [
+        10,
+        3.0
+      ],
+      [
+        14,
+        2.0
+      ]
+    ],
+    "izleyen_stop_yuzde": [
+      5,
+      8,
+      12
+    ]
+  },
+  "kurallar": "RSI<30 AL, RSI>70 SAT; MACD ve SuperTrend yön değişiminde AL/SAT; yalnızca RSI, MACD ve SuperTrend modelleri karşılaştırılır; her hisse için en iyi backtest modeli seçilir.",
   "sinyal_sayilari": {
     "AL": 0,
     "SAT": 0,
-    "İZLE": 0
+    "İZLE": 30
   },
-  "sinyaller": []
+  "sinyaller": [
+    {
+      "hisse": "ASELS",
+      "tarih": "2026-11-03",
+      "sinyal": "İZLE",
+      "aktif_gosterge_tetikleri": {
+        "al": [],
+        "sat": []
+      },
+      "en_iyi_model": "MACD",
+      "en_iyi_parametreler": {
+        "hizli": 8,
+        "yavas": 21,
+        "sinyal": 9
+      },
+      "izleyen_stop_yuzde": 12.0,
+      "model_backtest_getirisi_yuzde": 191.43,
+      "fiyat": 342.5,
+      "rsi": 46.22,
+      "rsi_durumu": "NÖTR",
+      "macd": -5.6867,
+      "macd_sinyal_cizgisi": -7.1967,
+      "macd_yonu": "YUKARI",
+      "macd_tetik": "YOK",
+      "supertrend_yonu": "AŞAĞI",
+      "supertrend_cizgisi": 375.3,
+      "supertrend_tetik": "YOK",
+      "en_iyi_model_tetik": 0
+    },
+    {
+      "hisse": "GUBRF",
+      "tarih": "2026-11-03",
+      "sinyal": "İZLE",
+      "aktif_gosterge_tetikleri": {
+        "al": [
+          "RSI 30 altı"
+        ],
+        "sat": []
+      },
+      "en_iyi_model": "MACD",
+      "en_iyi_parametreler": {
+        "hizli": 12,
+        "yavas": 26,
+        "sinyal": 9
+      },
+      "izleyen_stop_yuzde": 8.0,
+      "model_backtest_getirisi_yuzde": 181.8,
+      "fiyat": 272.75,
+      "rsi": 29.27,
+      "rsi_durumu": "AL",
+      "macd": -42.3561,
+      "macd_sinyal_cizgisi": -34.9939,
+      "macd_yonu": "AŞAĞI",
+      "macd_tetik": "YOK",
+      "supertrend_yonu": "AŞAĞI",
+      "supertrend_cizgisi": 325.9,
+      "supertrend_tetik": "YOK",
+      "en_iyi_model_tetik": 0
+    },
+    {
+      "hisse": "KONTR",
+      "tarih": "2026-11-03",
+      "sinyal": "İZLE",
+      "aktif_gosterge_tetikleri": {
+        "al": [],
+        "sat": []
+      },
+      "en_iyi_model": "SuperTrend",
+      "en_iyi_parametreler": {
+        "periyot": 14,
+        "carpan": 2.0
+      },
+      "izleyen_stop_yuzde": 5.0,
+      "model_backtest_getirisi_yuzde": 139.83,
+      "fiyat": 2.21,
+      "rsi": 56.55,
+      "rsi_durumu": "NÖTR",
+      "macd": -0.1888,
+      "macd_sinyal_cizgisi": -0.3018,
+      "macd_yonu": "YUKARI",
+      "macd_tetik": "YOK",
+      "supertrend_yonu": "YUKARI",
+      "supertrend_cizgisi": 1.81,
+      "supertrend_tetik": "YOK",
+      "en_iyi_model_tetik": 0
+    },
+    {
+      "hisse": "BIMAS",
+      "tarih": "2026-11-03",
+      "sinyal": "İZLE",
+      "aktif_gosterge_tetikleri": {
+        "al": [],
+        "sat": []
+      },
+      "en_iyi_model": "RSI",
+      "en_iyi_parametreler": {
+        "periyot": 7
+      },
+      "izleyen_stop_yuzde": 8.0,
+      "model_backtest_getirisi_yuzde": 125.69,
+      "fiyat": 359.5,
+      "rsi": 37.32,
+      "rsi_durumu": "NÖTR",
+      "macd": -14.0794,
+      "macd_sinyal_cizgisi": -11.3444,
+      "macd_yonu": "AŞAĞI",
+      "macd_tetik": "YOK",
+      "supertrend_yonu": "AŞAĞI",
+      "supertrend_cizgisi": 390.35,
+      "supertrend_tetik": "YOK",
+      "en_iyi_model_tetik": 0
+    },
+    {
+      "hisse": "AKBNK",
+      "tarih": "2026-11-03",
+      "sinyal": "İZLE",
+      "aktif_gosterge_tetikleri": {
+        "al": [],
+        "sat": []
+      },
+      "en_iyi_model": "MACD",
+      "en_iyi_parametreler": {
+        "hizli": 8,
+        "yavas": 21,
+        "sinyal": 9
+      },
+      "izleyen_stop_yuzde": 12.0,
+      "model_backtest_getirisi_yuzde": 117.97,
+      "fiyat": 62.25,
+      "rsi": 37.92,
+      "rsi_durumu": "NÖTR",
+      "macd": -1.8785,
+      "macd_sinyal_cizgisi": -1.4918,
+      "macd_yonu": "AŞAĞI",
+      "macd_tetik": "YOK",
+      "supertrend_yonu": "AŞAĞI",
+      "supertrend_cizgisi": 68.66,
+      "supertrend_tetik": "YOK",
+      "en_iyi_model_tetik": 0
+    },
+    {
+      "hisse": "ISCTR",
+      "tarih": "2026-11-03",
+      "sinyal": "İZLE",
+      "aktif_gosterge_tetikleri": {
+        "al": [],
+        "sat": []
+      },
+      "en_iyi_model": "RSI",
+      "en_iyi_parametreler": {
+        "periyot": 14
+      },
+      "izleyen_stop_yuzde": 8.0,
+      "model_backtest_getirisi_yuzde": 110.48,
+      "fiyat": 12.31,
+      "rsi": 45.08,
+      "rsi_durumu": "NÖTR",
+      "macd": -0.2236,
+      "macd_sinyal_cizgisi": -0.1728,
+      "macd_yonu": "AŞAĞI",
+      "macd_tetik": "YOK",
+      "supertrend_yonu": "AŞAĞI",
+      "supertrend_cizgisi": 13.14,
+      "supertrend_tetik": "YOK",
+      "en_iyi_model_tetik": 0
+    },
+    {
+      "hisse": "BRSAN",
+      "tarih": "2026-11-03",
+      "sinyal": "İZLE",
+      "aktif_gosterge_tetikleri": {
+        "al": [
+          "MACD yukarı kesişim"
+        ],
+        "sat": []
+      },
+      "en_iyi_model": "SuperTrend",
+      "en_iyi_parametreler": {
+        "periyot": 14,
+        "carpan": 2.0
+      },
+      "izleyen_stop_yuzde": 5.0,
+      "model_backtest_getirisi_yuzde": 110.07,
+      "fiyat": 650.0,
+      "rsi": 49.13,
+      "rsi_durumu": "NÖTR",
+      "macd": -6.0009,
+      "macd_sinyal_cizgisi": -6.597,
+      "macd_yonu": "YUKARI",
+      "macd_tetik": "AL",
+      "supertrend_yonu": "YUKARI",
+      "supertrend_cizgisi": 611.55,
+      "supertrend_tetik": "YOK",
+      "en_iyi_model_tetik": 0
+    },
+    {
+      "hisse": "TUPRS",
+      "tarih": "2026-11-03",
+      "sinyal": "İZLE",
+      "aktif_gosterge_tetikleri": {
+        "al": [],
+        "sat": []
+      },
+      "en_iyi_model": "MACD",
+      "en_iyi_parametreler": {
+        "hizli": 8,
+        "yavas": 21,
+        "sinyal": 9
+      },
+      "izleyen_stop_yuzde": 12.0,
+      "model_backtest_getirisi_yuzde": 109.63,
+      "fiyat": 338.25,
+      "rsi": 33.68,
+      "rsi_durumu": "NÖTR",
+      "macd": -10.814,
+      "macd_sinyal_cizgisi": -7.3424,
+      "macd_yonu": "AŞAĞI",
+      "macd_tetik": "YOK",
+      "supertrend_yonu": "AŞAĞI",
+      "supertrend_cizgisi": 375.5,
+      "supertrend_tetik": "YOK",
+      "en_iyi_model_tetik": 0
+    },
+    {
+      "hisse": "EUPWR",
+      "tarih": "2026-11-03",
+      "sinyal": "İZLE",
+      "aktif_gosterge_tetikleri": {
+        "al": [],
+        "sat": []
+      },
+      "en_iyi_model": "SuperTrend",
+      "en_iyi_parametreler": {
+        "periyot": 14,
+        "carpan": 2.0
+      },
+      "izleyen_stop_yuzde": 12.0,
+      "model_backtest_getirisi_yuzde": 93.69,
+      "fiyat": 39.62,
+      "rsi": 34.12,
+      "rsi_durumu": "NÖTR",
+      "macd": -5.9281,
+      "macd_sinyal_cizgisi": -6.7086,
+      "macd_yonu": "YUKARI",
+      "macd_tetik": "YOK",
+      "supertrend_yonu": "AŞAĞI",
+      "supertrend_cizgisi": 47.3,
+      "supertrend_tetik": "YOK",
+      "en_iyi_model_tetik": 0
+    },
+    {
+      "hisse": "YKBNK",
+      "tarih": "2026-11-03",
+      "sinyal": "İZLE",
+      "aktif_gosterge_tetikleri": {
+        "al": [],
+        "sat": []
+      },
+      "en_iyi_model": "RSI",
+      "en_iyi_parametreler": {
+        "periyot": 14
+      },
+      "izleyen_stop_yuzde": 8.0,
+      "model_backtest_getirisi_yuzde": 81.04,
+      "fiyat": 34.7,
+      "rsi": 45.82,
+      "rsi_durumu": "NÖTR",
+      "macd": -0.2511,
+      "macd_sinyal_cizgisi": -0.1258,
+      "macd_yonu": "AŞAĞI",
+      "macd_tetik": "YOK",
+      "supertrend_yonu": "AŞAĞI",
+      "supertrend_cizgisi": 37.1,
+      "supertrend_tetik": "YOK",
+      "en_iyi_model_tetik": 0
+    },
+    {
+      "hisse": "KRDMD",
+      "tarih": "2026-11-03",
+      "sinyal": "İZLE",
+      "aktif_gosterge_tetikleri": {
+        "al": [],
+        "sat": []
+      },
+      "en_iyi_model": "RSI",
+      "en_iyi_parametreler": {
+        "periyot": 7
+      },
+      "izleyen_stop_yuzde": 5.0,
+      "model_backtest_getirisi_yuzde": 76.24,
+      "fiyat": 38.34,
+      "rsi": 40.78,
+      "rsi_durumu": "NÖTR",
+      "macd": -1.82,
+      "macd_sinyal_cizgisi": -1.4975,
+      "macd_yonu": "AŞAĞI",
+      "macd_tetik": "YOK",
+      "supertrend_yonu": "AŞAĞI",
+      "supertrend_cizgisi": 42.51,
+      "supertrend_tetik": "YOK",
+      "en_iyi_model_tetik": 0
+    },
+    {
+      "hisse": "SISE",
+      "tarih": "2026-11-03",
+      "sinyal": "İZLE",
+      "aktif_gosterge_tetikleri": {
+        "al": [],
+        "sat": []
+      },
+      "en_iyi_model": "RSI",
+      "en_iyi_parametreler": {
+        "periyot": 10
+      },
+      "izleyen_stop_yuzde": 8.0,
+      "model_backtest_getirisi_yuzde": 72.64,
+      "fiyat": 34.46,
+      "rsi": 41.94,
+      "rsi_durumu": "NÖTR",
+      "macd": -1.4827,
+      "macd_sinyal_cizgisi": -1.4017,
+      "macd_yonu": "AŞAĞI",
+      "macd_tetik": "YOK",
+      "supertrend_yonu": "AŞAĞI",
+      "supertrend_cizgisi": 36.34,
+      "supertrend_tetik": "YOK",
+      "en_iyi_model_tetik": 0
+    },
+    {
+      "hisse": "ASTOR",
+      "tarih": "2026-11-03",
+      "sinyal": "İZLE",
+      "aktif_gosterge_tetikleri": {
+        "al": [],
+        "sat": []
+      },
+      "en_iyi_model": "MACD",
+      "en_iyi_parametreler": {
+        "hizli": 8,
+        "yavas": 21,
+        "sinyal": 9
+      },
+      "izleyen_stop_yuzde": 5.0,
+      "model_backtest_getirisi_yuzde": 72.13,
+      "fiyat": 155.5,
+      "rsi": 36.92,
+      "rsi_durumu": "NÖTR",
+      "macd": -20.7206,
+      "macd_sinyal_cizgisi": -23.3715,
+      "macd_yonu": "YUKARI",
+      "macd_tetik": "YOK",
+      "supertrend_yonu": "AŞAĞI",
+      "supertrend_cizgisi": 179.64,
+      "supertrend_tetik": "YOK",
+      "en_iyi_model_tetik": 0
+    },
+    {
+      "hisse": "EKGYO",
+      "tarih": "2026-11-03",
+      "sinyal": "İZLE",
+      "aktif_gosterge_tetikleri": {
+        "al": [],
+        "sat": []
+      },
+      "en_iyi_model": "MACD",
+      "en_iyi_parametreler": {
+        "hizli": 12,
+        "yavas": 26,
+        "sinyal": 9
+      },
+      "izleyen_stop_yuzde": 8.0,
+      "model_backtest_getirisi_yuzde": 70.94,
+      "fiyat": 16.57,
+      "rsi": 35.24,
+      "rsi_durumu": "NÖTR",
+      "macd": -0.778,
+      "macd_sinyal_cizgisi": -0.5656,
+      "macd_yonu": "AŞAĞI",
+      "macd_tetik": "YOK",
+      "supertrend_yonu": "AŞAĞI",
+      "supertrend_cizgisi": 18.97,
+      "supertrend_tetik": "YOK",
+      "en_iyi_model_tetik": 0
+    },
+    {
+      "hisse": "GARAN",
+      "tarih": "2026-11-03",
+      "sinyal": "İZLE",
+      "aktif_gosterge_tetikleri": {
+        "al": [],
+        "sat": []
+      },
+      "en_iyi_model": "RSI",
+      "en_iyi_parametreler": {
+        "periyot": 10
+      },
+      "izleyen_stop_yuzde": 5.0,
+      "model_backtest_getirisi_yuzde": 63.7,
+      "fiyat": 128.8,
+      "rsi": 48.73,
+      "rsi_durumu": "NÖTR",
+      "macd": -0.6756,
+      "macd_sinyal_cizgisi": -0.4133,
+      "macd_yonu": "AŞAĞI",
+      "macd_tetik": "YOK",
+      "supertrend_yonu": "AŞAĞI",
+      "supertrend_cizgisi": 135.8,
+      "supertrend_tetik": "YOK",
+      "en_iyi_model_tetik": 0
+    },
+    {
+      "hisse": "ALARK",
+      "tarih": "2026-11-03",
+      "sinyal": "İZLE",
+      "aktif_gosterge_tetikleri": {
+        "al": [],
+        "sat": []
+      },
+      "en_iyi_model": "MACD",
+      "en_iyi_parametreler": {
+        "hizli": 12,
+        "yavas": 26,
+        "sinyal": 9
+      },
+      "izleyen_stop_yuzde": 12.0,
+      "model_backtest_getirisi_yuzde": 61.47,
+      "fiyat": 94.95,
+      "rsi": 36.26,
+      "rsi_durumu": "NÖTR",
+      "macd": -3.3239,
+      "macd_sinyal_cizgisi": -2.2022,
+      "macd_yonu": "AŞAĞI",
+      "macd_tetik": "YOK",
+      "supertrend_yonu": "AŞAĞI",
+      "supertrend_cizgisi": 105.51,
+      "supertrend_tetik": "YOK",
+      "en_iyi_model_tetik": 0
+    },
+    {
+      "hisse": "KCHOL",
+      "tarih": "2026-11-03",
+      "sinyal": "İZLE",
+      "aktif_gosterge_tetikleri": {
+        "al": [],
+        "sat": []
+      },
+      "en_iyi_model": "RSI",
+      "en_iyi_parametreler": {
+        "periyot": 10
+      },
+      "izleyen_stop_yuzde": 12.0,
+      "model_backtest_getirisi_yuzde": 61.09,
+      "fiyat": 195.5,
+      "rsi": 39.42,
+      "rsi_durumu": "NÖTR",
+      "macd": -4.5938,
+      "macd_sinyal_cizgisi": -3.7741,
+      "macd_yonu": "AŞAĞI",
+      "macd_tetik": "YOK",
+      "supertrend_yonu": "AŞAĞI",
+      "supertrend_cizgisi": 212.08,
+      "supertrend_tetik": "YOK",
+      "en_iyi_model_tetik": 0
+    },
+    {
+      "hisse": "ENKAI",
+      "tarih": "2026-11-03",
+      "sinyal": "İZLE",
+      "aktif_gosterge_tetikleri": {
+        "al": [
+          "SuperTrend yukarı döndü"
+        ],
+        "sat": []
+      },
+      "en_iyi_model": "RSI",
+      "en_iyi_parametreler": {
+        "periyot": 7
+      },
+      "izleyen_stop_yuzde": 12.0,
+      "model_backtest_getirisi_yuzde": 48.34,
+      "fiyat": 80.2,
+      "rsi": 51.07,
+      "rsi_durumu": "NÖTR",
+      "macd": -1.5288,
+      "macd_sinyal_cizgisi": -2.1338,
+      "macd_yonu": "YUKARI",
+      "macd_tetik": "YOK",
+      "supertrend_yonu": "YUKARI",
+      "supertrend_cizgisi": 71.73,
+      "supertrend_tetik": "AL",
+      "en_iyi_model_tetik": 0
+    },
+    {
+      "hisse": "THYAO",
+      "tarih": "2026-11-03",
+      "sinyal": "İZLE",
+      "aktif_gosterge_tetikleri": {
+        "al": [],
+        "sat": []
+      },
+      "en_iyi_model": "RSI",
+      "en_iyi_parametreler": {
+        "periyot": 14
+      },
+      "izleyen_stop_yuzde": 8.0,
+      "model_backtest_getirisi_yuzde": 45.43,
+      "fiyat": 265.0,
+      "rsi": 45.19,
+      "rsi_durumu": "NÖTR",
+      "macd": -9.2195,
+      "macd_sinyal_cizgisi": -8.85,
+      "macd_yonu": "AŞAĞI",
+      "macd_tetik": "YOK",
+      "supertrend_yonu": "AŞAĞI",
+      "supertrend_cizgisi": 272.85,
+      "supertrend_tetik": "YOK",
+      "en_iyi_model_tetik": 0
+    },
+    {
+      "hisse": "CWENE",
+      "tarih": "2026-11-03",
+      "sinyal": "İZLE",
+      "aktif_gosterge_tetikleri": {
+        "al": [],
+        "sat": []
+      },
+      "en_iyi_model": "SuperTrend",
+      "en_iyi_parametreler": {
+        "periyot": 10,
+        "carpan": 3.0
+      },
+      "izleyen_stop_yuzde": 8.0,
+      "model_backtest_getirisi_yuzde": 41.35,
+      "fiyat": 14.88,
+      "rsi": 32.43,
+      "rsi_durumu": "NÖTR",
+      "macd": -2.5643,
+      "macd_sinyal_cizgisi": -2.9117,
+      "macd_yonu": "YUKARI",
+      "macd_tetik": "YOK",
+      "supertrend_yonu": "AŞAĞI",
+      "supertrend_cizgisi": 16.83,
+      "supertrend_tetik": "YOK",
+      "en_iyi_model_tetik": 0
+    },
+    {
+      "hisse": "EREGL",
+      "tarih": "2026-11-03",
+      "sinyal": "İZLE",
+      "aktif_gosterge_tetikleri": {
+        "al": [],
+        "sat": []
+      },
+      "en_iyi_model": "RSI",
+      "en_iyi_parametreler": {
+        "periyot": 10
+      },
+      "izleyen_stop_yuzde": 8.0,
+      "model_backtest_getirisi_yuzde": 35.72,
+      "fiyat": 30.9,
+      "rsi": 33.73,
+      "rsi_durumu": "NÖTR",
+      "macd": -1.8834,
+      "macd_sinyal_cizgisi": -1.3509,
+      "macd_yonu": "AŞAĞI",
+      "macd_tetik": "YOK",
+      "supertrend_yonu": "AŞAĞI",
+      "supertrend_cizgisi": 34.26,
+      "supertrend_tetik": "YOK",
+      "en_iyi_model_tetik": 0
+    },
+    {
+      "hisse": "TCELL",
+      "tarih": "2026-11-03",
+      "sinyal": "İZLE",
+      "aktif_gosterge_tetikleri": {
+        "al": [],
+        "sat": []
+      },
+      "en_iyi_model": "RSI",
+      "en_iyi_parametreler": {
+        "periyot": 7
+      },
+      "izleyen_stop_yuzde": 12.0,
+      "model_backtest_getirisi_yuzde": 35.5,
+      "fiyat": 93.8,
+      "rsi": 45.36,
+      "rsi_durumu": "NÖTR",
+      "macd": -2.1,
+      "macd_sinyal_cizgisi": -1.9005,
+      "macd_yonu": "AŞAĞI",
+      "macd_tetik": "YOK",
+      "supertrend_yonu": "AŞAĞI",
+      "supertrend_cizgisi": 97.43,
+      "supertrend_tetik": "YOK",
+      "en_iyi_model_tetik": 0
+    },
+    {
+      "hisse": "SASA",
+      "tarih": "2026-11-03",
+      "sinyal": "İZLE",
+      "aktif_gosterge_tetikleri": {
+        "al": [
+          "RSI 30 altı"
+        ],
+        "sat": []
+      },
+      "en_iyi_model": "MACD",
+      "en_iyi_parametreler": {
+        "hizli": 12,
+        "yavas": 26,
+        "sinyal": 9
+      },
+      "izleyen_stop_yuzde": 8.0,
+      "model_backtest_getirisi_yuzde": 34.83,
+      "fiyat": 1.5,
+      "rsi": 28.31,
+      "rsi_durumu": "AL",
+      "macd": -0.1695,
+      "macd_sinyal_cizgisi": -0.1664,
+      "macd_yonu": "AŞAĞI",
+      "macd_tetik": "YOK",
+      "supertrend_yonu": "AŞAĞI",
+      "supertrend_cizgisi": 1.72,
+      "supertrend_tetik": "YOK",
+      "en_iyi_model_tetik": 0
+    },
+    {
+      "hisse": "CIMSA",
+      "tarih": "2026-11-03",
+      "sinyal": "İZLE",
+      "aktif_gosterge_tetikleri": {
+        "al": [],
+        "sat": []
+      },
+      "en_iyi_model": "RSI",
+      "en_iyi_parametreler": {
+        "periyot": 10
+      },
+      "izleyen_stop_yuzde": 5.0,
+      "model_backtest_getirisi_yuzde": 33.16,
+      "fiyat": 39.96,
+      "rsi": 48.11,
+      "rsi_durumu": "NÖTR",
+      "macd": -0.8095,
+      "macd_sinyal_cizgisi": -1.0346,
+      "macd_yonu": "YUKARI",
+      "macd_tetik": "YOK",
+      "supertrend_yonu": "AŞAĞI",
+      "supertrend_cizgisi": 41.25,
+      "supertrend_tetik": "YOK",
+      "en_iyi_model_tetik": 0
+    },
+    {
+      "hisse": "DOAS",
+      "tarih": "2026-11-03",
+      "sinyal": "İZLE",
+      "aktif_gosterge_tetikleri": {
+        "al": [],
+        "sat": [
+          "SuperTrend aşağı döndü"
+        ]
+      },
+      "en_iyi_model": "RSI",
+      "en_iyi_parametreler": {
+        "periyot": 10
+      },
+      "izleyen_stop_yuzde": 12.0,
+      "model_backtest_getirisi_yuzde": 29.11,
+      "fiyat": 129.1,
+      "rsi": 38.75,
+      "rsi_durumu": "NÖTR",
+      "macd": -4.6254,
+      "macd_sinyal_cizgisi": -5.2793,
+      "macd_yonu": "YUKARI",
+      "macd_tetik": "YOK",
+      "supertrend_yonu": "AŞAĞI",
+      "supertrend_cizgisi": 154.08,
+      "supertrend_tetik": "SAT",
+      "en_iyi_model_tetik": 0
+    },
+    {
+      "hisse": "HEKTS",
+      "tarih": "2026-11-03",
+      "sinyal": "İZLE",
+      "aktif_gosterge_tetikleri": {
+        "al": [],
+        "sat": []
+      },
+      "en_iyi_model": "SuperTrend",
+      "en_iyi_parametreler": {
+        "periyot": 14,
+        "carpan": 2.0
+      },
+      "izleyen_stop_yuzde": 8.0,
+      "model_backtest_getirisi_yuzde": 18.93,
+      "fiyat": 1.69,
+      "rsi": 30.06,
+      "rsi_durumu": "NÖTR",
+      "macd": -0.1858,
+      "macd_sinyal_cizgisi": -0.1778,
+      "macd_yonu": "AŞAĞI",
+      "macd_tetik": "YOK",
+      "supertrend_yonu": "AŞAĞI",
+      "supertrend_cizgisi": 1.89,
+      "supertrend_tetik": "YOK",
+      "en_iyi_model_tetik": 0
+    },
+    {
+      "hisse": "SAHOL",
+      "tarih": "2026-11-03",
+      "sinyal": "İZLE",
+      "aktif_gosterge_tetikleri": {
+        "al": [],
+        "sat": []
+      },
+      "en_iyi_model": "RSI",
+      "en_iyi_parametreler": {
+        "periyot": 14
+      },
+      "izleyen_stop_yuzde": 12.0,
+      "model_backtest_getirisi_yuzde": 15.02,
+      "fiyat": 82.45,
+      "rsi": 39.61,
+      "rsi_durumu": "NÖTR",
+      "macd": -1.4282,
+      "macd_sinyal_cizgisi": -1.0923,
+      "macd_yonu": "AŞAĞI",
+      "macd_tetik": "YOK",
+      "supertrend_yonu": "AŞAĞI",
+      "supertrend_cizgisi": 90.96,
+      "supertrend_tetik": "YOK",
+      "en_iyi_model_tetik": 0
+    },
+    {
+      "hisse": "FROTO",
+      "tarih": "2026-11-03",
+      "sinyal": "İZLE",
+      "aktif_gosterge_tetikleri": {
+        "al": [],
+        "sat": []
+      },
+      "en_iyi_model": "MACD",
+      "en_iyi_parametreler": {
+        "hizli": 8,
+        "yavas": 21,
+        "sinyal": 9
+      },
+      "izleyen_stop_yuzde": 5.0,
+      "model_backtest_getirisi_yuzde": 9.71,
+      "fiyat": 66.1,
+      "rsi": 37.85,
+      "rsi_durumu": "NÖTR",
+      "macd": -2.4363,
+      "macd_sinyal_cizgisi": -2.4113,
+      "macd_yonu": "AŞAĞI",
+      "macd_tetik": "YOK",
+      "supertrend_yonu": "AŞAĞI",
+      "supertrend_cizgisi": 70.67,
+      "supertrend_tetik": "YOK",
+      "en_iyi_model_tetik": 0
+    },
+    {
+      "hisse": "ODAS",
+      "tarih": "2026-11-03",
+      "sinyal": "İZLE",
+      "aktif_gosterge_tetikleri": {
+        "al": [
+          "RSI 30 altı"
+        ],
+        "sat": []
+      },
+      "en_iyi_model": "SuperTrend",
+      "en_iyi_parametreler": {
+        "periyot": 10,
+        "carpan": 3.0
+      },
+      "izleyen_stop_yuzde": 12.0,
+      "model_backtest_getirisi_yuzde": 0.44,
+      "fiyat": 4.39,
+      "rsi": 21.36,
+      "rsi_durumu": "AL",
+      "macd": -0.5687,
+      "macd_sinyal_cizgisi": -0.536,
+      "macd_yonu": "AŞAĞI",
+      "macd_tetik": "YOK",
+      "supertrend_yonu": "AŞAĞI",
+      "supertrend_cizgisi": 4.88,
+      "supertrend_tetik": "YOK",
+      "en_iyi_model_tetik": 0
+    },
+    {
+      "hisse": "PGSUS",
+      "tarih": "2026-11-03",
+      "sinyal": "İZLE",
+      "aktif_gosterge_tetikleri": {
+        "al": [
+          "MACD yukarı kesişim"
+        ],
+        "sat": []
+      },
+      "en_iyi_model": "RSI",
+      "en_iyi_parametreler": {
+        "periyot": 10
+      },
+      "izleyen_stop_yuzde": 12.0,
+      "model_backtest_getirisi_yuzde": -0.8,
+      "fiyat": 127.2,
+      "rsi": 44.4,
+      "rsi_durumu": "NÖTR",
+      "macd": -5.5712,
+      "macd_sinyal_cizgisi": -5.6794,
+      "macd_yonu": "YUKARI",
+      "macd_tetik": "AL",
+      "supertrend_yonu": "AŞAĞI",
+      "supertrend_cizgisi": 130.62,
+      "supertrend_tetik": "YOK",
+      "en_iyi_model_tetik": 0
+    }
+  ]
 }
