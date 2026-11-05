@@ -1,0 +1,12 @@
+{
+  "surum": "rsi-macd-supertrend-only",
+  "guncelleme_utc": null,
+  "parametre_araligi": {},
+  "kurallar": "RSI, MACD ve SuperTrend kullanılır. İlk otomatik tarama henüz çalıştırılmadı.",
+  "sinyal_sayilari": {
+    "AL": 0,
+    "SAT": 0,
+    "İZLE": 0
+  },
+  "sinyaller": []
+}
