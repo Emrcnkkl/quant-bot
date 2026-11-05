@@ -179,9 +179,24 @@ def scan_one(ticker: str, prices: pd.DataFrame) -> dict:
     best = choose_best_model(prices)
     winning_signal = best["sinyal_serisi"].iloc[-1]
     winning_signal = 0 if pd.isna(winning_signal) else int(winning_signal)
-    overall = "AL" if winning_signal == 1 else "SAT" if winning_signal == -1 else "İZLE"
+
+    # Günlük etiketi tek seçilmiş modelin kesişim gününe bağlama:
+    # RSI uç seviyesi doğrudan sinyal verir; aksi halde MACD ve SuperTrend yön uyumu kullanılır.
+    macd_direction = int(macd_state.loc[last])
+    st_direction = 1 if st_trend.loc[last] > 0 else -1
+    if rsi_signal == "AL":
+        overall, signal_reasons = "AL", ["RSI 30 altı"]
+    elif rsi_signal == "SAT":
+        overall, signal_reasons = "SAT", ["RSI 70 üstü"]
+    elif macd_direction == st_direction == 1:
+        overall, signal_reasons = "AL", ["MACD yönü yukarı", "SuperTrend yönü yukarı"]
+    elif macd_direction == st_direction == -1:
+        overall, signal_reasons = "SAT", ["MACD yönü aşağı", "SuperTrend yönü aşağı"]
+    else:
+        overall, signal_reasons = "İZLE", ["MACD ve SuperTrend farklı yönde"]
     return {
         "hisse": ticker.removesuffix(".IS"), "tarih": last.strftime("%Y-%m-%d"), "sinyal": overall,
+        "sinyal_gerekcesi": signal_reasons,
         "aktif_gosterge_tetikleri": {"al": buy_reasons, "sat": sell_reasons},
         "en_iyi_model": best["ad"], "en_iyi_parametreler": best["parametreler"],
         "izleyen_stop_yuzde": best["stop_yuzde"], "model_backtest_getirisi_yuzde": round(best["backtest_getiri_yuzde"], 2),
@@ -223,7 +238,7 @@ def main() -> int:
         "parametre_araligi": {"rsi_periyotlari": RSI_PERIODS, "rsi_al": RSI_OVERSOLD, "rsi_sat": RSI_OVERBOUGHT,
                                "macd_hizli_yavas": MACD_CONFIGS, "macd_sinyal": MACD_SIGNAL,
                                "supertrend_periyot_carpan": ST_CONFIGS, "izleyen_stop_yuzde": [round(x * 100) for x in STOP_RATES]},
-        "kurallar": "RSI<30 AL, RSI>70 SAT; MACD ve SuperTrend yön değişiminde AL/SAT; yalnızca RSI, MACD ve SuperTrend modelleri karşılaştırılır; her hisse için en iyi backtest modeli seçilir.",
+        "kurallar": "RSI<30 ise AL, RSI>70 ise SAT; RSI nötrse MACD ve SuperTrend mevcut yönleri aynıysa o yönde AL/SAT; yönler ayrışırsa İZLE. Model backtesti en iyi gösterge/parametreleri ayrıca göstermek içindir.",
         "sinyal_sayilari": counts, "sinyaller": results,
     }
     OUTPUT.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")

@@ -15,7 +15,8 @@ GitHub Pages yayını ve sinyal üretimi ayrı çalışır. İlk taramaya kadar 
 - RSI: 7, 10 ve 14 periyot seçenekleri; 30 altı AL, 70 üstü SAT.
 - MACD: 8/21 ve 12/26; sinyal periyodu 9.
 - SuperTrend: (10, 3.0) ve (14, 2.0).
-- Her model, %5, %8 ve %12 iz süren stop seçenekleriyle geçmiş günlük veride karşılaştırılır; en yüksek geçmiş getirili modelin son sinyali gösterilir.
+- Sinyal kuralı: RSI 30 altı AL, 70 üstü SAT verir. RSI nötrse MACD ve SuperTrend’in mevcut yönleri aynıysa AL/SAT, farklıysa İZLE verir. MACD/ST kesişiminin tam o gün olmasını beklemez.
+- Geçmiş getiriye göre seçilen model ve stop bilgisi karşılaştırma amaçlı gösterilir; günlük AL/SAT etiketini belirlemez.
 - Yalnızca RSI, MACD ve SuperTrend kullanılır. Geçmiş getiri gelecek performansını göstermez; ekran yatırım tavsiyesi değildir.
 
 ## Yerelde çalıştırma
