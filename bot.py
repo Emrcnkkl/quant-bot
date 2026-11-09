@@ -291,6 +291,33 @@ def _clean(df: pd.DataFrame) -> pd.DataFrame:
     return df[~df.index.duplicated(keep="last")].sort_index()
 
 
+def data_quality(data: dict, tickers: list[str], bench: pd.DataFrame, usdtry, demo: bool) -> dict:
+    """Veri kalite kontrolü. Ciddi eksiklikte (evrenin %25'inden fazlası son gün verisiz) hiçbir dosyayı
+    değiştirmeden durur; küçük sorunları signals.json'a ve yöneticiye Telegram uyarısı olarak yazar."""
+    warns = []
+    newest = max(data[t].index[-1] for t in tickers if t in data)
+    missing = [t for t in tickers if t not in data or data[t].index[-1] < newest]
+    if missing:
+        warns.append(f"Son gün ({newest.date()}) verisi eksik: {', '.join(missing)}")
+    jumps = [f"{t} %{r * 100:+.0f}" for t in tickers if t in data and len(data[t]) > 1
+             for r in [data[t]["Close"].iloc[-1] / data[t]["Close"].iloc[-2] - 1] if abs(r) > 0.21]
+    if jumps:
+        warns.append("Günlük fiyat sınırını aşan hareket (veri hatası olabilir): " + ", ".join(jumps))
+    if bench.index[-1] < newest:
+        warns.append(f"BIST30 endeksinin son verisi geride ({bench.index[-1].date()})")
+    if not demo and MACRO_SOURCE != "TCMB (canlı)":
+        warns.append("TCMB'den faiz/enflasyon alınamadı; yerleşik tablo kullanıldı")
+    if not demo and usdtry is None:
+        warns.append("USD/TRY alınamadı; dolar bazlı getiriler eksik")
+    for w in warns:
+        print(f"  ⚠ {w}", file=sys.stderr)
+    if len(missing) > len(tickers) * 0.25 and not demo:
+        msg = f"Veri çok eksik ({len(missing)}/{len(tickers)} hisse); dosyalar değiştirilmedi."
+        telegram_send(f"⚠️ <b>BIST50 Sinyal</b> · {msg}", admin=True)
+        sys.exit("  ! " + msg)
+    return {"ok": not warns, "warnings": warns, "checked": str(newest.date())}
+
+
 def company_name(t: str) -> str:
     """Hisse adı: NAMES, yoksa names.json önbelleği, o da yoksa Yahoo (bir kez sorulur, önbelleğe yazılır)."""
     if t in NAMES:
@@ -858,6 +885,7 @@ def run(demo: bool, telegram_test: bool = False) -> None:
     mem_full = pit_membership(cand, full_cal, CFG["universe_size"])
     tickers = sorted(mem_full.columns[mem_full.iloc[-1]])
     print(f"  Evren: işlem hacmine göre en büyük {len(tickers)} hisse")
+    quality = data_quality(data, tickers, bench, usdtry, demo)
 
     signals, per_stock, all_daily, recent_trades = [], [], {}, []
     changes, change_dates = [], set()
@@ -1006,7 +1034,18 @@ def run(demo: bool, telegram_test: bool = False) -> None:
         for fn in os.listdir(sdir):
             if fn.endswith(".json") and fn not in keep:
                 os.remove(os.path.join(sdir, fn))
-    write("signals.json", {**meta, "regime": regime, "counts": counts, "signals": signals,
+    if quality["warnings"] and not demo:
+        qpath = os.path.join(OUT_DIR, "notify.json")
+        try:
+            with open(qpath, encoding="utf-8") as f:
+                ns = json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            ns = {}
+        if ns.get("last_warn") != meta["data_date"]:
+            if telegram_send("⚠️ <b>BIST50 Sinyal</b> veri uyarısı\n• " + "\n• ".join(quality["warnings"]), admin=True):
+                ns["last_warn"] = meta["data_date"]
+                write("notify.json", ns)
+    write("signals.json", {**meta, "regime": regime, "counts": counts, "signals": signals, "quality": quality,
                            "changes_days": CFG["changes_days"],
                            "changes_dates": sorted(change_dates)[-(CFG["changes_days"] + 1):], "changes": changes})
 
@@ -1091,13 +1130,16 @@ def signal_changes(t: str, d: pd.DataFrame, score: pd.Series) -> list[dict]:
 SITE_URL = "https://emrcnkkl.github.io/quant-bot/"
 
 
-def telegram_send(text: str) -> bool:
+def telegram_send(text: str, admin: bool = False) -> bool:
     """Telegram kanalına mesaj gönderir. Token ve kanal ID'si ortam değişkenlerinden okunur
     (GitHub → Settings → Secrets: TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID). Yoksa sessizce atlar."""
     import urllib.error
     import urllib.parse
     import urllib.request
     token, chat = os.environ.get("TELEGRAM_BOT_TOKEN"), os.environ.get("TELEGRAM_CHAT_ID")
+    if admin:
+        # Teknik uyarılar: tanımlıysa yalnızca yöneticinin sohbetine (TELEGRAM_ADMIN_CHAT_ID), değilse kanala
+        chat = os.environ.get("TELEGRAM_ADMIN_CHAT_ID") or chat
     if not token or not chat:
         print("  · Telegram ayarlı değil (TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID yok), bildirim atlandı")
         return False
@@ -1123,6 +1165,14 @@ def telegram_send(text: str) -> bool:
         return False
 
 
+def _notify_state() -> dict:
+    try:
+        with open(os.path.join(OUT_DIR, "notify.json"), encoding="utf-8") as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {}
+
+
 def notify(meta: dict, regime: dict, counts: dict, changes: list[dict], live: dict | None,
            demo: bool, test: bool = False) -> None:
     """Son bildirimden bu yana AL'a girenler / AL'dan çıkanlar ve model portföy işlemleri için Telegram mesajı.
@@ -1137,7 +1187,7 @@ def notify(meta: dict, regime: dict, counts: dict, changes: list[dict], live: di
         last = None
     today = meta["data_date"]
     if last is None and not test:
-        write("notify.json", {"last_date": today})
+        write("notify.json", {**_notify_state(), "last_date": today})
         print("  · Telegram: ilk çalıştırma, başlangıç tarihi kaydedildi (geçmiş gönderilmez)")
         return
     if last == today and not test:
@@ -1148,7 +1198,7 @@ def notify(meta: dict, regime: dict, counts: dict, changes: list[dict], live: di
     outs = [c for c in new if c["from"] == "AL"]
     ev = [e for e in (live or {}).get("events", []) if e["date"] > since]
     if not (ins or outs or ev or test):
-        write("notify.json", {"last_date": today})
+        write("notify.json", {**_notify_state(), "last_date": today})
         print("  · Telegram: AL değişikliği yok, mesaj gönderilmedi")
         return
 
@@ -1179,7 +1229,7 @@ def notify(meta: dict, regime: dict, counts: dict, changes: list[dict], live: di
                      f"BIST30 %{(p1['bench'] / p0['bench'] - 1) * 100:+.1f}")
     lines.append(f'<a href="{SITE_URL}">Siteye git</a> · <i>Yatırım tavsiyesi değildir.</i>')
     if telegram_send("\n".join(lines)) or not test:
-        write("notify.json", {"last_date": today})
+        write("notify.json", {**_notify_state(), "last_date": today})
 
 
 def update_live(port: pd.Series, weights: pd.DataFrame, bench_close: pd.Series, demo: bool) -> dict | None:

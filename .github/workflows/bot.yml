@@ -39,11 +39,15 @@ jobs:
           python-version: "3.11"
       - if: steps.check.outputs.skip != 'true'
         run: pip install -r requirements.txt
+      - name: Testler
+        if: steps.check.outputs.skip != 'true'
+        run: python -W ignore -m unittest discover -s tests
       - if: steps.check.outputs.skip != 'true'
         env:
           # GitHub → Settings → Secrets and variables → Actions içinde tanımlanır; kodda ya da depoda yer almaz
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          TELEGRAM_ADMIN_CHAT_ID: ${{ secrets.TELEGRAM_ADMIN_CHAT_ID }}
         run: python bot.py ${{ inputs.telegram_test && '--telegram-test' || '' }}
       - name: Sonuçları kaydet
         if: steps.check.outputs.skip != 'true'
@@ -56,3 +60,16 @@ jobs:
           # Bu sırada depoya başka bir değişiklik gönderildiyse önce onu al
           for i in 1 2 3; do git pull --rebase -X theirs && git push && exit 0; sleep 5; done
           exit 1
+      - name: Arıza uyarısı
+        # Son zamanlanmış deneme (21:10) ya da elle çalıştırma başarısız olursa Telegram'a haber ver.
+        # Önceki denemeler (18:40, 19:25) başarısız olursa sessiz kalınır; sonraki deneme tekrar dener.
+        if: failure() && (github.event_name == 'workflow_dispatch' || github.event.schedule == '10 18 * * 1-5')
+        env:
+          TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          CHAT: ${{ secrets.TELEGRAM_ADMIN_CHAT_ID || secrets.TELEGRAM_CHAT_ID }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          [ -z "$TOKEN" ] && exit 0
+          curl -s -o /dev/null "https://api.telegram.org/bot$TOKEN/sendMessage" \
+            --data-urlencode "chat_id=$CHAT" \
+            --data-urlencode "text=⚠️ BIST50 Sinyal: bugünkü güncelleme başarısız oldu. Site bir önceki günün verisini gösteriyor. Ayrıntı: $RUN_URL"
