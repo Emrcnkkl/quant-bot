@@ -156,7 +156,7 @@ exit_rule ("score" varsayılan | ema50 | cross | ema200 | regime), entry_rule ("
 - Demo veri rastgeledir; demo backtest sonuçları hiçbir şey ifade etmez.
 
 ## Sıradaki adımlar
-1. Kullanıcı Telegram token'ını GitHub Secrets'a ekleyince `telegram_test` ile dene.
+1. ~~Telegram~~ — çalışıyor (9 Kasım 2026 deneme mesajı gönderildi; kullanıcının eski QuantBIST projesiyle aynı bot ve kanal).
 2. Ocak 2027'de BIST30 listesini (`BIST30` sözlüğü) Borsa İstanbul duyurusuna göre güncelle; `CANDIDATES`'e yeni büyük hisseleri ekle.
 3. Fikirler: puan bileşenlerini tek tek sınamak (eğitim/test ayrımıyla), endeks EMA200 rejim filtresi (20 yıl testi),
    değerleme verisi (F/K) — veri kaynağı gerekli. Canlı portföy birkaç ay biriktikten sonra geriye dönük testle kıyasla.
