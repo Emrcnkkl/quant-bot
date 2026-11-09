@@ -8,12 +8,12 @@
 :root{
   --bg:#f6f7f9;--card:#fff;--ink:#14181f;--muted:#5f6b7a;--line:#e3e7ec;
   --al:#0f8a5f;--al-bg:#e3f5ec;--sat:#c23b3b;--sat-bg:#fbe7e7;--tut:#8a6d0f;--tut-bg:#f7f0da;
-  --accent:#2d5bd7;--bench:#9aa4b2;--cash:#b07a1f;
+  --accent:#2d5bd7;--bench:#9aa4b2;--cash:#b07a1f;--e20:#2d5bd7;--e50:#c2410c;--e200:#7c3aed;
 }
 @media (prefers-color-scheme:dark){:root{
   --bg:#0e1116;--card:#161b22;--ink:#e6e9ee;--muted:#8d97a5;--line:#262d37;
   --al:#3ccf91;--al-bg:#11291f;--sat:#ff7272;--sat-bg:#2e1616;--tut:#e0bd4f;--tut-bg:#2a2412;
-  --accent:#6f95ff;--bench:#5d6775;--cash:#d4a548;
+  --accent:#6f95ff;--bench:#5d6775;--cash:#d4a548;--e20:#6f95ff;--e50:#fb923c;--e200:#b794f6;
 }}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,sans-serif}
@@ -58,6 +58,21 @@ tr:last-child td{border-bottom:0}
 svg text{fill:var(--muted);font-size:11px}
 .legend{display:flex;gap:16px;font-size:13px;color:var(--muted);margin:4px 0 8px}
 .legend i{display:inline-block;width:14px;height:3px;border-radius:2px;vertical-align:middle;margin-right:6px}
+.macro{display:grid;grid-template-columns:auto 1fr;gap:4px 20px;align-items:center;margin-top:12px}
+.macro .big{font-size:30px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.1}
+.macro .eq{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.macro p{margin:0;font-size:14px;grid-row:span 2}
+.pill{display:inline-block;font-size:12px;font-weight:600;padding:2px 8px;border-radius:999px;margin-left:6px;vertical-align:middle}
+@media(max-width:620px){.macro{grid-template-columns:1fr}.macro p{grid-row:auto}}
+.dw{position:sticky;left:12px;max-width:100%}
+.sc{position:relative;margin:4px 0 14px}
+.sc .rng{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:6px;font-size:12px;color:var(--muted)}
+.sc .rng button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:2px 9px;border-radius:999px;cursor:pointer;font:inherit}
+.sc .rng button.on{background:var(--ink);color:var(--card);border-color:var(--ink)}
+.sc .rng .lg{margin-left:auto;display:flex;gap:10px;flex-wrap:wrap}
+.sc .tip{position:absolute;pointer-events:none;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:6px 9px;font-size:12px;line-height:1.4;box-shadow:0 4px 14px rgba(0,0,0,.12);display:none;white-space:nowrap;z-index:2}
+.yr td.best{font-weight:700}
+.yr td.best::after{content:" ●";font-size:9px;vertical-align:middle;color:var(--accent)}
 .mt td,.mt th{padding:8px 10px}
 footer{margin-top:40px;font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:16px}
 details summary{cursor:pointer;font-weight:600;color:var(--ink)}
@@ -76,6 +91,7 @@ details summary{cursor:pointer;font-weight:600;color:var(--ink)}
   <div id="banner"></div>
 
   <div class="cards" id="cards"></div>
+  <div class="card" id="macro" hidden></div>
 
   <div class="toolbar">
     <div class="tabs" id="tabs">
@@ -108,6 +124,9 @@ details summary{cursor:pointer;font-weight:600;color:var(--ink)}
 
   <div class="tbl" style="margin-top:12px"><table class="mt" id="pf"></table></div>
   <p class="muted small">Nakit = sermayenin tamamı TCMB politika faizinde beklese elde edilecek getiri. Sharpe, faizin üzerindeki fazla getiriye göre hesaplanır.</p>
+  <h2>Yıl yıl getiri</h2>
+  <div class="tbl"><table class="mt yr" id="yearly"></table></div>
+  <p class="muted small">● her yılın en yüksek getirisi. Eksik yıllar (backtest başlangıcı ve içinde bulunulan yıl) tarih aralığıyla gösterilir.</p>
   <div class="tbl" style="margin-top:12px"><table class="mt" id="trades"></table></div>
 
   <h2>Hisse bazında performans</h2>
@@ -170,7 +189,34 @@ function renderHeader(s) {
     ["AL", s.counts.AL, "var(--al)"], ["TUT", s.counts.TUT, "var(--tut)"], ["SAT", s.counts.SAT, "var(--sat)"],
     ["Ortalama skor", fmt(avg, 1), "var(--ink)"], ["Açık pozisyon", inPos, "var(--ink)"],
   ].map(([k, v, c]) => `<div class="card"><div class="k">${k}</div><div class="v" style="color:${c}">${v}</div></div>`).join("");
+  renderMacro(s.regime);
   $("#disc").innerHTML = `<b>Yasal uyarı:</b> ${s.disclaimer} Geçmiş performans gelecekteki sonuçların göstergesi değildir.`;
+}
+
+const MONTHS = ["Ocak","Şubat","Mart","Nisan","Mayıs","Haziran","Temmuz","Ağustos","Eylül","Ekim","Kasım","Aralık"];
+const monthName = ym => { const [y, m] = ym.split("-"); return `${MONTHS[+m - 1]} ${y}`; };
+const trDate = iso => new Date(iso + "T00:00:00").toLocaleDateString("tr-TR", {day: "numeric", month: "long", year: "numeric"});
+
+function renderMacro(r) {
+  if (!r || r.real_rate == null) return;
+  const pos = r.real_rate > 0;
+  const col = pos ? "var(--tut)" : "var(--al)";
+  const text = pos
+    ? `Reel faiz <b>pozitif</b>: politika faizi enflasyonun üzerinde. Geçmiş 5 yılda böyle dönemlerde (Aralık 2024'ten beri) parayı faizde tutmak hem BIST30'u hem bu stratejiyi geride bıraktı.`
+    : `Reel faiz <b>negatif</b>: politika faizi enflasyonun altında. Geçmiş 5 yılda böyle dönemlerde (2021–2024) hisseler faizden çok daha fazla kazandırdı.`;
+  const filt = r.filter_max == null
+    ? `Reel faiz filtresi kapalı — AL/SAT sinyalleri faiz ortamını hesaba katmaz.`
+    : r.blocking ? `<b>Filtre açık:</b> reel faiz %${fmt(r.filter_max, 0)} eşiğinin üstünde olduğu için yeni AL sinyalleri işleme alınmıyor.`
+                 : `Filtre açık (eşik %${fmt(r.filter_max, 0)}); şu an alımlara engel yok.`;
+  const el = $("#macro");
+  el.hidden = false; el.style.marginTop = "12px";
+  el.innerHTML = `<div class="k">Faiz ortamı<span class="pill" style="background:${pos ? "var(--tut-bg)" : "var(--al-bg)"};color:${col}">${pos ? "faiz cazip" : "hisse lehine"}</span></div>
+    <div class="macro">
+      <div class="big" style="color:${col}">${r.real_rate > 0 ? "+" : ""}${fmt(r.real_rate, 1)}</div>
+      <p>${text} <span class="muted">${filt}</span></p>
+      <div class="eq">reel faiz (puan) = %${fmt(r.policy_rate, 2)} politika − %${fmt(r.cpi_yoy, 2)} TÜFE</div>
+    </div>
+    <div class="muted small" style="margin-top:8px">Politika faizi ${trDate(r.policy_date)} itibarıyla · TÜFE ${monthName(r.cpi_month)} (yıllık) · kaynak: ${r.source || "TCMB"}</div>`;
 }
 
 function scoreBar(v) {
@@ -196,13 +242,113 @@ function renderSignals() {
       <td>${fmt(x.rsi, 0)}</td><td>${fmt(stop)}</td><td>${fmt(x.target)}</td></tr>`;
     if (openRow !== x.ticker) return main;
     const p = x.position;
-    return main + `<tr class="detail"><td colspan="8">
+    return main + `<tr class="detail"><td colspan="8"><div class="dw">
+      <div class="sc" id="sc-${x.ticker}"><div class="muted small">Grafik yükleniyor…</div></div>
       <b>Gerekçeler</b><ul>${x.reasons.map(r => `<li>${r}</li>`).join("")}</ul>
       ${p ? `<div class="small">Model pozisyonu: ${p.entry_date} tarihinde ${fmt(p.entry_price)} ile girildi · ${p.days} gün · ${pct(p.pnl_pct, 2)} · iz süren stop ${fmt(p.stop)}</div>` : ""}
       <div class="comp">${Object.entries(x.components).map(([k, v]) => `<span>${COMP[k]} <b class="${v > 0 ? "pos" : v < 0 ? "neg" : ""}">${v > 0 ? "+" : ""}${fmt(v, 1)}</b></span>`).join("")}</div>
       <div class="small muted" style="margin-top:6px">ADX ${fmt(x.adx, 0)} · ATR %${fmt(x.atr_pct, 1)}</div>
-    </td></tr>`;
+    </div></td></tr>`;
   }).join("") || `<tr><td colspan="8" class="muted">Sonuç yok</td></tr>`;
+  fitDetail();
+  if (openRow) loadStock(openRow);
+}
+
+// Telefonda tablo yana kayar; detay alanını görünen genişliğe sabitle
+function fitDetail() {
+  const dw = document.querySelector("#sig .dw");
+  if (dw) dw.style.width = ($("#sig").parentElement.clientWidth - 24) + "px";
+}
+
+// ---------------- Hisse detay grafiği ----------------
+const STOCK = {}, RANGES = [["3A", 63], ["6A", 126], ["1Y", 252], ["2Y", 500]];
+let chartRange = 126;
+
+async function loadStock(t) {
+  const box = document.getElementById("sc-" + t);
+  if (!box) return;
+  try {
+    STOCK[t] = STOCK[t] || await fetch(`stocks/${t}.json?v=${S.generated_at}`).then(r => { if (!r.ok) throw 0; return r.json(); });
+    drawStock(box, STOCK[t]);
+  } catch (e) { box.innerHTML = `<div class="muted small">Grafik verisi bulunamadı.</div>`; }
+}
+
+function drawStock(box, D) {
+  const n = D.dates.length, from = Math.max(0, n - chartRange), idx = [];
+  for (let i = from; i < n; i++) idx.push(i);
+  const W = Math.max(300, box.clientWidth), PH = W < 560 ? 200 : 260, SH = 70, GAP = 18, L = 8, R = 52, T = 8, B = 18;
+  const H = T + PH + GAP + SH + B;
+  const x = k => L + k / (idx.length - 1) * (W - L - R);
+  const series = ["close", "ema20", "ema50", "ema200"];
+  const vals = idx.flatMap(i => series.map(k => D[k][i])).filter(v => v != null);
+  let lo = Math.min(...vals), hi = Math.max(...vals); const pad = (hi - lo) * .06; lo -= pad; hi += pad;
+  const y = v => T + (1 - (v - lo) / (hi - lo)) * PH;
+  const sy = v => T + PH + GAP + (1 - (v + 100) / 200) * SH;
+  const pos = {}; idx.forEach((i, k) => pos[D.dates[i]] = k);
+  const kOf = date => pos[date] ?? (date < D.dates[from] ? 0 : null);
+  const path = key => idx.map((i, k) => D[key][i] == null ? "" : `${k && D[key][idx[k - 1]] != null ? "L" : "M"}${x(k).toFixed(1)},${y(D[key][i]).toFixed(1)}`).join("");
+  // pozisyonda olunan dönemler
+  const spans = [...D.trades.map(t => [t.entry_date, t.exit_date, t]), ...(D.open ? [[D.open.entry_date, D.dates[n - 1], null]] : [])]
+    .filter(([a, b]) => b >= D.dates[from]);
+  let shade = "", marks = "";
+  for (const [a, b, t] of spans) {
+    const ka = kOf(a), kb = pos[b] ?? idx.length - 1;
+    shade += `<rect x="${x(ka)}" y="${T}" width="${Math.max(1, x(kb) - x(ka))}" height="${PH}" fill="var(--al)" opacity=".08"/>`;
+    if (pos[a] != null) marks += `<path d="M${x(ka)},${y(D.close[idx[ka]]) + 16}l-5,8h10z" fill="var(--al)"><title>Alış ${a}</title></path>`;
+    if (t && pos[b] != null) marks += `<path d="M${x(kb)},${y(D.close[idx[kb]]) - 16}l-5,-8h10z" fill="var(--sat)"><title>Satış ${b} (${t.exit_reason}) ${t.ret_pct > 0 ? "+" : ""}${fmt(t.ret_pct, 1)}%</title></path>`;
+  }
+  // fiyat ekseni
+  let grid = "";
+  const step = niceStep((hi - lo) / 4);
+  for (let v = Math.ceil(lo / step) * step; v <= hi; v += step)
+    grid += `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/><text x="${W - R + 6}" y="${y(v) + 4}">${fmt(v, v < 10 ? 2 : 0)}</text>`;
+  // tarih etiketleri
+  let dates = ""; const every = Math.ceil(idx.length / (W < 560 ? 3 : 6));
+  for (let k = every; k < idx.length - every / 3; k += every) {
+    const d = new Date(D.dates[idx[k]] + "T00:00:00");
+    dates += `<text x="${x(k)}" y="${H - 4}" text-anchor="middle">${d.toLocaleDateString("tr-TR", {month: "short", year: "2-digit"})}</text>`;
+  }
+  // skor şeridi
+  const sPath = idx.map((i, k) => `${k ? "L" : "M"}${x(k).toFixed(1)},${sy(D.score[i]).toFixed(1)}`).join("");
+  const thr = [S.thresholds.buy, 0, S.thresholds.sell].map(v =>
+    `<line x1="${L}" x2="${W - R}" y1="${sy(v)}" y2="${sy(v)}" stroke="${v ? (v > 0 ? "var(--al)" : "var(--sat)") : "var(--line)"}" stroke-dasharray="${v ? "3 3" : ""}" opacity="${v ? .7 : 1}"/><text x="${W - R + 6}" y="${sy(v) + 4}">${v > 0 ? "+" : ""}${v}</text>`).join("");
+  const lg = [["close", "Fiyat", "var(--ink)"], ["ema20", "EMA20", "var(--e20)"], ["ema50", "EMA50", "var(--e50)"], ["ema200", "EMA200", "var(--e200)"]]
+    .map(([, n, c]) => `<span><i style="background:${c}"></i>${n}</span>`).join("");
+  box.innerHTML = `<div class="rng">${RANGES.map(([l, v]) => `<button data-r="${v}" class="${v === chartRange ? "on" : ""}">${l}</button>`).join("")}
+      <div class="lg legend" style="margin:0">${lg}<span><i style="background:var(--al);opacity:.35;height:8px"></i>pozisyonda</span></div></div>
+    <svg width="${W}" height="${H}" style="display:block;max-width:100%">
+      ${shade}${grid}
+      <path d="${path("ema200")}" fill="none" stroke="var(--e200)" stroke-width="1.3"/>
+      <path d="${path("ema50")}" fill="none" stroke="var(--e50)" stroke-width="1.3"/>
+      <path d="${path("ema20")}" fill="none" stroke="var(--e20)" stroke-width="1.3"/>
+      <path d="${path("close")}" fill="none" stroke="var(--ink)" stroke-width="1.8"/>
+      ${marks}
+      <text x="${L}" y="${T + PH + GAP - 4}">Skor</text>${thr}
+      <path d="${sPath}" fill="none" stroke="var(--accent)" stroke-width="1.4"/>
+      ${dates}
+      <line class="cur" x1="0" x2="0" y1="${T}" y2="${T + PH + GAP + SH}" stroke="var(--muted)" stroke-dasharray="2 3" visibility="hidden"/>
+      <rect class="hit" x="${L}" y="${T}" width="${W - L - R}" height="${PH + GAP + SH}" fill="transparent"/>
+    </svg><div class="tip"></div>`;
+  box.querySelectorAll(".rng button").forEach(b => b.onclick = e => { e.stopPropagation(); chartRange = +b.dataset.r; drawStock(box, D); });
+  const tip = box.querySelector(".tip"), cur = box.querySelector(".cur"), hit = box.querySelector(".hit");
+  const move = ev => {
+    const r = hit.getBoundingClientRect(), px = (ev.touches ? ev.touches[0].clientX : ev.clientX) - r.left;
+    const k = Math.max(0, Math.min(idx.length - 1, Math.round(px / r.width * (idx.length - 1)))), i = idx[k];
+    cur.setAttribute("x1", x(k)); cur.setAttribute("x2", x(k)); cur.setAttribute("visibility", "visible");
+    tip.style.display = "block";
+    tip.innerHTML = `<b>${trDate(D.dates[i])}</b><br>Fiyat ${fmt(D.close[i])}<br>EMA20 ${fmt(D.ema20[i])} · EMA50 ${fmt(D.ema50[i])}<br>EMA200 ${fmt(D.ema200[i])}<br>Skor <b>${D.score[i] > 0 ? "+" : ""}${fmt(D.score[i], 0)}</b>`;
+    const tx = x(k) + 14 + tip.offsetWidth > W ? x(k) - tip.offsetWidth - 14 : x(k) + 14;
+    tip.style.left = tx + "px"; tip.style.top = "40px";
+  };
+  const leave = () => { tip.style.display = "none"; cur.setAttribute("visibility", "hidden"); };
+  hit.addEventListener("mousemove", move); hit.addEventListener("touchmove", move, {passive: true});
+  hit.addEventListener("mouseleave", leave); hit.addEventListener("touchend", leave);
+  box.onclick = e => e.stopPropagation();
+}
+
+function niceStep(raw) {
+  const p = Math.pow(10, Math.floor(Math.log10(raw))), f = raw / p;
+  return (f < 1.5 ? 1 : f < 3.5 ? 2 : f < 7.5 ? 5 : 10) * p;
 }
 
 function renderBacktest(b) {
@@ -214,6 +360,7 @@ function renderBacktest(b) {
   ];
   $("#pf").innerHTML = `<thead><tr><th>Portföy</th><th>Strateji</th><th>XU030</th><th>Nakit</th><th>Strateji OOS</th><th>XU030 OOS</th><th>Nakit OOS</th></tr></thead><tbody>` +
     rows.map(([n, k, f]) => `<tr><td>${n}</td><td>${f(P.full[k])}</td><td>${f(P.benchmark_full?.[k])}</td><td>${f(P.cash_full?.[k])}</td><td>${f(P.oos[k])}</td><td>${f(P.benchmark_oos?.[k])}</td><td>${f(P.cash_oos?.[k])}</td></tr>`).join("") + "</tbody>";
+  renderYearly(b.yearly || []);
   $("#trades").innerHTML = `<thead><tr><th>Son işlemler</th><th>Giriş</th><th>Çıkış</th><th>Getiri</th><th>Neden</th></tr></thead><tbody>` +
     b.recent_trades.slice(0, 8).map(t => `<tr><td class="tk">${t.ticker}</td><td>${t.entry_date.slice(5)}</td><td>${t.exit_date.slice(5)}</td><td>${pct(t.ret_pct)}</td><td>${t.exit_reason}</td></tr>`).join("") + "</tbody>";
   $("#stocks").innerHTML = `<thead><tr><th>Hisse</th><th>Strateji</th><th>Al-tut</th><th>OOS</th><th>İşlem</th><th>Kazanma</th><th>Kâr faktörü</th><th>Maks. düşüş</th><th>Sharpe</th></tr></thead><tbody>` +
@@ -221,6 +368,22 @@ function renderBacktest(b) {
       <td>${pct(s.strategy.total_return_pct, 0)}</td><td>${pct(s.buy_hold_pct, 0)}</td><td>${pct(s.oos.total_return_pct, 0)}</td>
       <td>${s.strategy.trades}</td><td>${fmt(s.strategy.win_rate_pct, 0)}%</td><td>${fmt(s.strategy.profit_factor)}</td>
       <td>${pct(s.strategy.max_drawdown_pct, 0)}</td><td>${fmt(s.strategy.sharpe)}</td></tr>`).join("") + "</tbody>";
+}
+
+function renderYearly(rows) {
+  const short = iso => new Date(iso + "T00:00:00").toLocaleDateString("tr-TR", {day: "numeric", month: "short"});
+  const cols = [["strategy", "Strateji"], ["benchmark", "XU030 al-tut"], ["cash", "Nakit (faiz)"]];
+  const wins = Object.fromEntries(cols.map(([k]) => [k, 0]));
+  const body = rows.map(r => {
+    const best = cols.map(([k]) => r[k]).filter(v => v != null).reduce((a, b) => Math.max(a, b), -Infinity);
+    if (!r.partial) cols.forEach(([k]) => { if (r[k] === best) wins[k]++; });
+    return `<tr><td><b>${r.year}</b>${r.partial ? `<span class="nm">${short(r.from)} – ${short(r.to)}</span>` : ""}</td>` +
+      cols.map(([k]) => `<td class="${r[k] === best ? "best" : ""}">${pct(r[k])}</td>`).join("") +
+      `<td>${r.strategy != null && r.benchmark != null ? pct(r.strategy - r.benchmark) : "–"}</td></tr>`;
+  }).join("");
+  $("#yearly").innerHTML = `<thead><tr><th>Yıl</th>${cols.map(([, n]) => `<th>${n}</th>`).join("")}<th>Strateji − XU030</th></tr></thead><tbody>${body}</tbody>` +
+    `<tfoot><tr><td class="muted small" colspan="5" style="text-align:left">Tam yıllarda birinci olma sayısı: ` +
+    cols.map(([k, n]) => `${n} <b>${wins[k]}</b>`).join(" · ") + `</td></tr></tfoot>`;
 }
 
 function drawChart(c, oos) {
@@ -264,6 +427,8 @@ $("#sig tbody").addEventListener("click", e => {
   const tr = e.target.closest("tr.row"); if (!tr) return;
   openRow = openRow === tr.dataset.t ? null : tr.dataset.t; renderSignals();
 });
+let rsz;
+addEventListener("resize", () => { clearTimeout(rsz); rsz = setTimeout(() => { fitDetail(); if (openRow && STOCK[openRow]) drawStock(document.getElementById("sc-" + openRow), STOCK[openRow]); }, 150); });
 load();
 </script>
 </body>

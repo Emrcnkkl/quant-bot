@@ -32,6 +32,7 @@ import argparse
 import json
 import math
 import os
+import re
 import sys
 from datetime import datetime, timezone, timedelta
 
@@ -74,27 +75,27 @@ CFG = {
     "real_rate_max": None,      # reel faiz (politika − yıllık TÜFE) bunun üstündeyse yeni alım yok; None = filtre kapalı
 }
 
-# TCMB politika faizi (bir hafta vadeli repo), yıllık %. (yürürlük tarihi, oran)
-# Nakitte bekleyen para bu orandan günlük bileşik faiz kazanır.
-# Yeni PPK kararlarında listeye satır ekleyin; son oran sonraki günlere taşınır.
-# 2026 kararları henüz eklenmedi -> son satırı TCMB duyurularına göre kontrol edin.
+# TCMB politika faizi (bir hafta vadeli repo, borç verme), yıllık %. (yürürlük tarihi, oran)
+# Kaynak: tcmb.gov.tr → Merkez Bankası Faiz Oranları → 1 Hafta Repo.
+# Bot her gerçek çalıştırmada bu tabloyu TCMB sitesinden günceller (fetch_macro);
+# siteye ulaşılamazsa aşağıdaki yerleşik tablo kullanılır.
 POLICY_RATES = [
-    ("2020-05-21", 8.25), ("2020-09-24", 10.25), ("2020-11-19", 15.00),
-    ("2020-12-24", 17.00), ("2021-03-18", 19.00), ("2021-09-23", 18.00),
-    ("2021-10-21", 16.00), ("2021-11-18", 15.00), ("2021-12-16", 14.00),
-    ("2022-08-18", 13.00), ("2022-09-22", 12.00), ("2022-10-20", 10.50),
-    ("2022-11-24", 9.00), ("2023-02-23", 8.50), ("2023-06-22", 15.00),
-    ("2023-07-20", 17.50), ("2023-08-24", 25.00), ("2023-09-21", 30.00),
-    ("2023-10-26", 35.00), ("2023-11-23", 40.00), ("2023-12-21", 42.50),
-    ("2024-01-25", 45.00), ("2024-03-21", 50.00), ("2024-12-26", 47.50),
-    ("2025-01-23", 45.00), ("2025-03-06", 42.50), ("2025-04-17", 46.00),
-    ("2025-07-24", 43.00), ("2025-09-11", 40.50), ("2025-10-23", 39.50),
-    ("2025-12-11", 38.00),
+    ("2020-05-22", 8.25), ("2020-09-25", 10.25), ("2020-11-20", 15.00),
+    ("2020-12-25", 17.00), ("2021-03-19", 19.00), ("2021-09-24", 18.00),
+    ("2021-10-22", 16.00), ("2021-11-19", 15.00), ("2021-12-17", 14.00),
+    ("2022-08-19", 13.00), ("2022-09-23", 12.00), ("2022-10-21", 10.50),
+    ("2022-11-25", 9.00), ("2023-02-24", 8.50), ("2023-06-23", 15.00),
+    ("2023-07-21", 17.50), ("2023-08-25", 25.00), ("2023-09-22", 30.00),
+    ("2023-10-27", 35.00), ("2023-11-24", 40.00), ("2023-12-22", 42.50),
+    ("2024-01-26", 45.00), ("2024-03-22", 50.00), ("2024-12-27", 47.50),
+    ("2025-01-24", 45.00), ("2025-03-07", 42.50), ("2025-04-18", 46.00),
+    ("2025-07-25", 43.00), ("2025-09-12", 40.50), ("2025-10-24", 39.50),
+    ("2025-12-12", 38.00), ("2026-01-23", 37.00), ("2026-10-23", 36.00),
 ]
 
-# TÜİK yıllık TÜFE (%), ay -> oran. Veri ayın bitiminden ~3 gün sonra açıklanır;
-# ileriye bakmamak için her ay verisi bir sonraki ayın 5'inden itibaren kullanılır.
-# Her ay yeni satır ekleyin. 2026 verileri henüz eklenmedi.
+# TÜİK yıllık TÜFE (%), ay -> oran. Kaynak: tcmb.gov.tr → Enflasyon Verileri → Tüketici Fiyatları.
+# Veri ayın bitiminden ~3 gün sonra açıklanır; ileriye bakmamak için her ay verisi
+# bir sonraki ayın 5'inden itibaren kullanılır. fetch_macro() bu tabloyu da günceller.
 CPI_YOY = {
     "2020-09": 11.75, "2020-10": 11.89, "2020-11": 14.03, "2020-12": 14.60,
     "2021-01": 14.97, "2021-02": 15.61, "2021-03": 16.19, "2021-04": 17.14,
@@ -112,7 +113,15 @@ CPI_YOY = {
     "2025-01": 42.12, "2025-02": 39.05, "2025-03": 38.10, "2025-04": 37.86,
     "2025-05": 35.41, "2025-06": 35.05, "2025-07": 33.52, "2025-08": 32.95,
     "2025-09": 33.29, "2025-10": 32.87, "2025-11": 31.07, "2025-12": 30.89,
+    "2026-01": 30.65, "2026-02": 31.53, "2026-03": 30.87, "2026-04": 32.37,
+    "2026-05": 32.61, "2026-06": 32.11, "2026-07": 31.75, "2026-08": 31.51,
+    "2026-09": 29.73, "2026-10": 29.77,
 }
+MACRO_SOURCE = "yerleşik tablo"   # fetch_macro başarılı olursa "TCMB (canlı)" olur
+
+TCMB = "https://www.tcmb.gov.tr/wps/wcm/connect/TR/TCMB+TR/Main+Menu/"
+TCMB_REPO_URL = TCMB + "Temel+Faaliyetler/Para+Politikasi/Merkez+Bankasi+Faiz+Oranlari/1+Hafta+Repo"
+TCMB_CPI_URL = TCMB + "Istatistikler/Enflasyon+Verileri/Tuketici+Fiyatlari"
 
 TR_TZ = timezone(timedelta(hours=3))
 OUT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -169,6 +178,35 @@ def fetch_demo(tickers: list[str]) -> dict[str, pd.DataFrame]:
         data[t] = pd.DataFrame({"Open": open_, "High": hi, "Low": lo,
                                 "Close": close, "Volume": vol}, index=idx)
     return data
+
+
+def _page_text(url: str) -> str:
+    import html
+    import urllib.request
+    req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 (bist30-bot)"})
+    with urllib.request.urlopen(req, timeout=30) as r:
+        raw = r.read().decode("utf-8", errors="ignore")
+    raw = re.sub(r"(?s)<(script|style).*?</\1>", " ", raw)
+    return re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", raw)))
+
+
+def fetch_macro() -> None:
+    """Politika faizi ve TÜFE tablolarını TCMB sitesinden günceller.
+    Başarısız olursa (internet yok, sayfa yapısı değişti...) yerleşik tablolar kalır."""
+    global POLICY_RATES, CPI_YOY, MACRO_SOURCE
+    try:
+        rows = re.findall(r"(\d{2})\.(\d{2})\.(\d{4}) - (\d+\.\d+)", _page_text(TCMB_REPO_URL))
+        rates = sorted((f"{y}-{m}-{d}", float(v)) for d, m, y, v in rows)
+        cpi = {f"{y}-{m}": float(v) for m, y, v in
+               re.findall(r"\b(\d{2})-(\d{4}) (-?\d+\.\d+) -?\d+\.\d+", _page_text(TCMB_CPI_URL))}
+        # Basit akıl sağlığı kontrolü: yerleşik tablodaki son kayıtları içermeli
+        if len(rates) < 30 or POLICY_RATES[-1] not in rates or len(cpi) < 60 or max(cpi) < max(CPI_YOY):
+            raise ValueError(f"beklenmeyen içerik ({len(rates)} faiz, {len(cpi)} TÜFE satırı)")
+        POLICY_RATES, CPI_YOY, MACRO_SOURCE = rates, cpi, "TCMB (canlı)"
+        print(f"  ✓ TCMB: politika faizi %{rates[-1][1]} ({rates[-1][0]}), "
+              f"TÜFE %{cpi[max(cpi)]} ({max(cpi)})")
+    except Exception as e:  # noqa: BLE001
+        print(f"  ! TCMB verisi alınamadı, yerleşik tablo kullanılıyor: {e}", file=sys.stderr)
 
 
 # --------------------------------------------------------------------------- #
@@ -473,6 +511,8 @@ def r2(x):
 def run(demo: bool) -> None:
     tickers = list(BIST30)
     print(f"BIST30 sinyal botu — {'DEMO (sentetik veri)' if demo else 'gerçek veri'}")
+    if not demo:
+        fetch_macro()
     fetch = fetch_demo if demo else fetch_real
     data = fetch(tickers + [BENCHMARK])
     bench = data.pop(BENCHMARK, None)
@@ -541,6 +581,7 @@ def run(demo: bool) -> None:
         })
         for tr_ in bt["trades"][-5:]:
             recent_trades.append({"ticker": t, **tr_})
+        write_stock_chart(t, d, sc["score"], bt)
 
     if not signals:
         sys.exit("Hiç veri işlenemedi. İnternet bağlantısını ve yfinance kurulumunu kontrol edin.")
@@ -581,7 +622,7 @@ def run(demo: bool) -> None:
     mf = macro_frame(today).iloc[0]
     regime = {
         "policy_rate": r2(mf["policy"]), "cpi_yoy": r2(mf["cpi"]), "real_rate": r2(mf["real"]),
-        "policy_date": POLICY_RATES[-1][0], "cpi_month": max(CPI_YOY),
+        "policy_date": POLICY_RATES[-1][0], "cpi_month": max(CPI_YOY), "source": MACRO_SOURCE,
         "filter_max": CFG["real_rate_max"],
         "blocking": bool(CFG["real_rate_max"] is not None and mf["real"] > CFG["real_rate_max"]),
     }
@@ -606,6 +647,7 @@ def run(demo: bool) -> None:
             "cash_oos": {**metrics(cash.iloc[split:]), "sharpe": None},
         },
         "equity_curve": curve,
+        "yearly": yearly_table(port, bench_eq.pct_change().fillna(0) if bench_eq is not None else None, cash),
         "stocks": sorted(per_stock, key=lambda x: -(x["strategy"].get("total_return_pct") or 0)),
         "recent_trades": sorted(recent_trades, key=lambda x: x["exit_date"], reverse=True)[:40],
     })
@@ -631,11 +673,43 @@ def run(demo: bool) -> None:
           f"Sharpe {pf['sharpe']}")
 
 
-def write(name: str, obj) -> None:
+def yearly_table(port: pd.Series, bench: pd.Series | None, cash: pd.Series) -> list[dict]:
+    """Takvim yılı bazında strateji / XU030 / nakit getirisi (%). Eksik yıllar `partial` işaretli."""
+    out = []
+    for year, p in port.groupby(port.index.year):
+        def ret(s):
+            return None if s is None else r2(((1 + s.loc[p.index].fillna(0)).prod() - 1) * 100)
+        out.append({
+            "year": int(year), "from": str(p.index[0].date()), "to": str(p.index[-1].date()),
+            "partial": bool(p.index[0].month > 1 or p.index[0].day > 10 or p.index[-1].month < 12),
+            "strategy": ret(p), "benchmark": ret(bench), "cash": ret(cash),
+        })
+    return out
+
+
+def write_stock_chart(t: str, d: pd.DataFrame, score: pd.Series, bt: dict, days: int = 500) -> None:
+    """Sayfadaki hisse detay grafiği için son ~2 yılın fiyat, EMA, skor ve işlem verisi."""
+    w = d.iloc[-days:]
+    start = str(w.index[0].date())
+    col = lambda s: [r2(x) for x in s]  # noqa: E731
+    write(f"stocks/{t}.json", {
+        "ticker": t, "name": BIST30[t],
+        "dates": [str(x.date()) for x in w.index],
+        "close": col(w["Close"]), "ema20": col(w["ema20"]), "ema50": col(w["ema50"]),
+        "ema200": col(w["ema200"]), "score": [round(float(x), 1) for x in score.iloc[-days:]],
+        "trades": [x for x in bt["trades"] if x["exit_date"] >= start],
+        "open": bt["open"],
+    }, quiet=True)
+
+
+def write(name: str, obj, quiet: bool = False) -> None:
     path = os.path.join(OUT_DIR, name)
+    os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:
-        json.dump(obj, f, ensure_ascii=False, indent=1, allow_nan=False)
-    print(f"  → {name}")
+        json.dump(obj, f, ensure_ascii=False, indent=None if quiet else 1,
+                  separators=(",", ":") if quiet else None, allow_nan=False)
+    if not quiet:
+        print(f"  → {name}")
 
 
 if __name__ == "__main__":
