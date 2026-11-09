@@ -18,7 +18,9 @@ ve sonuçları statik bir web sayfasında gösteren bir bot. Şu an **Aşama 1**
 - Site arkadaşlara açılacak → genel kitleye yönelik: koyu tema varsayılan (açık tema `prefers-color-scheme: light`),
   üstte sabit menü (Bugün / Sinyaller / Performans / Nasıl çalışır / SSS), "yatırım tavsiyesi değildir" bandı,
   "100.000 ₺ ile başlasaydı" özet kartı (endeks ve faizle dürüst kıyas), sade dil (Puan, Zarar-kes, modelde...).
-  Tasarım referansı kullanıcının diğer projesi (emrcnkkl.github.io/anlik_bot). Kalan fikir: sinyal geçmişi listesi.
+  Tasarım referansı kullanıcının diğer projesi (emrcnkkl.github.io/anlik_bot).
+- Sinyal geçmişi: "Son sinyal değişiklikleri" (Sinyaller bölümü, `#gecmis`) — son 30 işlem günündeki AL/TUT/SAT geçişleri,
+  geçmiş fiyatlardan yeniden hesaplanır (`signal_changes()`); history.json'a bağlı değil.
 - Bulgular: strateji test döneminde endeksle başa baş, düşüşü ~1/3; ama 2024 sonrası faizin gerisinde
   (`docs/duyarlilik-analizi.md`, `docs/reel-faiz-filtresi.md`).
 
@@ -90,7 +92,7 @@ Bilgi amaçlı stop = kapanış − 2.5×ATR, hedef = kapanış + 4×ATR. Pozisy
 
 ### Tüm ayarlar
 `bot.py` başındaki `CFG` sözlüğü: history_period, warmup_days, buy/sell_threshold, exit_score,
-stop_atr, target_atr, commission, slippage, oos_fraction, min_bars, cash_rate_factor (0 = faiz yok),
+stop_atr, target_atr, commission, slippage, oos_fraction, min_bars, cash_rate_factor (0 = faiz yok), changes_days (30),
 real_rate_max (None = kapalı; reel faiz bunun üstündeyse yeni alım yok — `entry_allowed()`, `macro_frame()`).
 
 `POLICY_RATES` (TCMB 1 hafta repo, yürürlük tarihi) ve `CPI_YOY` (yıllık TÜFE) yerleşik tablolar; gerçek çalıştırmada
@@ -98,7 +100,8 @@ real_rate_max (None = kapalı; reel faiz bunun üstündeyse yeni alım yok — `
 `regime.source` bunu gösterir. Yerleşik tabloları ara ara canlı veriyle eşitle.
 
 ## JSON şemaları (index.html bunlara bağımlı — alan adı değiştirirken sayfayı da güncelle)
-**signals.json**: `generated_at, data_date, demo, universe, thresholds{buy,sell}, disclaimer, regime{policy_rate,cpi_yoy,real_rate,policy_date,cpi_month,source,filter_max,blocking}, counts{AL,TUT,SAT}, signals[]`
+**signals.json**: `generated_at, data_date, demo, universe, thresholds{buy,sell}, disclaimer, regime{policy_rate,cpi_yoy,real_rate,policy_date,cpi_month,source,filter_max,blocking}, counts{AL,TUT,SAT}, signals[], changes_days, changes_dates[], changes[]`
+- `changes[]`: `date, ticker, name, from, to, score, close, since_pct` (yeniden eskiye)
 - `signals[]`: `ticker, name, date, close, change_pct, score, signal, state, score_5d_ago, components{ema200,...}, rsi, adx, atr_pct, stop, target, position{entry_date,entry_price,last_price,stop,pnl_pct,days}|null, reasons[]`
 
 **backtest.json**: meta alanları + `settings, period{start,end,oos_start}, portfolio{full,oos,benchmark_full,benchmark_oos,cash_full,cash_oos}, equity_curve[{date,strategy,benchmark,cash}] (haftalık), yearly[{year,from,to,partial,strategy,benchmark,cash}], stocks[{ticker,name,strategy,oos,buy_hold_pct}], recent_trades[]`
@@ -131,5 +134,5 @@ real_rate_max (None = kapalı; reel faiz bunun üstündeyse yeni alım yok — `
 5. ~~Duyarlılık analizi~~ — yapıldı (`sensitivity.py`, sonuç `docs/duyarlilik-analizi.md`): sonuç ayarlara duyarsız, ayar oynamak OOS'u iyileştirmiyor, hiçbir ayar OOS'ta faizi geçmiyor → mevcut ayarlar korunuyor.
 6. ~~Reel faiz filtresi~~ — kodda var, varsayılan kapalı (`docs/reel-faiz-filtresi.md`). Haftalık trend / XU030 EMA200 rejim filtresi denenmedi.
 7. Sinyal değişimlerinde Telegram bildirimi (yalnızca AL↔TUT↔SAT değişince).
-8. ~~Hisse detay grafiği~~ — yapıldı. Sırada: history.json'dan sinyal geçmişi (son günlerde AL'a dönen / çıkan hisseler).
+8. ~~Hisse detay grafiği~~ ve ~~sinyal geçmişi listesi~~ — yapıldı.
 9. Ocak 2027'de BIST30 listesini güncelle.

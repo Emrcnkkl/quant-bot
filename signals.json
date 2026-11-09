@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-09T06:47+03:00",
+ "generated_at": "2026-11-09T08:21+03:00",
  "data_date": "2026-11-06",
  "demo": false,
  "universe": "BIST 30 (Ekim-Aralık 2026)",
@@ -1081,6 +1081,1582 @@
     "MACD histogramı negatif",
     "Düşüşte yüksek hacim (ort. 1.9x)"
    ]
+  }
+ ],
+ "changes_days": 30,
+ "changes_dates": [
+  "2026-09-24",
+  "2026-09-25",
+  "2026-09-28",
+  "2026-09-29",
+  "2026-09-30",
+  "2026-10-01",
+  "2026-10-02",
+  "2026-10-05",
+  "2026-10-06",
+  "2026-10-07",
+  "2026-10-08",
+  "2026-10-09",
+  "2026-10-12",
+  "2026-10-13",
+  "2026-10-14",
+  "2026-10-15",
+  "2026-10-16",
+  "2026-10-19",
+  "2026-10-20",
+  "2026-10-21",
+  "2026-10-22",
+  "2026-10-23",
+  "2026-10-26",
+  "2026-10-27",
+  "2026-10-28",
+  "2026-10-30",
+  "2026-11-02",
+  "2026-11-03",
+  "2026-11-04",
+  "2026-11-05",
+  "2026-11-06"
+ ],
+ "changes": [
+  {
+   "date": "2026-11-06",
+   "ticker": "YKBNK",
+   "name": "Yapı Kredi",
+   "from": "TUT",
+   "to": "AL",
+   "score": 48.7,
+   "close": 37.24,
+   "since_pct": 0.0
+  },
+  {
+   "date": "2026-11-06",
+   "ticker": "THYAO",
+   "name": "Türk Hava Yolları",
+   "from": "TUT",
+   "to": "AL",
+   "score": 44.8,
+   "close": 299.25,
+   "since_pct": 0.0
+  },
+  {
+   "date": "2026-11-06",
+   "ticker": "FROTO",
+   "name": "Ford Otosan",
+   "from": "SAT",
+   "to": "TUT",
+   "score": 22.0,
+   "close": 73.15,
+   "since_pct": 0.0
+  },
+  {
+   "date": "2026-11-06",
+   "ticker": "TOASO",
+   "name": "Tofaş",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -14.7,
+   "close": 243.0,
+   "since_pct": 0.0
+  },
+  {
+   "date": "2026-11-06",
+   "ticker": "EKGYO",
+   "name": "Emlak Konut GYO",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -20.0,
+   "close": 17.66,
+   "since_pct": 0.0
+  },
+  {
+   "date": "2026-11-06",
+   "ticker": "TUPRS",
+   "name": "Tüpraş",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -23.7,
+   "close": 337.5,
+   "since_pct": 0.0
+  },
+  {
+   "date": "2026-11-06",
+   "ticker": "MGROS",
+   "name": "Migros",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -25.0,
+   "close": 468.75,
+   "since_pct": 0.0
+  },
+  {
+   "date": "2026-11-06",
+   "ticker": "TRMET",
+   "name": "TR Anadolu Metal Madencilik",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -32.6,
+   "close": 111.9,
+   "since_pct": 0.0
+  },
+  {
+   "date": "2026-11-06",
+   "ticker": "TRALT",
+   "name": "Türk Altın İşletmeleri",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -35.0,
+   "close": 38.14,
+   "since_pct": 0.0
+  },
+  {
+   "date": "2026-11-06",
+   "ticker": "TTKOM",
+   "name": "Türk Telekom",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -43.5,
+   "close": 48.16,
+   "since_pct": 0.0
+  },
+  {
+   "date": "2026-11-06",
+   "ticker": "SISE",
+   "name": "Şişecam",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -66.0,
+   "close": 34.24,
+   "since_pct": 0.0
+  },
+  {
+   "date": "2026-11-05",
+   "ticker": "TAVHL",
+   "name": "TAV Havalimanları",
+   "from": "TUT",
+   "to": "AL",
+   "score": 60.9,
+   "close": 291.0,
+   "since_pct": 1.2
+  },
+  {
+   "date": "2026-11-05",
+   "ticker": "TTKOM",
+   "name": "Türk Telekom",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -14.9,
+   "close": 49.28,
+   "since_pct": -2.27
+  },
+  {
+   "date": "2026-11-05",
+   "ticker": "SAHOL",
+   "name": "Sabancı Holding",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -20.8,
+   "close": 85.1,
+   "since_pct": 2.59
+  },
+  {
+   "date": "2026-11-05",
+   "ticker": "AEFES",
+   "name": "Anadolu Efes",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -21.2,
+   "close": 16.77,
+   "since_pct": 0.48
+  },
+  {
+   "date": "2026-11-05",
+   "ticker": "TUPRS",
+   "name": "Tüpraş",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -40.7,
+   "close": 331.75,
+   "since_pct": 1.73
+  },
+  {
+   "date": "2026-11-05",
+   "ticker": "TCELL",
+   "name": "Turkcell",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -42.0,
+   "close": 91.8,
+   "since_pct": -1.96
+  },
+  {
+   "date": "2026-11-05",
+   "ticker": "FROTO",
+   "name": "Ford Otosan",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -42.4,
+   "close": 67.85,
+   "since_pct": 7.81
+  },
+  {
+   "date": "2026-11-05",
+   "ticker": "ASELS",
+   "name": "Aselsan",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -47.9,
+   "close": 329.0,
+   "since_pct": 0.84
+  },
+  {
+   "date": "2026-11-05",
+   "ticker": "KRDMD",
+   "name": "Kardemir (D)",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -73.4,
+   "close": 36.72,
+   "since_pct": -1.53
+  },
+  {
+   "date": "2026-11-04",
+   "ticker": "GARAN",
+   "name": "Garanti BBVA",
+   "from": "TUT",
+   "to": "AL",
+   "score": 65.5,
+   "close": 137.5,
+   "since_pct": 4.95
+  },
+  {
+   "date": "2026-11-04",
+   "ticker": "YKBNK",
+   "name": "Yapı Kredi",
+   "from": "SAT",
+   "to": "TUT",
+   "score": 17.1,
+   "close": 35.88,
+   "since_pct": 3.79
+  },
+  {
+   "date": "2026-11-04",
+   "ticker": "KCHOL",
+   "name": "Koç Holding",
+   "from": "SAT",
+   "to": "TUT",
+   "score": 3.1,
+   "close": 203.0,
+   "since_pct": 1.53
+  },
+  {
+   "date": "2026-11-04",
+   "ticker": "KRDMD",
+   "name": "Kardemir (D)",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -5.2,
+   "close": 40.8,
+   "since_pct": -11.37
+  },
+  {
+   "date": "2026-11-04",
+   "ticker": "BIMAS",
+   "name": "BİM Mağazalar",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -15.7,
+   "close": 372.5,
+   "since_pct": -0.2
+  },
+  {
+   "date": "2026-11-04",
+   "ticker": "TCELL",
+   "name": "Turkcell",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -16.5,
+   "close": 93.95,
+   "since_pct": -4.2
+  },
+  {
+   "date": "2026-11-04",
+   "ticker": "PGSUS",
+   "name": "Pegasus",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -18.0,
+   "close": 134.6,
+   "since_pct": 5.2
+  },
+  {
+   "date": "2026-11-04",
+   "ticker": "FROTO",
+   "name": "Ford Otosan",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -27.8,
+   "close": 68.65,
+   "since_pct": 6.55
+  },
+  {
+   "date": "2026-11-04",
+   "ticker": "SISE",
+   "name": "Şişecam",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -29.4,
+   "close": 35.6,
+   "since_pct": -3.82
+  },
+  {
+   "date": "2026-11-04",
+   "ticker": "AKBNK",
+   "name": "Akbank",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -30.3,
+   "close": 66.2,
+   "since_pct": 3.7
+  },
+  {
+   "date": "2026-11-04",
+   "ticker": "VAKBN",
+   "name": "VakıfBank",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -35.9,
+   "close": 31.5,
+   "since_pct": 4.95
+  },
+  {
+   "date": "2026-11-03",
+   "ticker": "TUPRS",
+   "name": "Tüpraş",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -30.0,
+   "close": 338.25,
+   "since_pct": -0.22
+  },
+  {
+   "date": "2026-11-03",
+   "ticker": "THYAO",
+   "name": "Türk Hava Yolları",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -37.8,
+   "close": 265.0,
+   "since_pct": 12.92
+  },
+  {
+   "date": "2026-11-03",
+   "ticker": "YKBNK",
+   "name": "Yapı Kredi",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -50.2,
+   "close": 34.7,
+   "since_pct": 7.32
+  },
+  {
+   "date": "2026-11-02",
+   "ticker": "ENKAI",
+   "name": "Enka İnşaat",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -21.7,
+   "close": 80.05,
+   "since_pct": 1.0
+  },
+  {
+   "date": "2026-11-02",
+   "ticker": "YKBNK",
+   "name": "Yapı Kredi",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -29.4,
+   "close": 35.64,
+   "since_pct": 4.49
+  },
+  {
+   "date": "2026-11-02",
+   "ticker": "TAVHL",
+   "name": "TAV Havalimanları",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -33.6,
+   "close": 262.0,
+   "since_pct": 12.4
+  },
+  {
+   "date": "2026-11-02",
+   "ticker": "GARAN",
+   "name": "Garanti BBVA",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -34.1,
+   "close": 129.3,
+   "since_pct": 11.6
+  },
+  {
+   "date": "2026-11-02",
+   "ticker": "ISCTR",
+   "name": "İş Bankası (C)",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -34.7,
+   "close": 12.32,
+   "since_pct": 7.87
+  },
+  {
+   "date": "2026-11-02",
+   "ticker": "TUPRS",
+   "name": "Tüpraş",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -40.0,
+   "close": 337.0,
+   "since_pct": 0.15
+  },
+  {
+   "date": "2026-10-30",
+   "ticker": "ENKAI",
+   "name": "Enka İnşaat",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -40.1,
+   "close": 76.65,
+   "since_pct": 5.48
+  },
+  {
+   "date": "2026-10-30",
+   "ticker": "KCHOL",
+   "name": "Koç Holding",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -63.5,
+   "close": 192.8,
+   "since_pct": 6.9
+  },
+  {
+   "date": "2026-10-28",
+   "ticker": "ENKAI",
+   "name": "Enka İnşaat",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -26.3,
+   "close": 78.45,
+   "since_pct": 3.06
+  },
+  {
+   "date": "2026-10-28",
+   "ticker": "SAHOL",
+   "name": "Sabancı Holding",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -45.4,
+   "close": 83.25,
+   "since_pct": 4.86
+  },
+  {
+   "date": "2026-10-28",
+   "ticker": "YKBNK",
+   "name": "Yapı Kredi",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -53.6,
+   "close": 34.48,
+   "since_pct": 8.0
+  },
+  {
+   "date": "2026-10-27",
+   "ticker": "ASELS",
+   "name": "Aselsan",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -4.5,
+   "close": 340.75,
+   "since_pct": -2.64
+  },
+  {
+   "date": "2026-10-27",
+   "ticker": "TAVHL",
+   "name": "TAV Havalimanları",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -55.4,
+   "close": 264.75,
+   "since_pct": 11.24
+  },
+  {
+   "date": "2026-10-27",
+   "ticker": "BIMAS",
+   "name": "BİM Mağazalar",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -76.8,
+   "close": 363.0,
+   "since_pct": 2.41
+  },
+  {
+   "date": "2026-10-26",
+   "ticker": "KCHOL",
+   "name": "Koç Holding",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -21.7,
+   "close": 200.6,
+   "since_pct": 2.74
+  },
+  {
+   "date": "2026-10-23",
+   "ticker": "BIMAS",
+   "name": "BİM Mağazalar",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -22.2,
+   "close": 373.0,
+   "since_pct": -0.34
+  },
+  {
+   "date": "2026-10-23",
+   "ticker": "GARAN",
+   "name": "Garanti BBVA",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -55.7,
+   "close": 126.5,
+   "since_pct": 14.07
+  },
+  {
+   "date": "2026-10-23",
+   "ticker": "KRDMD",
+   "name": "Kardemir (D)",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -69.0,
+   "close": 38.6,
+   "since_pct": -6.32
+  },
+  {
+   "date": "2026-10-23",
+   "ticker": "VAKBN",
+   "name": "VakıfBank",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -75.0,
+   "close": 30.06,
+   "since_pct": 9.98
+  },
+  {
+   "date": "2026-10-22",
+   "ticker": "GARAN",
+   "name": "Garanti BBVA",
+   "from": "AL",
+   "to": "TUT",
+   "score": 11.3,
+   "close": 128.5,
+   "since_pct": 12.3
+  },
+  {
+   "date": "2026-10-22",
+   "ticker": "YKBNK",
+   "name": "Yapı Kredi",
+   "from": "AL",
+   "to": "TUT",
+   "score": 5.0,
+   "close": 35.32,
+   "since_pct": 5.44
+  },
+  {
+   "date": "2026-10-22",
+   "ticker": "TAVHL",
+   "name": "TAV Havalimanları",
+   "from": "AL",
+   "to": "TUT",
+   "score": 3.5,
+   "close": 267.0,
+   "since_pct": 10.3
+  },
+  {
+   "date": "2026-10-22",
+   "ticker": "BIMAS",
+   "name": "BİM Mağazalar",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -41.0,
+   "close": 369.0,
+   "since_pct": 0.75
+  },
+  {
+   "date": "2026-10-22",
+   "ticker": "ISCTR",
+   "name": "İş Bankası (C)",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -55.7,
+   "close": 12.42,
+   "since_pct": 7.0
+  },
+  {
+   "date": "2026-10-22",
+   "ticker": "ASELS",
+   "name": "Aselsan",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -57.3,
+   "close": 338.25,
+   "since_pct": -1.92
+  },
+  {
+   "date": "2026-10-22",
+   "ticker": "KCHOL",
+   "name": "Koç Holding",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -73.4,
+   "close": 196.1,
+   "since_pct": 5.1
+  },
+  {
+   "date": "2026-10-22",
+   "ticker": "EREGL",
+   "name": "Ereğli Demir Çelik",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -75.7,
+   "close": 35.1,
+   "since_pct": -11.51
+  },
+  {
+   "date": "2026-10-21",
+   "ticker": "EKGYO",
+   "name": "Emlak Konut GYO",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -54.6,
+   "close": 18.57,
+   "since_pct": -4.9
+  },
+  {
+   "date": "2026-10-21",
+   "ticker": "AKBNK",
+   "name": "Akbank",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -63.7,
+   "close": 67.2,
+   "since_pct": 2.16
+  },
+  {
+   "date": "2026-10-20",
+   "ticker": "TAVHL",
+   "name": "TAV Havalimanları",
+   "from": "TUT",
+   "to": "AL",
+   "score": 90.0,
+   "close": 286.25,
+   "since_pct": 2.88
+  },
+  {
+   "date": "2026-10-20",
+   "ticker": "GARAN",
+   "name": "Garanti BBVA",
+   "from": "TUT",
+   "to": "AL",
+   "score": 71.9,
+   "close": 134.6,
+   "since_pct": 7.21
+  },
+  {
+   "date": "2026-10-20",
+   "ticker": "SAHOL",
+   "name": "Sabancı Holding",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -18.4,
+   "close": 89.2,
+   "since_pct": -2.13
+  },
+  {
+   "date": "2026-10-20",
+   "ticker": "BIMAS",
+   "name": "BİM Mağazalar",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -19.2,
+   "close": 385.5,
+   "since_pct": -3.57
+  },
+  {
+   "date": "2026-10-20",
+   "ticker": "EKGYO",
+   "name": "Emlak Konut GYO",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -29.9,
+   "close": 19.03,
+   "since_pct": -7.2
+  },
+  {
+   "date": "2026-10-20",
+   "ticker": "ASELS",
+   "name": "Aselsan",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -30.3,
+   "close": 342.75,
+   "since_pct": -3.21
+  },
+  {
+   "date": "2026-10-20",
+   "ticker": "AKBNK",
+   "name": "Akbank",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -37.3,
+   "close": 68.3,
+   "since_pct": 0.51
+  },
+  {
+   "date": "2026-10-19",
+   "ticker": "YKBNK",
+   "name": "Yapı Kredi",
+   "from": "TUT",
+   "to": "AL",
+   "score": 54.3,
+   "close": 36.1,
+   "since_pct": 3.16
+  },
+  {
+   "date": "2026-10-19",
+   "ticker": "BIMAS",
+   "name": "BİM Mağazalar",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -40.2,
+   "close": 371.0,
+   "since_pct": 0.2
+  },
+  {
+   "date": "2026-10-19",
+   "ticker": "EKGYO",
+   "name": "Emlak Konut GYO",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -66.9,
+   "close": 18.25,
+   "since_pct": -3.23
+  },
+  {
+   "date": "2026-10-19",
+   "ticker": "ASELS",
+   "name": "Aselsan",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -80.8,
+   "close": 322.25,
+   "since_pct": 2.95
+  },
+  {
+   "date": "2026-10-16",
+   "ticker": "VAKBN",
+   "name": "VakıfBank",
+   "from": "AL",
+   "to": "TUT",
+   "score": 25.0,
+   "close": 32.86,
+   "since_pct": 0.61
+  },
+  {
+   "date": "2026-10-16",
+   "ticker": "YKBNK",
+   "name": "Yapı Kredi",
+   "from": "AL",
+   "to": "TUT",
+   "score": 14.0,
+   "close": 35.7,
+   "since_pct": 4.31
+  },
+  {
+   "date": "2026-10-16",
+   "ticker": "PETKM",
+   "name": "Petkim",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -59.4,
+   "close": 19.71,
+   "since_pct": -17.15
+  },
+  {
+   "date": "2026-10-16",
+   "ticker": "AKBNK",
+   "name": "Akbank",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -63.1,
+   "close": 66.85,
+   "since_pct": 2.69
+  },
+  {
+   "date": "2026-10-16",
+   "ticker": "TRMET",
+   "name": "TR Anadolu Metal Madencilik",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -64.5,
+   "close": 120.0,
+   "since_pct": -6.75
+  },
+  {
+   "date": "2026-10-16",
+   "ticker": "TCELL",
+   "name": "Turkcell",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -69.5,
+   "close": 96.8,
+   "since_pct": -7.02
+  },
+  {
+   "date": "2026-10-16",
+   "ticker": "TTKOM",
+   "name": "Türk Telekom",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -73.1,
+   "close": 50.9,
+   "since_pct": -5.38
+  },
+  {
+   "date": "2026-10-15",
+   "ticker": "TRMET",
+   "name": "TR Anadolu Metal Madencilik",
+   "from": "AL",
+   "to": "TUT",
+   "score": 8.7,
+   "close": 127.9,
+   "since_pct": -12.51
+  },
+  {
+   "date": "2026-10-15",
+   "ticker": "AKBNK",
+   "name": "Akbank",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -37.7,
+   "close": 68.0,
+   "since_pct": 0.96
+  },
+  {
+   "date": "2026-10-15",
+   "ticker": "AEFES",
+   "name": "Anadolu Efes",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -47.8,
+   "close": 18.07,
+   "since_pct": -6.75
+  },
+  {
+   "date": "2026-10-14",
+   "ticker": "AKBNK",
+   "name": "Akbank",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -63.4,
+   "close": 67.1,
+   "since_pct": 2.31
+  },
+  {
+   "date": "2026-10-13",
+   "ticker": "VAKBN",
+   "name": "VakıfBank",
+   "from": "TUT",
+   "to": "AL",
+   "score": 55.0,
+   "close": 34.4,
+   "since_pct": -3.9
+  },
+  {
+   "date": "2026-10-13",
+   "ticker": "YKBNK",
+   "name": "Yapı Kredi",
+   "from": "TUT",
+   "to": "AL",
+   "score": 53.0,
+   "close": 36.42,
+   "since_pct": 2.25
+  },
+  {
+   "date": "2026-10-13",
+   "ticker": "TCELL",
+   "name": "Turkcell",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -24.4,
+   "close": 99.45,
+   "since_pct": -9.5
+  },
+  {
+   "date": "2026-10-13",
+   "ticker": "TTKOM",
+   "name": "Türk Telekom",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -37.7,
+   "close": 52.25,
+   "since_pct": -7.83
+  },
+  {
+   "date": "2026-10-13",
+   "ticker": "ISCTR",
+   "name": "İş Bankası (C)",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -39.4,
+   "close": 13.05,
+   "since_pct": 1.84
+  },
+  {
+   "date": "2026-10-12",
+   "ticker": "TRMET",
+   "name": "TR Anadolu Metal Madencilik",
+   "from": "TUT",
+   "to": "AL",
+   "score": 53.4,
+   "close": 135.4,
+   "since_pct": -17.36
+  },
+  {
+   "date": "2026-10-12",
+   "ticker": "AKBNK",
+   "name": "Akbank",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -38.2,
+   "close": 68.35,
+   "since_pct": 0.44
+  },
+  {
+   "date": "2026-10-12",
+   "ticker": "TCELL",
+   "name": "Turkcell",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -49.7,
+   "close": 97.25,
+   "since_pct": -7.46
+  },
+  {
+   "date": "2026-10-12",
+   "ticker": "THYAO",
+   "name": "Türk Hava Yolları",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -53.4,
+   "close": 285.75,
+   "since_pct": 4.72
+  },
+  {
+   "date": "2026-10-12",
+   "ticker": "TTKOM",
+   "name": "Türk Telekom",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -61.7,
+   "close": 51.85,
+   "since_pct": -7.12
+  },
+  {
+   "date": "2026-10-09",
+   "ticker": "GARAN",
+   "name": "Garanti BBVA",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -14.8,
+   "close": 129.3,
+   "since_pct": 11.6
+  },
+  {
+   "date": "2026-10-09",
+   "ticker": "THYAO",
+   "name": "Türk Hava Yolları",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -29.6,
+   "close": 287.5,
+   "since_pct": 4.09
+  },
+  {
+   "date": "2026-10-09",
+   "ticker": "TTKOM",
+   "name": "Türk Telekom",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -36.7,
+   "close": 52.3,
+   "since_pct": -7.92
+  },
+  {
+   "date": "2026-10-09",
+   "ticker": "ISCTR",
+   "name": "İş Bankası (C)",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -50.8,
+   "close": 12.67,
+   "since_pct": 4.89
+  },
+  {
+   "date": "2026-10-09",
+   "ticker": "TOASO",
+   "name": "Tofaş",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -55.4,
+   "close": 265.0,
+   "since_pct": -8.3
+  },
+  {
+   "date": "2026-10-09",
+   "ticker": "SAHOL",
+   "name": "Sabancı Holding",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -79.7,
+   "close": 83.5,
+   "since_pct": 4.55
+  },
+  {
+   "date": "2026-10-08",
+   "ticker": "SAHOL",
+   "name": "Sabancı Holding",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -20.4,
+   "close": 88.75,
+   "since_pct": -1.63
+  },
+  {
+   "date": "2026-10-08",
+   "ticker": "YKBNK",
+   "name": "Yapı Kredi",
+   "from": "AL",
+   "to": "TUT",
+   "score": -20.9,
+   "close": 35.66,
+   "since_pct": 4.43
+  },
+  {
+   "date": "2026-10-08",
+   "ticker": "TOASO",
+   "name": "Tofaş",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -38.7,
+   "close": 269.0,
+   "since_pct": -9.67
+  },
+  {
+   "date": "2026-10-08",
+   "ticker": "GARAN",
+   "name": "Garanti BBVA",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -44.9,
+   "close": 128.5,
+   "since_pct": 12.3
+  },
+  {
+   "date": "2026-10-08",
+   "ticker": "AKBNK",
+   "name": "Akbank",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -51.1,
+   "close": 68.15,
+   "since_pct": 0.73
+  },
+  {
+   "date": "2026-10-07",
+   "ticker": "YKBNK",
+   "name": "Yapı Kredi",
+   "from": "TUT",
+   "to": "AL",
+   "score": 49.0,
+   "close": 36.6,
+   "since_pct": 1.75
+  },
+  {
+   "date": "2026-10-07",
+   "ticker": "PETKM",
+   "name": "Petkim",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -25.7,
+   "close": 20.1,
+   "since_pct": -18.76
+  },
+  {
+   "date": "2026-10-07",
+   "ticker": "ISCTR",
+   "name": "İş Bankası (C)",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -39.4,
+   "close": 12.97,
+   "since_pct": 2.47
+  },
+  {
+   "date": "2026-10-07",
+   "ticker": "TTKOM",
+   "name": "Türk Telekom",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -44.9,
+   "close": 52.15,
+   "since_pct": -7.65
+  },
+  {
+   "date": "2026-10-07",
+   "ticker": "THYAO",
+   "name": "Türk Hava Yolları",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -54.3,
+   "close": 286.25,
+   "since_pct": 4.54
+  },
+  {
+   "date": "2026-10-07",
+   "ticker": "TOASO",
+   "name": "Tofaş",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -64.1,
+   "close": 262.5,
+   "since_pct": -7.43
+  },
+  {
+   "date": "2026-10-06",
+   "ticker": "AEFES",
+   "name": "Anadolu Efes",
+   "from": "SAT",
+   "to": "TUT",
+   "score": 6.4,
+   "close": 18.67,
+   "since_pct": -9.75
+  },
+  {
+   "date": "2026-10-06",
+   "ticker": "TOASO",
+   "name": "Tofaş",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -38.8,
+   "close": 271.25,
+   "since_pct": -10.41
+  },
+  {
+   "date": "2026-10-06",
+   "ticker": "PETKM",
+   "name": "Petkim",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -43.6,
+   "close": 19.78,
+   "since_pct": -17.44
+  },
+  {
+   "date": "2026-10-05",
+   "ticker": "TCELL",
+   "name": "Turkcell",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -22.3,
+   "close": 100.5,
+   "since_pct": -10.45
+  },
+  {
+   "date": "2026-10-05",
+   "ticker": "PETKM",
+   "name": "Petkim",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -26.4,
+   "close": 20.1,
+   "since_pct": -18.76
+  },
+  {
+   "date": "2026-10-05",
+   "ticker": "GARAN",
+   "name": "Garanti BBVA",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -36.9,
+   "close": 130.4,
+   "since_pct": 10.66
+  },
+  {
+   "date": "2026-10-05",
+   "ticker": "AKBNK",
+   "name": "Akbank",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -38.9,
+   "close": 68.95,
+   "since_pct": -0.44
+  },
+  {
+   "date": "2026-10-02",
+   "ticker": "THYAO",
+   "name": "Türk Hava Yolları",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -28.3,
+   "close": 292.0,
+   "since_pct": 2.48
+  },
+  {
+   "date": "2026-10-02",
+   "ticker": "TAVHL",
+   "name": "TAV Havalimanları",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -29.8,
+   "close": 266.25,
+   "since_pct": 10.61
+  },
+  {
+   "date": "2026-10-02",
+   "ticker": "YKBNK",
+   "name": "Yapı Kredi",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -37.5,
+   "close": 34.94,
+   "since_pct": 6.58
+  },
+  {
+   "date": "2026-10-02",
+   "ticker": "TTKOM",
+   "name": "Türk Telekom",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -37.6,
+   "close": 52.45,
+   "since_pct": -8.18
+  },
+  {
+   "date": "2026-10-02",
+   "ticker": "PETKM",
+   "name": "Petkim",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -42.3,
+   "close": 19.55,
+   "since_pct": -16.47
+  },
+  {
+   "date": "2026-10-01",
+   "ticker": "ASELS",
+   "name": "Aselsan",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -2.5,
+   "close": 370.0,
+   "since_pct": -10.34
+  },
+  {
+   "date": "2026-10-01",
+   "ticker": "EKGYO",
+   "name": "Emlak Konut GYO",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -37.5,
+   "close": 19.03,
+   "since_pct": -7.2
+  },
+  {
+   "date": "2026-10-01",
+   "ticker": "AKBNK",
+   "name": "Akbank",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -63.7,
+   "close": 67.55,
+   "since_pct": 1.63
+  },
+  {
+   "date": "2026-09-30",
+   "ticker": "KRDMD",
+   "name": "Kardemir (D)",
+   "from": "AL",
+   "to": "TUT",
+   "score": 24.6,
+   "close": 43.98,
+   "since_pct": -17.78
+  },
+  {
+   "date": "2026-09-30",
+   "ticker": "THYAO",
+   "name": "Türk Hava Yolları",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -50.5,
+   "close": 283.25,
+   "since_pct": 5.65
+  },
+  {
+   "date": "2026-09-30",
+   "ticker": "TAVHL",
+   "name": "TAV Havalimanları",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -56.3,
+   "close": 261.25,
+   "since_pct": 12.73
+  },
+  {
+   "date": "2026-09-30",
+   "ticker": "TOASO",
+   "name": "Tofaş",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -62.4,
+   "close": 262.0,
+   "since_pct": -7.25
+  },
+  {
+   "date": "2026-09-30",
+   "ticker": "YKBNK",
+   "name": "Yapı Kredi",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -65.8,
+   "close": 34.04,
+   "since_pct": 9.4
+  },
+  {
+   "date": "2026-09-30",
+   "ticker": "ISCTR",
+   "name": "İş Bankası (C)",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -68.5,
+   "close": 12.2,
+   "since_pct": 8.93
+  },
+  {
+   "date": "2026-09-29",
+   "ticker": "BIMAS",
+   "name": "BİM Mağazalar",
+   "from": "AL",
+   "to": "TUT",
+   "score": 28.0,
+   "close": 421.75,
+   "since_pct": -11.86
+  },
+  {
+   "date": "2026-09-29",
+   "ticker": "TRMET",
+   "name": "TR Anadolu Metal Madencilik",
+   "from": "AL",
+   "to": "TUT",
+   "score": 24.0,
+   "close": 130.5,
+   "since_pct": -14.25
+  },
+  {
+   "date": "2026-09-29",
+   "ticker": "THYAO",
+   "name": "Türk Hava Yolları",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -24.5,
+   "close": 291.5,
+   "since_pct": 2.66
+  },
+  {
+   "date": "2026-09-29",
+   "ticker": "GARAN",
+   "name": "Garanti BBVA",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -46.9,
+   "close": 129.1,
+   "since_pct": 11.77
+  },
+  {
+   "date": "2026-09-29",
+   "ticker": "ASELS",
+   "name": "Aselsan",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -47.6,
+   "close": 338.5,
+   "since_pct": -1.99
+  },
+  {
+   "date": "2026-09-29",
+   "ticker": "TTKOM",
+   "name": "Türk Telekom",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -48.0,
+   "close": 52.8,
+   "since_pct": -8.79
+  },
+  {
+   "date": "2026-09-29",
+   "ticker": "MGROS",
+   "name": "Migros",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -58.4,
+   "close": 520.5,
+   "since_pct": -9.94
+  },
+  {
+   "date": "2026-09-29",
+   "ticker": "TRALT",
+   "name": "Türk Altın İşletmeleri",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -70.1,
+   "close": 44.86,
+   "since_pct": -14.99
+  },
+  {
+   "date": "2026-09-28",
+   "ticker": "MGROS",
+   "name": "Migros",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -35.0,
+   "close": 532.0,
+   "since_pct": -11.89
+  },
+  {
+   "date": "2026-09-28",
+   "ticker": "GUBRF",
+   "name": "Gübre Fabrikaları",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -41.4,
+   "close": 437.36,
+   "since_pct": -33.86
+  },
+  {
+   "date": "2026-09-28",
+   "ticker": "TCELL",
+   "name": "Turkcell",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -49.4,
+   "close": 98.35,
+   "since_pct": -8.49
+  },
+  {
+   "date": "2026-09-28",
+   "ticker": "THYAO",
+   "name": "Türk Hava Yolları",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -52.3,
+   "close": 287.0,
+   "since_pct": 4.27
+  },
+  {
+   "date": "2026-09-28",
+   "ticker": "EKGYO",
+   "name": "Emlak Konut GYO",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -65.5,
+   "close": 18.92,
+   "since_pct": -6.66
+  },
+  {
+   "date": "2026-09-28",
+   "ticker": "AEFES",
+   "name": "Anadolu Efes",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -73.1,
+   "close": 17.89,
+   "since_pct": -5.81
+  },
+  {
+   "date": "2026-09-28",
+   "ticker": "ASTOR",
+   "name": "Astor Enerji",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -87.1,
+   "close": 232.53,
+   "since_pct": -30.55
+  },
+  {
+   "date": "2026-09-25",
+   "ticker": "TRMET",
+   "name": "TR Anadolu Metal Madencilik",
+   "from": "TUT",
+   "to": "AL",
+   "score": 54.4,
+   "close": 140.4,
+   "since_pct": -20.3
+  },
+  {
+   "date": "2026-09-25",
+   "ticker": "BIMAS",
+   "name": "BİM Mağazalar",
+   "from": "TUT",
+   "to": "AL",
+   "score": 44.6,
+   "close": 424.75,
+   "since_pct": -12.48
+  },
+  {
+   "date": "2026-09-25",
+   "ticker": "TUPRS",
+   "name": "Tüpraş",
+   "from": "AL",
+   "to": "TUT",
+   "score": 31.3,
+   "close": 398.85,
+   "since_pct": -15.38
+  },
+  {
+   "date": "2026-09-25",
+   "ticker": "GUBRF",
+   "name": "Gübre Fabrikaları",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -11.3,
+   "close": 452.93,
+   "since_pct": -36.14
+  },
+  {
+   "date": "2026-09-25",
+   "ticker": "AEFES",
+   "name": "Anadolu Efes",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -36.7,
+   "close": 18.65,
+   "since_pct": -9.67
+  },
+  {
+   "date": "2026-09-25",
+   "ticker": "THYAO",
+   "name": "Türk Hava Yolları",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -37.3,
+   "close": 290.75,
+   "since_pct": 2.92
   }
  ]
 }

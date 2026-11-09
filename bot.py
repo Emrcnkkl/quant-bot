@@ -72,7 +72,8 @@ CFG = {
     "oos_fraction": 0.30,       # son %30'luk dönem örneklem dışı olarak raporlanır
     "min_bars": 260,
     "cash_rate_factor": 1.0,    # nakit getirisi = politika faizi × bu katsayı (0 -> faiz yok)
-    "real_rate_max": None,      # reel faiz (politika − yıllık TÜFE) bunun üstündeyse yeni alım yok; None = filtre kapalı
+    "real_rate_max": None,
+    "changes_days": 30,         # sinyal geçmişi listesi: son kaç işlem günündeki değişiklikler      # reel faiz (politika − yıllık TÜFE) bunun üstündeyse yeni alım yok; None = filtre kapalı
 }
 
 # TCMB politika faizi (bir hafta vadeli repo, borç verme), yıllık %. (yürürlük tarihi, oran)
@@ -521,6 +522,7 @@ def run(demo: bool) -> None:
         print("  ! XU030 verisi alınamadı, göreli güç bileşeni 0 kabul edilecek", file=sys.stderr)
 
     signals, per_stock, all_daily, recent_trades = [], [], {}, []
+    changes, change_dates = [], set()
     oos_daily = {}
 
     for t in tickers:
@@ -582,6 +584,8 @@ def run(demo: bool) -> None:
         for tr_ in bt["trades"][-5:]:
             recent_trades.append({"ticker": t, **tr_})
         write_stock_chart(t, d, sc["score"], bt)
+        changes += signal_changes(t, d, sc["score"])
+        change_dates.update(str(x.date()) for x in d.index[-(CFG["changes_days"] + 1):])
 
     if not signals:
         sys.exit("Hiç veri işlenemedi. İnternet bağlantısını ve yfinance kurulumunu kontrol edin.")
@@ -626,7 +630,10 @@ def run(demo: bool) -> None:
         "filter_max": CFG["real_rate_max"],
         "blocking": bool(CFG["real_rate_max"] is not None and mf["real"] > CFG["real_rate_max"]),
     }
-    write("signals.json", {**meta, "regime": regime, "counts": counts, "signals": signals})
+    changes.sort(key=lambda x: (x["date"], x["to"] == "AL", x["score"]), reverse=True)
+    write("signals.json", {**meta, "regime": regime, "counts": counts, "signals": signals,
+                           "changes_days": CFG["changes_days"],
+                           "changes_dates": sorted(change_dates)[-(CFG["changes_days"] + 1):], "changes": changes})
 
     write("backtest.json", {
         **meta,
@@ -671,6 +678,26 @@ def run(demo: bool) -> None:
     print(f"Nakit (politika faizi) aynı dönemde: toplam %{cf['total_return_pct']}")
     print(f"Backtest portföy: toplam %{pf['total_return_pct']}, MaxDD %{pf['max_drawdown_pct']}, "
           f"Sharpe {pf['sharpe']}")
+
+
+def signal_changes(t: str, d: pd.DataFrame, score: pd.Series) -> list[dict]:
+    """Son `changes_days` işlem gününde sinyalin (AL/TUT/SAT) değiştiği günler.
+    Puan yalnızca o güne kadarki fiyatlardan hesaplandığı için geçmiş sinyaller birebir yeniden üretilebilir."""
+    n = CFG["changes_days"]
+    lab = score.iloc[-(n + 1):].map(label)
+    close = d["Close"].iloc[-(n + 1):]
+    out = []
+    for i in range(1, len(lab)):
+        if lab.iloc[i] != lab.iloc[i - 1]:
+            c0 = float(close.iloc[i])
+            out.append({
+                "date": str(lab.index[i].date()), "ticker": t, "name": BIST30[t],
+                "from": lab.iloc[i - 1], "to": lab.iloc[i],
+                "score": round(float(score.iloc[len(score) - len(lab) + i]), 1),
+                "close": r2(c0),
+                "since_pct": r2((float(close.iloc[-1]) / c0 - 1) * 100),   # o günden bugüne fiyat değişimi
+            })
+    return out
 
 
 def yearly_table(port: pd.Series, bench: pd.Series | None, cash: pd.Series) -> list[dict]:

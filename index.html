@@ -163,6 +163,18 @@ details.more>summary::before{content:"▸ ";color:var(--muted)}
 details.more[open]>summary::before{content:"▾ "}
 details.more>div{padding-top:12px}
 
+/* ---- Sinyal geçmişi ---- */
+.hist .day{padding:10px 16px;font-size:13px;font-weight:650;color:var(--muted);background:var(--card2);border-bottom:1px solid var(--line);display:flex;justify-content:space-between}
+.hist .ch{display:grid;grid-template-columns:minmax(120px,1.4fr) auto minmax(60px,.6fr) minmax(70px,.7fr) minmax(90px,.8fr);align-items:center;gap:12px;padding:11px 16px;border-bottom:1px solid var(--line);cursor:pointer;font-variant-numeric:tabular-nums}
+.hist .ch:hover{background:color-mix(in srgb,var(--accent) 7%,transparent)}
+.hist .ch>:nth-child(n+3){text-align:right}
+.hist .arrow{display:inline-flex;align-items:center;gap:6px;color:var(--muted)}
+.hist .arrow .badge{min-width:40px;font-size:12px;padding:2px 7px}
+.hist .lbl{display:block;font-size:11px;color:var(--muted)}
+.hist .empty{padding:18px 16px;color:var(--muted)}
+.hist>div:last-child .ch:last-child{border-bottom:0}
+@media(max-width:620px){.hist .ch{grid-template-columns:1fr auto;gap:4px 10px}.hist .ch>:nth-child(3),.hist .ch>:nth-child(4){display:none}.hist .ch>:nth-child(5){grid-column:2}}
+
 /* ---- Nasıl çalışır / SSS ---- */
 .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
 .step{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}
@@ -246,6 +258,15 @@ footer p{margin:0 0 8px}
       </table>
     </div>
     <p class="muted small">Fiyatlar günlük kapanıştır. "Modelde olanlar", geriye dönük test kurallarına göre şu an elde tutulan hisselerdir.</p>
+
+    <h3 class="sm" id="gecmis" style="margin-top:40px">Son sinyal değişiklikleri</h3>
+    <p class="lead" style="margin-bottom:12px">Hangi hisse ne zaman AL'a girdi, ne zaman çıktı? "O günden beri" sütunu, sinyalin değiştiği günkü kapanıştan bugüne fiyat değişimidir.</p>
+    <div class="toolbar">
+      <div class="tabs" id="hfilt"></div>
+      <div class="seg" id="hrange" style="margin-left:auto"><button data-n="5">1 hafta</button><button data-n="10" class="on">2 hafta</button><button data-n="30">1 ay</button></div>
+    </div>
+    <div class="tbl hist" id="hist"></div>
+    <p class="muted small">Geçmiş günlerin sinyalleri, o güne kadarki fiyatlarla yeniden hesaplanmıştır (puan geleceği kullanmaz). Bir satıra dokunarak hisseyi tabloda açabilirsiniz.</p>
   </section>
 
   <!-- ===== PERFORMANS ===== -->
@@ -347,6 +368,7 @@ const monthName = ym => { const [y, m] = ym.split("-"); return `${MONTHS[+m - 1]
 const trDate = iso => new Date(iso + "T00:00:00").toLocaleDateString("tr-TR", {day: "numeric", month: "long", year: "numeric"});
 const START = 100000;
 let S = null, B = null, filter = "ALL", sortK = null, sortDir = 1, openRow = null, period = "full";
+let hFilter = "inAL", hDays = 10;
 
 async function load() {
   try {
@@ -355,7 +377,7 @@ async function load() {
       fetch("backtest.json?v=" + Date.now()).then(r => r.json()),
     ]);
     S = s; B = b;
-    renderHero(); renderToday(); renderSignals(); renderBacktest();
+    renderHero(); renderToday(); renderSignals(); renderHistory(); renderBacktest();
   } catch (e) {
     $("#h-sub").textContent = "Veri yüklenemedi. Sayfayı bir web sunucusu üzerinden açın (örn. python3 -m http.server).";
   }
@@ -389,7 +411,10 @@ function renderToday() {
     .map(([k, c, d]) => `<div class="tile" data-go="${k}"><div class="k">${k}</div><div class="v" style="color:${c}">${S.counts[k]}</div><div class="d">hisse · ${d}</div><div class="go">Listeyi gör →</div></div>`).join("");
   $("#today").innerHTML = tiles + macroTile(S.regime) ;
   document.querySelectorAll("#today .tile[data-go]").forEach(t => t.onclick = () => { setFilter(t.dataset.go); location.hash = "#sinyaller"; });
-  $("#today").insertAdjacentHTML("afterend", `<p class="muted small" style="text-align:center;margin:12px 0 0">${trDate(S.data_date)} kapanışına göre · modelin şu an elinde <b>${inPos}</b> hisse var</p>`);
+  const todayCh = (S.changes || []).filter(c => c.date === S.data_date);
+  const nIn = todayCh.filter(c => c.to === "AL").length, nOut = todayCh.filter(c => c.from === "AL").length;
+  $("#today").insertAdjacentHTML("afterend", `<p class="muted small" style="text-align:center;margin:12px 0 0">${trDate(S.data_date)} kapanışına göre · modelin şu an elinde <b>${inPos}</b> hisse var` +
+    (todayCh.length ? ` · bugün <a href="#gecmis">${todayCh.length} hissenin sinyali değişti</a>${nIn ? ` (${nIn} AL'a girdi${nOut ? `, ${nOut} AL'dan çıktı` : ""})` : nOut ? ` (${nOut} AL'dan çıktı)` : ""}` : "") + `</p>`);
 }
 
 function macroTile(r) {
@@ -447,6 +472,32 @@ function renderSignals() {
   if (openRow) loadStock(openRow);
 }
 
+// ---------------- Sinyal geçmişi ----------------
+const HF = [["inAL", "AL'a girenler", c => c.to === "AL"], ["outAL", "AL'dan çıkanlar", c => c.from === "AL"],
+            ["inSAT", "SAT'a düşenler", c => c.to === "SAT"], ["all", "Tümü", () => true]];
+function renderHistory() {
+  const all = S.changes || [];
+  const days = [...new Set(all.map(c => c.date))].sort().reverse();
+  const allDates = S.changes_dates || days.slice().reverse();          // işlem günleri, eskiden yeniye
+  const cutoff = allDates[Math.max(0, allDates.length - hDays)] || "";  // son N işlem günü
+  const inRange = all.filter(c => c.date >= cutoff);
+  $("#hfilt").innerHTML = HF.map(([k, n, f]) => `<button data-h="${k}" class="${k === hFilter ? "on" : ""}">${n} <span class="muted">${inRange.filter(f).length}</span></button>`).join("");
+  const f = HF.find(h => h[0] === hFilter)[2], rows = inRange.filter(f);
+  const byDay = {};
+  rows.forEach(c => (byDay[c.date] = byDay[c.date] || []).push(c));
+  const head = `<div class="ch" style="cursor:default;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;background:var(--card2)"><span>Hisse</span><span>Değişim</span><span>Puan</span><span>O günkü fiyat</span><span>O günden beri</span></div>`;
+  $("#hist").innerHTML = rows.length ? head + Object.keys(byDay).sort().reverse().map(d => {
+    const dt = new Date(d + "T00:00:00");
+    return `<div><div class="day"><span>${dt.toLocaleDateString("tr-TR", {weekday: "long", day: "numeric", month: "long"})}</span><span>${byDay[d].length} hisse</span></div>` +
+      byDay[d].map(c => `<div class="ch" data-t="${c.ticker}">
+        <span><span class="tk">${c.ticker}</span><span class="nm">${c.name}</span></span>
+        <span class="arrow"><span class="badge ${c.from}">${c.from}</span>→<span class="badge ${c.to}">${c.to}</span></span>
+        <span>${c.score > 0 ? "+" : ""}${fmt(c.score, 0)}</span>
+        <span>${fmt(c.close)}</span>
+        <span>${c.date === S.data_date ? '<span class="muted small">bugün</span>' : pct(c.since_pct)}</span>
+      </div>`).join("") + `</div>`;
+  }).join("") : `<div class="empty">Bu dönemde bu türde değişiklik yok.</div>`;
+}
 // Telefonda tablo yana kayabilir; detay alanını görünen genişliğe sabitle
 function fitDetail() {
   const dw = document.querySelector("#sig .dw");
@@ -637,6 +688,16 @@ $("#sig thead").addEventListener("click", e => {
 $("#sig tbody").addEventListener("click", e => {
   const tr = e.target.closest("tr.row"); if (!tr) return;
   openRow = openRow === tr.dataset.t ? null : tr.dataset.t; renderSignals();
+});
+$("#hfilt").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; hFilter = b.dataset.h; renderHistory(); });
+$("#hrange").addEventListener("click", e => {
+  if (!e.target.dataset.n) return; hDays = +e.target.dataset.n;
+  document.querySelectorAll("#hrange button").forEach(b => b.classList.toggle("on", b === e.target)); renderHistory();
+});
+$("#hist").addEventListener("click", e => {
+  const r = e.target.closest(".ch[data-t]"); if (!r) return;
+  $("#q").value = ""; openRow = r.dataset.t; setFilter("ALL");
+  document.querySelector(`#sig tr.row[data-t="${openRow}"]`)?.scrollIntoView({behavior: "smooth", block: "start"});
 });
 $("#perseg").addEventListener("click", e => {
   if (!e.target.dataset.p) return;
