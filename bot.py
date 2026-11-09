@@ -57,7 +57,28 @@ BIST30 = {
     "TTKOM": "Türk Telekom", "TUPRS": "Tüpraş", "VAKBN": "VakıfBank",
     "YKBNK": "Yapı Kredi",
 }
-BENCHMARK = "XU030"
+BENCHMARK = "XU030"   # Yahoo'da XU050 geçmişi yok; kıyas endeksi BIST30 (BIST50 ile çok benzer hareket eder)
+
+# Şirket adları: BIST30 + sık listeye giren diğer büyük hisseler. Listede olmayan bir hisse evrene girerse
+# adı Yahoo'dan alınır ve names.json'a kaydedilir (company_name).
+NAMES = {
+    **BIST30,
+    "AKSEN": "Aksa Enerji", "ALARK": "Alarko Holding", "BJKAS": "Beşiktaş", "BRSAN": "Borusan Boru",
+    "BTCIM": "Batıçim", "CCOLA": "Coca-Cola İçecek", "CRFSA": "CarrefourSA", "CWENE": "CW Enerji",
+    "ENERY": "Enerya Enerji", "EUPWR": "Europower Enerji", "GESAN": "Girişim Elektrik", "HALKB": "Halkbank",
+    "HEKTS": "Hektaş", "MIATK": "Mia Teknoloji", "ODAS": "Odaş Elektrik", "SELEC": "Selçuk Ecza",
+    "SKBNK": "Şekerbank", "TKFEN": "Tekfen Holding", "TURSG": "Türkiye Sigorta", "ULKER": "Ülker",
+    "CANTE": "Çan2 Termik", "ECILC": "Eczacıbaşı İlaç", "FENER": "Fenerbahçe", "KLRHO": "Kiler Holding",
+    "KONTR": "Kontrolmatik", "OYAKC": "Oyak Çimento", "ARCLK": "Arçelik", "DOAS": "Doğuş Otomotiv",
+    "OTKAR": "Otokar", "TTRAK": "Türk Traktör", "VESTL": "Vestel", "ISMEN": "İş Yatırım", "SOKM": "Şok Marketler",
+    "MAVI": "Mavi Giyim", "AGHOL": "Anadolu Grubu Holding", "ENJSA": "Enerjisa", "AKSA": "Aksa Akrilik",
+    "KONYA": "Konya Çimento", "CIMSA": "Çimsa", "EGEEN": "Ege Endüstri", "KORDS": "Kordsa", "ZOREN": "Zorlu Enerji",
+    "SMRTG": "Smart Güneş", "GWIND": "Galata Wind", "ISGYO": "İş GYO", "TSKB": "TSKB", "ALBRK": "Albaraka Türk",
+    "DOHOL": "Doğan Holding", "GLYHO": "Global Yatırım Holding", "AYGAZ": "Aygaz", "TMSN": "Tümosan",
+    "KCAER": "Kocaer Çelik", "ISDMR": "İskenderun Demir Çelik", "QUAGR": "Qua Granite", "REEDR": "Reeder",
+    "BERA": "Bera Holding", "CEMTS": "Çemtaş", "YYLGD": "Yayla Gıda", "GSRAY": "Galatasaray", "TSPOR": "Trabzonspor",
+    "VESBE": "Vestel Beyaz Eşya", "BRYAT": "Borusan Yatırım", "AKSUE": "Akdeniz Su", "PASEU": "Pasifik Eurasia",
+}
 
 # Geriye dönük test için aday hisseler: bugünkü BIST100'ün büyük kısmı + geçmişte BIST30'da olmuş ve hâlâ
 # Yahoo'da verisi bulunan hisseler. Her çeyrek bunların arasından işlem hacmine göre en büyük 30'u seçilir
@@ -79,7 +100,8 @@ CANDIDATES = """
 CFG = {
     "history_start": "2004-01-01",  # indirilecek verinin başlangıcı (2005 öncesi eski TL, atılır)
     "backtest_start": "2006-01-01", # portföy testinin başlangıcı (2008 krizi dahil)
-    "universe_size": 30,        # test evreni: her çeyrek işlem hacmine göre en büyük N hisse
+    "universe_size": 50,        # sinyal ve test evreni: her çeyrek işlem hacmine göre en büyük N hisse ("BIST50 benzeri")
+    "universe_window": 252,     # hacim ortalaması penceresi (gün); 12 ay -> kısa süreli spekülatif hacim listeye sokmaz
     "vol_sizing": True,         # oynaklığa göre pozisyon büyüklüğü (docs/uzun-donem-arastirma.md)
     "vol_cap": 2.0,             # bir pozisyon en fazla temel payın bu katı olabilir
     "jump_limit": 0.25,         # tek günde bundan büyük fiyat sıçraması veri hatası sayılır
@@ -269,6 +291,31 @@ def _clean(df: pd.DataFrame) -> pd.DataFrame:
     return df[~df.index.duplicated(keep="last")].sort_index()
 
 
+def company_name(t: str) -> str:
+    """Hisse adı: NAMES, yoksa names.json önbelleği, o da yoksa Yahoo (bir kez sorulur, önbelleğe yazılır)."""
+    if t in NAMES:
+        return NAMES[t]
+    path = os.path.join(OUT_DIR, "names.json")
+    try:
+        with open(path, encoding="utf-8") as f:
+            cache = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        cache = {}
+    if t not in cache:
+        name = t
+        try:
+            import yfinance as yf
+            info = yf.Ticker(f"{t}.IS").info
+            raw = info.get("longName") or info.get("shortName") or t
+            name = re.sub(r"\s+(A\.?\s?[SŞ]\.?|Anonim\s+[SŞ]irketi|T\.?A\.?S\.?)\s*$", "", raw, flags=re.I).strip()
+        except Exception:  # noqa: BLE001
+            pass
+        cache[t] = name
+        write("names.json", cache, quiet=True)
+    NAMES[t] = cache[t]
+    return cache[t]
+
+
 def fetch_real(tickers: list[str], verbose: bool = True) -> dict[str, pd.DataFrame]:
     import time
 
@@ -327,11 +374,12 @@ def dedupe(data: dict[str, pd.DataFrame]) -> dict[str, pd.DataFrame]:
     return out
 
 
-def pit_membership(data: dict[str, pd.DataFrame], cal: pd.DatetimeIndex, n: int) -> pd.DataFrame:
+def pit_membership(data: dict[str, pd.DataFrame], cal: pd.DatetimeIndex, n: int, window: int | None = None) -> pd.DataFrame:
     """Noktasal evren: her çeyrek başında, önceki 3 ayın ortalama TL işlem hacmine göre en büyük `n` hisse
     (en az 6 aylık geçmişi olanlar) o çeyreğin evrenidir. Yalnızca o güne kadarki veri kullanılır."""
     tv = pd.DataFrame({t: df["Close"] * df["Volume"] for t, df in data.items()}).reindex(cal)
-    avg = tv.rolling(63, min_periods=40).mean().shift(1)
+    w = window or CFG.get("universe_window", 63)
+    avg = tv.rolling(w, min_periods=int(w * 0.65)).mean().shift(1)
     age = tv.notna().cumsum()
     mem = pd.DataFrame(False, index=cal, columns=tv.columns)
     q = pd.Series(cal, index=cal).dt.to_period("Q")
@@ -757,7 +805,7 @@ def r2(x):
 
 def run(demo: bool, telegram_test: bool = False) -> None:
     tickers = list(BIST30)
-    print(f"BIST30 sinyal botu — {'DEMO (sentetik veri)' if demo else 'gerçek veri'}")
+    print(f"BIST50 sinyal botu — {'DEMO (sentetik veri)' if demo else 'gerçek veri'}")
     if not demo:
         fetch_macro()
     if demo:
@@ -781,7 +829,14 @@ def run(demo: bool, telegram_test: bool = False) -> None:
     bench = data.pop(BENCHMARK, None)
     bench_close = bench["Close"] if bench is not None else None
     if bench is None:
-        print("  ! XU030 verisi alınamadı, göreli güç bileşeni 0 kabul edilecek", file=sys.stderr)
+        sys.exit("XU030 verisi alınamadı; evren seçimi ve portföy testi yapılamıyor.")
+
+    # --- Evren: her çeyrek işlem hacmine göre en büyük N hisse. Sinyaller bugünkü üyeler için üretilir.
+    cand = dedupe(data)
+    full_cal = bench.index
+    mem_full = pit_membership(cand, full_cal, CFG["universe_size"])
+    tickers = sorted(mem_full.columns[mem_full.iloc[-1]])
+    print(f"  Evren: işlem hacmine göre en büyük {len(tickers)} hisse")
 
     signals, per_stock, all_daily, recent_trades = [], [], {}, []
     changes, change_dates = [], set()
@@ -814,7 +869,7 @@ def run(demo: bool, telegram_test: bool = False) -> None:
             state = "GİRİŞ" if bt["pending"] == "buy" else "BEKLE"
 
         signals.append({
-            "ticker": t, "name": BIST30[t],
+            "ticker": t, "name": company_name(t),
             "date": str(d.index[-1].date()),
             "close": r2(close),
             "change_pct": r2((close / prev_close - 1) * 100),
@@ -836,7 +891,7 @@ def run(demo: bool, telegram_test: bool = False) -> None:
         oos_start = daily.index[split]
         bh = d["Close"].iloc[CFG["warmup_days"]:]
         per_stock.append({
-            "ticker": t, "name": BIST30[t],
+            "ticker": t, "name": company_name(t),
             "strategy": metrics(daily, bt["trades"], rf=cash_d),
             "oos": metrics(daily.iloc[split:], [x for x in bt["trades"] if x["entry_date"] >= str(oos_start.date())],
                            rf=cash_d),
@@ -852,11 +907,6 @@ def run(demo: bool, telegram_test: bool = False) -> None:
         sys.exit("Hiç veri işlenemedi. İnternet bağlantısını ve yfinance kurulumunu kontrol edin.")
 
     # --- Portföy testi: noktasal evren (her çeyrek o zamanki en büyük 30 hisse) + oynaklığa göre pozisyon
-    if bench is None:
-        sys.exit("XU030 verisi olmadan portföy testi yapılamıyor.")
-    cand = dedupe(data)
-    full_cal = bench.index
-    mem_full = pit_membership(cand, full_cal, CFG["universe_size"])
     first = max(pd.Timestamp(CFG["backtest_start"]), full_cal[min(CFG["warmup_days"], len(full_cal) - 1)])
     cal = full_cal[full_cal >= first]
     mem = mem_full.reindex(cal).fillna(False)
@@ -876,7 +926,7 @@ def run(demo: bool, telegram_test: bool = False) -> None:
     closes = pd.DataFrame({t: d_["Close"] for t, (d_, _) in prep.items()}).reindex(cal)
     rets = closes.pct_change().where(closes.notna() & closes.shift(1).notna() & mem)
     uni = rets.mean(axis=1).fillna(cash)
-    universe_note = (f"Her çeyrek, önceki 3 ayın işlem hacmine göre en büyük {CFG['universe_size']} hisse "
+    universe_note = (f"Her çeyrek, önceki {round(CFG['universe_window'] / 21)} ayın işlem hacmine göre en büyük {CFG['universe_size']} hisse "
                      f"({len(cand)} aday, {len(prep)} farklı hisse en az bir kez evrende)")
     print(f"  Portföy testi: {cal[0].date()} – {cal[-1].date()} · {universe_note} · ortalama hisse payı %{expo.mean() * 100:.0f}")
     split = int(len(port) * (1 - CFG["oos_fraction"]))
@@ -912,7 +962,7 @@ def run(demo: bool, telegram_test: bool = False) -> None:
         "generated_at": now.isoformat(timespec="minutes"),
         "data_date": max(s["date"] for s in signals),
         "demo": demo,
-        "universe": "BIST 30 (Ekim-Aralık 2026)",
+        "universe": f"BIST50 benzeri: işlem hacmine göre en büyük {CFG['universe_size']} hisse (her çeyrek güncellenir)",
         "thresholds": {"buy": CFG["buy_threshold"], "sell": CFG["sell_threshold"]},
         "disclaimer": "Buradaki bilgiler algoritmik teknik analiz çıktısıdır; yatırım tavsiyesi değildir. "
                       "Yatırım danışmanlığı hizmeti, SPK lisanslı kuruluşlar tarafından kişiye özel sunulur.",
@@ -928,6 +978,13 @@ def run(demo: bool, telegram_test: bool = False) -> None:
     }
     changes.sort(key=lambda x: (x["date"], x["to"] == "AL", x["score"]), reverse=True)
     notify_args = (meta, regime, counts)
+    # Evrenden çıkan hisselerin grafik dosyalarını sil
+    sdir = os.path.join(OUT_DIR, "stocks")
+    if os.path.isdir(sdir):
+        keep = {f"{x['ticker']}.json" for x in signals}
+        for fn in os.listdir(sdir):
+            if fn.endswith(".json") and fn not in keep:
+                os.remove(os.path.join(sdir, fn))
     write("signals.json", {**meta, "regime": regime, "counts": counts, "signals": signals,
                            "changes_days": CFG["changes_days"],
                            "changes_dates": sorted(change_dates)[-(CFG["changes_days"] + 1):], "changes": changes})
@@ -1001,7 +1058,7 @@ def signal_changes(t: str, d: pd.DataFrame, score: pd.Series) -> list[dict]:
         if lab.iloc[i] != lab.iloc[i - 1]:
             c0 = float(close.iloc[i])
             out.append({
-                "date": str(lab.index[i].date()), "ticker": t, "name": BIST30[t],
+                "date": str(lab.index[i].date()), "ticker": t, "name": company_name(t),
                 "from": lab.iloc[i - 1], "to": lab.iloc[i],
                 "score": round(float(score.iloc[len(score) - len(lab) + i]), 1),
                 "close": r2(c0),
@@ -1078,7 +1135,7 @@ def notify(meta: dict, regime: dict, counts: dict, changes: list[dict], live: di
         return f"<b>{c['ticker']}</b> ({c['score']:+.0f})"
     day = pd.Timestamp(today)
     months = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"]
-    lines = [f"📊 <b>BIST30 Sinyal</b> · {day.day} {months[day.month - 1]} {day.year} kapanışı"]
+    lines = [f"📊 <b>BIST50 Sinyal</b> · {day.day} {months[day.month - 1]} {day.year} kapanışı"]
     if test and not (ins or outs or ev):
         lines.append("🔔 Deneme mesajı: bildirimler çalışıyor.")
     if ins:
@@ -1122,7 +1179,7 @@ def update_live(port: pd.Series, weights: pd.DataFrame, bench_close: pd.Series, 
     def holdings(day):
         w = weights.loc[day]
         w = w[w > 1e-6].sort_values(ascending=False)
-        return [{"ticker": t, "name": BIST30.get(t, t), "weight_pct": r2(v * 100)} for t, v in w.items()]
+        return [{"ticker": t, "name": company_name(t), "weight_pct": r2(v * 100)} for t, v in w.items()]
 
     last_day = port.index[-1]
     b_last = float(bench_close.asof(last_day))
@@ -1143,9 +1200,9 @@ def update_live(port: pd.Series, weights: pd.DataFrame, bench_close: pd.Series, 
                                    "stock_pct": r2(weights.loc[day].sum() * 100)})
             cur = set(weights.columns[weights.loc[day] > 1e-6])
             for t in sorted(cur - prev_set):
-                live["events"].append({"date": str(day.date()), "ticker": t, "name": BIST30.get(t, t), "type": "alış"})
+                live["events"].append({"date": str(day.date()), "ticker": t, "name": company_name(t), "type": "alış"})
             for t in sorted(prev_set - cur):
-                live["events"].append({"date": str(day.date()), "ticker": t, "name": BIST30.get(t, t), "type": "satış"})
+                live["events"].append({"date": str(day.date()), "ticker": t, "name": company_name(t), "type": "satış"})
             prev_set = cur
         live["events"] = live["events"][-100:]
     live["holdings"] = holdings(last_day)
@@ -1208,7 +1265,7 @@ def write_stock_chart(t: str, d: pd.DataFrame, score: pd.Series, bt: dict, days:
     start = str(w.index[0].date())
     col = lambda s: [r2(x) for x in s]  # noqa: E731
     write(f"stocks/{t}.json", {
-        "ticker": t, "name": BIST30[t],
+        "ticker": t, "name": company_name(t),
         "dates": [str(x.date()) for x in w.index],
         "close": col(w["Close"]), "ema20": col(w["ema20"]), "ema50": col(w["ema50"]),
         "ema200": col(w["ema200"]), "score": [round(float(x), 1) for x in score.iloc[-days:]],

@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>BIST30 Sinyal</title>
-<meta name="description" content="BIST 30 hisseleri için her iş günü güncellenen teknik analiz sinyalleri ve geriye dönük test sonuçları. Yatırım tavsiyesi değildir.">
+<title>BIST50 Sinyal</title>
+<meta name="description" content="Borsa İstanbul'un en büyük 50 hissesi için her iş günü güncellenen teknik analiz sinyalleri ve geriye dönük test sonuçları. Yatırım tavsiyesi değildir.">
 <link rel="preload" href="fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
 <style>
 /* ---- Yazı tipi: Inter (OFL lisanslı, depoda barındırılıyor) ---- */
@@ -296,7 +296,7 @@ footer p{margin:0 0 8px;max-width:860px}
   <div class="wrap">
     <a class="brand" href="#bugun">
       <span class="mark"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3 2 8l10 5 10-5-10-5Z" fill="#3b82f6"/><path d="m2 12 10 5 10-5" stroke="#3b82f6" stroke-width="2" stroke-linejoin="round" opacity=".7"/><path d="m2 16 10 5 10-5" stroke="#10b981" stroke-width="2" stroke-linejoin="round"/></svg></span>
-      <span>BIST30 <span class="gtext">Sinyal</span></span>
+      <span>BIST50 <span class="gtext">Sinyal</span></span>
     </a>
     <div class="links">
       <a href="#bugun">Bugün</a><a href="#sinyaller">Sinyaller</a><a href="#performans">Performans</a><a href="#nasil">Nasıl çalışır</a>
@@ -332,7 +332,7 @@ footer p{margin:0 0 8px;max-width:860px}
   <section id="sinyaller">
     <div class="kicker"><span class="gtext">01 · Sinyaller</span></div>
     <h2>Bugünün sinyalleri</h2>
-    <p class="lead">Her hisseye 8 teknik göstergeye bakılarak −100 ile +100 arasında bir puan verilir. Puan yükseldikçe fiyat hareketi o kadar güçlü görünür. <b>Ayrıntı ve grafik için bir hisseye dokunun.</b></p>
+    <p class="lead">Borsa İstanbul'un işlem hacmine göre en büyük 50 hissesi (her çeyrek güncellenir). Her hisseye 8 teknik göstergeye bakılarak −100 ile +100 arasında bir puan verilir. Puan yükseldikçe fiyat hareketi o kadar güçlü görünür. <b>Ayrıntı ve grafik için bir hisseye dokunun.</b></p>
     <div id="filt"></div>
     <div class="legend-sig">
       <span><span class="badge AL">AL</span>&nbsp; puan +40 ve üstü: teknik görünüm güçlü</span>
@@ -373,13 +373,13 @@ footer p{margin:0 0 8px;max-width:860px}
   <section id="performans">
     <div class="kicker"><span class="gtext">02 · Performans</span></div>
     <h2>Model geçmişte ne yapardı?</h2>
-    <p class="lead" id="btlead">Aynı kurallar 2006'dan bu yana geçmiş fiyatlara uygulanarak 100.000 ₺'lik bir portföy simüle edildi. Her dönemde o zamanın en büyük 30 hissesi kullanıldı; oynak hisselere daha küçük pay ayrıldı, sinyal yokken para faizde bekledi. Komisyon ve kayma maliyeti düşüldü. Gerçek işlem değildir.</p>
+    <p class="lead" id="btlead">Aynı kurallar 2006'dan bu yana geçmiş fiyatlara uygulanarak 100.000 ₺'lik bir portföy simüle edildi. Her dönemde o zamanın en büyük 50 hissesi kullanıldı; oynak hisselere daha küçük pay ayrıldı, sinyal yokken para faizde bekledi. Komisyon ve kayma maliyeti düşüldü. Gerçek işlem değildir.</p>
 
     <div class="card">
       <div class="chart-head">
         <h3>Portföy eğrisi</h3>
         <div class="seg units" id="unitseg"><button data-u="tl" class="on">TL</button><button data-u="real" title="Enflasyondan arındırılmış: 2006 fiyatlarıyla alım gücü">Enflasyondan arındırılmış</button><button data-u="usd">Dolar</button></div>
-        <div class="legend"><span><i style="background:var(--strat);color:var(--strat)"></i>Model portföy</span><span><i style="background:var(--bench);color:var(--bench)"></i>BIST30 endeksi</span><span><i style="background:var(--cash);color:var(--cash)"></i>Faiz (politika faizi)</span><span title="Her dönemin en büyük 30 hissesini eşit ağırlıkla tutmak"><i style="background:var(--uni);color:var(--uni)"></i>Büyük 30 hisse al-bekle</span></div>
+        <div class="legend"><span><i style="background:var(--strat);color:var(--strat)"></i>Model portföy</span><span><i style="background:var(--bench);color:var(--bench)"></i>BIST30 endeksi</span><span><i style="background:var(--cash);color:var(--cash)"></i>Faiz (politika faizi)</span><span title="Her dönemin en büyük 50 hissesini eşit ağırlıkla tutmak"><i style="background:var(--uni);color:var(--uni)"></i>Büyük 50 hisse al-bekle</span></div>
       </div>
       <div class="chartbox" id="chart"></div>
       <div class="muted small" id="btmeta" style="margin-top:6px"></div>
@@ -412,7 +412,7 @@ footer p{margin:0 0 8px;max-width:860px}
     <h2>Nasıl çalışır?</h2>
     <p class="lead">Her iş günü borsa kapandıktan sonra (18:40) otomatik çalışır; kimse elle müdahale etmez.</p>
     <div class="steps">
-      <div class="step"><div class="n">1</div><h4>Veri</h4><p>BIST 30 hisselerinin ve ~150 büyük hissenin 2004'ten beri günlük fiyatları indirilir. Faiz ve enflasyon TCMB'den alınır.</p></div>
+      <div class="step"><div class="n">1</div><h4>Veri</h4><p>~150 büyük hissenin 2004'ten beri günlük fiyatları indirilir; işlem hacmine göre en büyük 50'si seçilir. Faiz ve enflasyon TCMB'den alınır.</p></div>
       <div class="step"><div class="n">2</div><h4>Puan</h4><p>Trend, momentum, hacim ve endekse göre güç gibi 8 gösterge birleştirilip her hisseye −100…+100 puan verilir.</p></div>
       <div class="step"><div class="n">3</div><h4>Sinyal</h4><p>Puan +40 üstü AL, −40 altı SAT, arası TUT. Model girdiği hissede zarar-kes seviyesi takip eder.</p></div>
       <div class="step"><div class="n">4</div><h4>Test</h4><p>Aynı kurallar 2006'dan bu yana, her dönemin o zamanki büyük hisselerine uygulanır; sonuç endeks ve faizle kıyaslanır.</p></div>
@@ -433,8 +433,8 @@ footer p{margin:0 0 8px;max-width:860px}
         <ul>
           <li>Sadece alış yapılır, açığa satış yok. Sinyal kapanışta oluşur, işlem ertesi gün açılışta yapılır (geleceği bilmeden).</li>
           <li>Giriş: puan ≥ +40. Çıkış: puan 0'ın altına inerse ertesi açılışta, ya da 2,5×ATR iz süren zarar-kes gün içinde tetiklenirse.</li>
-          <li>Her işlemde %0,10 komisyon + %0,05 kayma düşülür. Her pozisyona temel olarak sermayenin 1/30'u ayrılır; oynak hisselerde bu pay küçülür, sakin hisselerde büyür (en fazla 2 katı, toplam %100'ü geçmez). Boştaki para TCMB politika faizi kazanır.</li>
-          <li>Test evreni: her çeyrek başında, önceki 3 ayın işlem hacmine göre en büyük 30 hisse (Borsa İstanbul'un seçimine benzer). Böylece geçmişte büyük olup sonra küçülen şirketler de teste girer.</li>
+          <li>Her işlemde %0,10 komisyon + %0,05 kayma düşülür. Her pozisyona temel olarak sermayenin 1/50'si ayrılır; oynak hisselerde bu pay küçülür, sakin hisselerde büyür (en fazla 2 katı, toplam %100'ü geçmez). Boştaki para TCMB politika faizi kazanır.</li>
+          <li>Hisse evreni: her çeyrek başında, son 12 ayın işlem hacmine göre en büyük 50 hisse (BIST 50'ye benzer; resmi liste değildir). Sinyaller de bugünkü 50 hisse için üretilir. Böylece geçmişte büyük olup sonra küçülen şirketler de teste girer.</li>
           <li>Son %30'luk dönem "test" olarak ayrı raporlanır. Ayarlar bu döneme bakılarak seçilmedi.</li>
           <li>Bilinen sınırlama: borsadan tamamen çıkmış birkaç şirketin (ör. Finansbank, Petrol Ofisi) verisi bulunamadığı için testte yok; sonuçlar bu yüzden bir miktar iyimser olabilir.</li>
         </ul>
@@ -450,9 +450,9 @@ footer p{margin:0 0 8px;max-width:860px}
     <details><summary>Bu bir yatırım tavsiyesi mi?</summary><div><p>Hayır. Sayfa bir hobi/araştırma projesidir; kimsenin kişisel durumunu, risk tercihini ya da vergisini bilmez. Yatırım danışmanlığı yalnızca SPK lisanslı kuruluşlarca kişiye özel verilir.</p></div></details>
     <details><summary>AL sinyali gelen hisse kesin yükselir mi?</summary><div><p>Hayır. AL, sadece fiyat hareketinin teknik olarak güçlü göründüğü anlamına gelir. Testte işlemlerin yarısından azı kârla kapandı; model kazancını, kârlı işlemlerin zararlılardan daha büyük olmasından elde ediyor.</p></div></details>
     <details><summary>Model endeksi geçiyor mu?</summary><div id="faq-perf"><p>Yükleniyor…</p></div></details>
-    <details id="sss-yanlilik"><summary>Test neden bugünkü BIST 30 hisseleriyle yapılmıyor?</summary><div>
-      <p>Bugün BIST 30'da olan hisseler, geçmişte değerlendikleri için oradalar. Testi yalnızca onlarla yapmak, geçmişte büyük olup sonra düşen şirketleri dışarıda bırakır ve sonuçları olduğundan çok iyi gösterir ("hayatta kalma yanlılığı"). Bizim ölçümümüzde bu fark yılda ~15 puandı.</p>
-      <p>Bu yüzden test, her çeyrek o zamanın en büyük 30 hissesiyle yapılıyor. Kontrol: bu evrenin al-bekle'si gerçek BIST30 endeksine çok yakın çıkıyor. Borsadan tamamen çıkmış birkaç şirketin verisi olmadığı için küçük bir iyimserlik payı hâlâ olabilir.</p>
+    <details id="sss-yanlilik"><summary>Test neden bugünkü hisselerle yapılmıyor?</summary><div>
+      <p>Bugün en büyük 50'de olan hisseler, geçmişte değerlendikleri için oradalar. Testi yalnızca onlarla yapmak, geçmişte büyük olup sonra düşen şirketleri dışarıda bırakır ve sonuçları olduğundan çok iyi gösterir ("hayatta kalma yanlılığı"). Bizim ölçümümüzde bu fark yılda ~15 puandı.</p>
+      <p>Bu yüzden test, her çeyrek o zamanın en büyük 50 hissesiyle yapılıyor. Kontrol: bu evrenin al-bekle'si gerçek endekse yakın çıkıyor. Kıyas için BIST 30 endeksi kullanılıyor, çünkü BIST 50 endeksinin uzun geçmiş verisi ücretsiz kaynaklarda yok; iki endeks çok benzer hareket eder. Borsadan tamamen çıkmış birkaç şirketin verisi olmadığı için küçük bir iyimserlik payı hâlâ olabilir.</p>
     </div></details>
     <details><summary>"Faiz ortamı" kutusu ne anlatıyor?</summary><div><p>Reel faiz = politika faizi − yıllık enflasyon. Pozitifse paranızı faizde tutmak enflasyonun üstünde getiri sağlar; bu dönemlerde hisseler cazibesini yitirebilir.</p>
       <p><b>Model bunu kullanıyor:</b> reel faiz %5'in üzerindeyken model portföy yeni hisse almaz, parayı faizde tutar (elindeki hisseleri normal kurallarla satar). 2006'dan beri yapılan testte bu kural hem 2006–2020'de hem 2021–2026'da sonucu iyileştirdi. AL / TUT / SAT etiketleri yine gösterilir; bunlar teknik görünümü anlatır.</p></div></details>
@@ -463,7 +463,7 @@ footer p{margin:0 0 8px;max-width:860px}
   </section>
 
   <footer>
-    <div class="fb"><span class="brand" style="font-size:16px;margin:0">BIST30 <span class="gtext">Sinyal</span></span></div>
+    <div class="fb"><span class="brand" style="font-size:16px;margin:0">BIST50 <span class="gtext">Sinyal</span></span></div>
     <p id="disc"></p>
     <p id="meta"></p>
   </footer>
@@ -533,23 +533,23 @@ function renderHero() {
   $("#h-delta").innerHTML = `<span class="${gain >= 0 ? "pos" : "neg"}">${gain >= 0 ? "↗ +" : "↘ "}%${fmt(ret, 0)} (${gain >= 0 ? "+" : ""}${tl(gain)})</span>`;
   $("#h-sub").innerHTML = `${trDate(B.period.start)} tarihinde 100.000 ₺ ile başlansaydı · yaklaşık ${fmt(yrs, 1)} yıl, yıllık %${fmt(B.portfolio.full.cagr_pct, 0)}<br>Aynı parayla şunlar yapılsaydı:`;
   $("#h-chips").innerHTML =
-    (last.universe ? `<span class="chip" title="Her dönemin en büyük 30 hissesini eşit ağırlıkla alıp tutmak"><i style="background:var(--uni);color:var(--uni)"></i>Büyük 30 hisse al-bekle <b>${tl(START * last.universe)}</b></span>` : "") +
+    (last.universe ? `<span class="chip" title="Her dönemin en büyük 50 hissesini eşit ağırlıkla alıp tutmak"><i style="background:var(--uni);color:var(--uni)"></i>Büyük 50 hisse al-bekle <b>${tl(START * last.universe)}</b></span>` : "") +
     `<span class="chip"><i style="background:var(--bench);color:var(--bench)"></i>BIST30 al-bekle <b>${tl(START * last.benchmark)}</b></span>` +
     `<span class="chip"><i style="background:var(--cash);color:var(--cash)"></i>Faiz <b>${tl(START * last.cash)}</b></span>` +
     `<span class="chip">En büyük düşüş: model <b>${pct(B.portfolio.full.max_drawdown_pct, 0)}</b></span>` +
     `<span class="chip">endeks <b>${pct(B.portfolio.benchmark_full?.max_drawdown_pct, 0)}</b></span>`;
   const U = B.units || {};
   if (U.real) $("#h-chips").insertAdjacentHTML("afterend", `<p class="small" style="margin:16px auto 0;max-width:680px;color:var(--ink2)"><b>Enflasyondan arındırılmış</b> yıllık getiri: model ${pct(U.real.strategy.full.cagr_pct, 1)} · endeks ${pct(U.real.benchmark?.full.cagr_pct, 1)} · faiz ${pct(U.real.cash.full.cagr_pct, 1)}${U.usd ? ` &nbsp;|&nbsp; <b>Dolar bazında:</b> model ${pct(U.usd.strategy.full.cagr_pct, 1)} · endeks ${pct(U.usd.benchmark?.full.cagr_pct, 1)}` : ""} <a href="#sss">Ne demek?</a></p>`);
-  $("#h-chips").insertAdjacentHTML("afterend", `<p class="small muted" style="margin:18px auto 0;max-width:640px">Test her dönemde o zamanın en büyük 30 hissesiyle yapıldı (bugünkü listeyle değil); 2008 ve 2018 krizleri dahil. <a href="#sss-yanlilik">Neden önemli?</a></p>`);
+  $("#h-chips").insertAdjacentHTML("afterend", `<p class="small muted" style="margin:18px auto 0;max-width:640px">Test her dönemde o zamanın en büyük 50 hissesiyle yapıldı (bugünkü listeyle değil); 2008 ve 2018 krizleri dahil. <a href="#sss-yanlilik">Neden önemli?</a></p>`);
   if (S.demo) $("#demo").innerHTML = `<div class="warn demo"><div><b>DEMO verisi:</b> Bu sayfa şu an gerçek olmayan, rastgele üretilmiş fiyatlarla çalışıyor.</div></div>`;
   $("#disc").innerHTML = `<b>Yasal uyarı:</b> ${S.disclaimer} Geçmiş performans gelecekteki sonuçların göstergesi değildir.`;
   $("#meta").textContent = `Son veri: ${trDate(S.data_date)} kapanışı · sayfa güncellendi ${new Date(S.generated_at).toLocaleString("tr-TR", {dateStyle: "medium", timeStyle: "short"})} · ${S.universe} · Fiyat: Yahoo Finance · Faiz ve enflasyon: TCMB`;
   // SSS: dürüst performans özeti
   const y = (B.yearly || []).filter(r => !r.partial), beatIdx = y.filter(r => r.strategy > r.benchmark).length;
   const P0 = B.portfolio, up = P0.full.cagr_pct > (P0.benchmark_full?.cagr_pct ?? 0);
-  if (U.real) $("#faq-real").innerHTML = `<p>Az. Türkiye'de fiyatlar 2006'dan bu yana ~${fmt(B.equity_curve.at(-1).cpi, 0)} katına çıktı. Enflasyondan arındırınca modelin yıllık getirisi ${pct(U.real.strategy.full.cagr_pct, 1)}, BIST30 endeksinin ${pct(U.real.benchmark?.full.cagr_pct, 1)}, büyük 30 hisseyi al-bekle ${pct(U.real.universe.full.cagr_pct, 1)}, faizin ${pct(U.real.cash.full.cagr_pct, 1)}.${U.usd ? ` Dolar bazında model ${pct(U.usd.strategy.full.cagr_pct, 1)}, endeks ${pct(U.usd.benchmark?.full.cagr_pct, 1)}.` : ""}</p>
+  if (U.real) $("#faq-real").innerHTML = `<p>Az. Türkiye'de fiyatlar 2006'dan bu yana ~${fmt(B.equity_curve.at(-1).cpi, 0)} katına çıktı. Enflasyondan arındırınca modelin yıllık getirisi ${pct(U.real.strategy.full.cagr_pct, 1)}, BIST30 endeksinin ${pct(U.real.benchmark?.full.cagr_pct, 1)}, büyük 50 hisseyi al-bekle ${pct(U.real.universe.full.cagr_pct, 1)}, faizin ${pct(U.real.cash.full.cagr_pct, 1)}.${U.usd ? ` Dolar bazında model ${pct(U.usd.strategy.full.cagr_pct, 1)}, endeks ${pct(U.usd.benchmark?.full.cagr_pct, 1)}.` : ""}</p>
     <p>Yani model 20 yılda alım gücünü koruyup biraz artırdı; endeks ve faiz ise alım gücü kaybettirdi. TL cinsinden büyük görünen rakamların çoğu enflasyondan geliyor. Performans bölümündeki "Enflasyondan arındırılmış" ve "Dolar" düğmeleriyle tüm grafik ve tabloları bu ölçülerle görebilirsiniz.</p>`;
-  $("#faq-perf").innerHTML = `<p>${trDate(B.period.start).split(" ").pop()}'dan bu yana ${up ? "evet, az farkla" : "hayır"}: model yılda ortalama %${fmt(P0.full.cagr_pct, 1)}, BIST30 endeksi %${fmt(P0.benchmark_full?.cagr_pct, 1)}, büyük 30 hisseyi al-bekle %${fmt(P0.universe_full?.cagr_pct, 1)} getirdi. Asıl fark riskte: en büyük düşüş modelde ${pct(P0.full.max_drawdown_pct, 0)}, endekste ${pct(P0.benchmark_full?.max_drawdown_pct, 0)} (2008).</p>
+  $("#faq-perf").innerHTML = `<p>${trDate(B.period.start).split(" ").pop()}'dan bu yana ${up ? "evet, az farkla" : "hayır"}: model yılda ortalama %${fmt(P0.full.cagr_pct, 1)}, BIST30 endeksi %${fmt(P0.benchmark_full?.cagr_pct, 1)}, büyük 50 hisseyi al-bekle %${fmt(P0.universe_full?.cagr_pct, 1)} getirdi. Asıl fark riskte: en büyük düşüş modelde ${pct(P0.full.max_drawdown_pct, 0)}, endekste ${pct(P0.benchmark_full?.max_drawdown_pct, 0)} (2008).</p>
     <p>Yükselişlerde model genellikle geride kalır (zamanının yarısında piyasa dışında), düşüşlerde ise çok daha az kaybeder. Tam yılların ${y.length}'ünün ${beatIdx}'ünde endeksi geçti. Faizin çok yüksek olduğu son yıllarda hem model hem endeks faizin gerisinde kaldı. Ayrıntılar <a href="#performans">Performans</a> bölümünde.</p>`;
 }
 
@@ -688,7 +688,7 @@ function renderHistory() {
 // Telefonda tablo yana kayabilir; detay alanını görünen genişliğe sabitle
 function fitDetail() {
   const dw = document.querySelector("#sig .dw");
-  if (dw) dw.style.width = ($("#sig").parentElement.clientWidth - 28) + "px";
+  if (dw) dw.style.width = ($("#sig").parentElement.clientWidth - 32) + "px";
 }
 
 // ---------------- Hisse detay grafiği ----------------
@@ -805,7 +805,7 @@ function renderBacktest() {
 function renderStats() {
   const P = B.portfolio, oos = period === "oos", Ux = unit === "tl" ? null : B.units?.[unit];
   const pick = (k, nom) => Ux ? (Ux[k] ? Ux[k][oos ? "oos" : "full"] : null) : nom;
-  const sets = [["Model portföy", "var(--strat)", pick("strategy", oos ? P.oos : P.full)], ["BIST30 al-bekle", "var(--bench)", pick("benchmark", oos ? P.benchmark_oos : P.benchmark_full)], ["Büyük 30 hisse al-bekle", "var(--uni)", pick("universe", oos ? P.universe_oos : P.universe_full)], ["Faiz", "var(--cash)", pick("cash", oos ? P.cash_oos : P.cash_full)]];
+  const sets = [["Model portföy", "var(--strat)", pick("strategy", oos ? P.oos : P.full)], ["BIST30 al-bekle", "var(--bench)", pick("benchmark", oos ? P.benchmark_oos : P.benchmark_full)], ["Büyük 50 hisse al-bekle", "var(--uni)", pick("universe", oos ? P.universe_oos : P.universe_full)], ["Faiz", "var(--cash)", pick("cash", oos ? P.cash_oos : P.cash_full)]];
   $("#perdesc").textContent = (oos ? `${trDate(B.period.oos_start)} – ${trDate(B.period.end)}` : `${trDate(B.period.start)} – ${trDate(B.period.end)}`) + UNIT[unit];
   $("#stats").innerHTML = sets.map(([n, c, m]) => !m ? "" : `<div class="stat" style="--c:${c}">
     <div class="k"><i style="background:${c};color:${c}"></i>${n}</div>
@@ -827,7 +827,7 @@ function renderYearly(rows0) {
     return o;
   });
   const short = iso => new Date(iso + "T00:00:00").toLocaleDateString("tr-TR", {day: "numeric", month: "short"});
-  const cols = [["strategy", "Model"], ["benchmark", "BIST30 endeksi"], ["universe", "Büyük 30 al-bekle"], ["cash", "Faiz"]].filter(([k]) => rows.some(r => r[k] != null));
+  const cols = [["strategy", "Model"], ["benchmark", "BIST30 endeksi"], ["universe", "Büyük 50 al-bekle"], ["cash", "Faiz"]].filter(([k]) => rows.some(r => r[k] != null));
   const wins = Object.fromEntries(cols.map(([k]) => [k, 0]));
   const body = rows.map(r => {
     const best = cols.map(([k]) => r[k]).filter(v => v != null).reduce((a, b) => Math.max(a, b), -Infinity);
@@ -882,7 +882,7 @@ function drawChart(c, oos) {
   hover(box, x, c.length, (k, tip) => {
     const p = c[k];
     const m = k => cv(p, k) == null ? "–" : money0(cv(p, k));
-    tip.innerHTML = `<b>${trDate(p.date)}</b>${UNIT[unit] ? `<br><span class="muted">${UNIT[unit].trim()}</span>` : ""}<br><i style="background:var(--strat)"></i>Model <b>${m("strategy")}</b><br><i style="background:var(--bench)"></i>BIST30 <b>${m("benchmark")}</b><br><i style="background:var(--cash)"></i>Faiz <b>${m("cash")}</b>${p.universe ? `<br><i style="background:var(--uni)"></i>Büyük 30 al-bekle <b>${m("universe")}</b>` : ""}`;
+    tip.innerHTML = `<b>${trDate(p.date)}</b>${UNIT[unit] ? `<br><span class="muted">${UNIT[unit].trim()}</span>` : ""}<br><i style="background:var(--strat)"></i>Model <b>${m("strategy")}</b><br><i style="background:var(--bench)"></i>BIST30 <b>${m("benchmark")}</b><br><i style="background:var(--cash)"></i>Faiz <b>${m("cash")}</b>${p.universe ? `<br><i style="background:var(--uni)"></i>Büyük 50 al-bekle <b>${m("universe")}</b>` : ""}`;
   }, W);
 }
 

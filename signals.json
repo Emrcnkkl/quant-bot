@@ -1,8 +1,8 @@
 {
- "generated_at": "2026-11-09T20:38+03:00",
+ "generated_at": "2026-11-09T23:01+03:00",
  "data_date": "2026-11-09",
  "demo": false,
- "universe": "BIST 30 (Ekim-Aralık 2026)",
+ "universe": "BIST50 benzeri: işlem hacmine göre en büyük 50 hisse (her çeyrek güncellenir)",
  "thresholds": {
   "buy": 40,
   "sell": -40
@@ -19,9 +19,9 @@
   "blocking": true
  },
  "counts": {
-  "AL": 7,
-  "TUT": 17,
-  "SAT": 6
+  "AL": 8,
+  "TUT": 30,
+  "SAT": 12
  },
  "signals": [
   {
@@ -129,6 +129,41 @@
     "MACD histogramı pozitif",
     "20 günlük zirve kırıldı",
     "3 ayda endeksten iyi (%+19.2)"
+   ]
+  },
+  {
+   "ticker": "BRSAN",
+   "name": "Borusan Boru",
+   "date": "2026-11-09",
+   "close": 685.0,
+   "change_pct": 0.44,
+   "score": 79.3,
+   "signal": "AL",
+   "state": "BEKLE",
+   "score_5d_ago": 5.0,
+   "components": {
+    "ema200": 15.0,
+    "ema_cross": 15.0,
+    "adx": 0.0,
+    "rsi": 15.0,
+    "macd": 15.0,
+    "volume": 10.0,
+    "breakout": 0.0,
+    "relative": 9.3
+   },
+   "rsi": 56.52,
+   "adx": 11.22,
+   "atr_pct": 4.41,
+   "stop": 609.48,
+   "target": 805.84,
+   "position": null,
+   "reasons": [
+    "Fiyat EMA200 üzerinde (uzun vade yukarı)",
+    "EMA20 > EMA50 (kısa vade pozitif)",
+    "RSI 57",
+    "MACD histogramı pozitif",
+    "Yükselişte yüksek hacim (ort. 2.4x)",
+    "3 ayda endeksten iyi (%+13.9)"
    ]
   },
   {
@@ -413,6 +448,41 @@
    ]
   },
   {
+   "ticker": "OYAKC",
+   "name": "Oyak Çimento",
+   "date": "2026-11-09",
+   "close": 19.77,
+   "change_pct": 1.44,
+   "score": 4.6,
+   "signal": "TUT",
+   "state": "BEKLE",
+   "score_5d_ago": -58.9,
+   "components": {
+    "ema200": -15.0,
+    "ema_cross": -15.0,
+    "adx": 9.4,
+    "rsi": 0.0,
+    "macd": 15.0,
+    "volume": 10.0,
+    "breakout": 0.0,
+    "relative": 0.2
+   },
+   "rsi": 52.86,
+   "adx": 29.09,
+   "atr_pct": 3.4,
+   "stop": 18.09,
+   "target": 22.46,
+   "position": null,
+   "reasons": [
+    "Fiyat EMA200 altında (uzun vade aşağı)",
+    "EMA20 < EMA50 (kısa vade negatif)",
+    "Güçlü trend (ADX 29, alıcılar baskın)",
+    "RSI 53",
+    "MACD histogramı pozitif",
+    "Yükselişte yüksek hacim (ort. 1.8x)"
+   ]
+  },
+  {
    "ticker": "MGROS",
    "name": "Migros",
    "date": "2026-11-09",
@@ -445,6 +515,41 @@
     "RSI 55",
     "MACD histogramı pozitif",
     "3 ayda endeksten kötü (%-18.2)"
+   ]
+  },
+  {
+   "ticker": "HALKB",
+   "name": "Halkbank",
+   "date": "2026-11-09",
+   "close": 42.86,
+   "change_pct": 4.43,
+   "score": -2.5,
+   "signal": "TUT",
+   "state": "BEKLE",
+   "score_5d_ago": -26.0,
+   "components": {
+    "ema200": 15.0,
+    "ema_cross": -15.0,
+    "adx": -7.5,
+    "rsi": 0.0,
+    "macd": -5.0,
+    "volume": 0.0,
+    "breakout": 0.0,
+    "relative": 10.0
+   },
+   "rsi": 51.33,
+   "adx": 26.32,
+   "atr_pct": 4.72,
+   "stop": 37.8,
+   "target": 50.95,
+   "position": null,
+   "reasons": [
+    "Fiyat EMA200 üzerinde (uzun vade yukarı)",
+    "EMA20 < EMA50 (kısa vade negatif)",
+    "Güçlü trend (ADX 26, satıcılar baskın)",
+    "RSI 51",
+    "MACD histogramı negatif",
+    "3 ayda endeksten iyi (%+37.6)"
    ]
   },
   {
@@ -483,6 +588,75 @@
    ]
   },
   {
+   "ticker": "KONTR",
+   "name": "Kontrolmatik",
+   "date": "2026-11-09",
+   "close": 2.67,
+   "change_pct": -0.37,
+   "score": -10.0,
+   "signal": "TUT",
+   "state": "BEKLE",
+   "score_5d_ago": -15.0,
+   "components": {
+    "ema200": -15.0,
+    "ema_cross": -15.0,
+    "adx": 10.0,
+    "rsi": 15.0,
+    "macd": 5.0,
+    "volume": 0.0,
+    "breakout": 0.0,
+    "relative": -10.0
+   },
+   "rsi": 66.39,
+   "adx": 39.35,
+   "atr_pct": 4.73,
+   "stop": 2.35,
+   "target": 3.17,
+   "position": null,
+   "reasons": [
+    "Fiyat EMA200 altında (uzun vade aşağı)",
+    "EMA20 < EMA50 (kısa vade negatif)",
+    "Güçlü trend (ADX 39, alıcılar baskın)",
+    "RSI 66",
+    "MACD histogramı pozitif",
+    "3 ayda endeksten kötü (%-26.7)"
+   ]
+  },
+  {
+   "ticker": "TKFEN",
+   "name": "Tekfen Holding",
+   "date": "2026-11-09",
+   "close": 194.1,
+   "change_pct": 2.7,
+   "score": -10.2,
+   "signal": "TUT",
+   "state": "BEKLE",
+   "score_5d_ago": -3.0,
+   "components": {
+    "ema200": 15.0,
+    "ema_cross": -15.0,
+    "adx": -5.6,
+    "rsi": -15.0,
+    "macd": 15.0,
+    "volume": 0.0,
+    "breakout": 0.0,
+    "relative": -4.6
+   },
+   "rsi": 44.88,
+   "adx": 23.38,
+   "atr_pct": 7.75,
+   "stop": 156.5,
+   "target": 254.27,
+   "position": null,
+   "reasons": [
+    "Fiyat EMA200 üzerinde (uzun vade yukarı)",
+    "EMA20 < EMA50 (kısa vade negatif)",
+    "RSI 45",
+    "MACD histogramı pozitif",
+    "3 ayda endeksten kötü (%-6.9)"
+   ]
+  },
+  {
    "ticker": "EKGYO",
    "name": "Emlak Konut GYO",
    "date": "2026-11-09",
@@ -518,6 +692,40 @@
    ]
   },
   {
+   "ticker": "MIATK",
+   "name": "Mia Teknoloji",
+   "date": "2026-11-09",
+   "close": 24.68,
+   "change_pct": 2.15,
+   "score": -22.6,
+   "signal": "TUT",
+   "state": "BEKLE",
+   "score_5d_ago": -78.0,
+   "components": {
+    "ema200": -15.0,
+    "ema_cross": -15.0,
+    "adx": 0.0,
+    "rsi": 0.0,
+    "macd": 15.0,
+    "volume": 0.0,
+    "breakout": 0.0,
+    "relative": -7.6
+   },
+   "rsi": 47.79,
+   "adx": 10.41,
+   "atr_pct": 8.09,
+   "stop": 19.69,
+   "target": 32.67,
+   "position": null,
+   "reasons": [
+    "Fiyat EMA200 altında (uzun vade aşağı)",
+    "EMA20 < EMA50 (kısa vade negatif)",
+    "RSI 48",
+    "MACD histogramı pozitif",
+    "3 ayda endeksten kötü (%-11.4)"
+   ]
+  },
+  {
    "ticker": "ASELS",
    "name": "Aselsan",
    "date": "2026-11-09",
@@ -549,6 +757,42 @@
     "Güçlü trend (ADX 29, satıcılar baskın)",
     "RSI 46",
     "MACD histogramı pozitif"
+   ]
+  },
+  {
+   "ticker": "SKBNK",
+   "name": "Şekerbank",
+   "date": "2026-11-09",
+   "close": 3.88,
+   "change_pct": 6.01,
+   "score": -25.0,
+   "signal": "TUT",
+   "state": "BEKLE",
+   "score_5d_ago": -40.0,
+   "components": {
+    "ema200": -15.0,
+    "ema_cross": -15.0,
+    "adx": -10.0,
+    "rsi": 0.0,
+    "macd": 15.0,
+    "volume": 10.0,
+    "breakout": 0.0,
+    "relative": -10.0
+   },
+   "rsi": 45.36,
+   "adx": 49.36,
+   "atr_pct": 6.91,
+   "stop": 3.21,
+   "target": 4.95,
+   "position": null,
+   "reasons": [
+    "Fiyat EMA200 altında (uzun vade aşağı)",
+    "EMA20 < EMA50 (kısa vade negatif)",
+    "Güçlü trend (ADX 49, satıcılar baskın)",
+    "RSI 45",
+    "MACD histogramı pozitif",
+    "Yükselişte yüksek hacim (ort. 2.0x)",
+    "3 ayda endeksten kötü (%-30.1)"
    ]
   },
   {
@@ -690,6 +934,41 @@
    ]
   },
   {
+   "ticker": "AKSEN",
+   "name": "Aksa Enerji",
+   "date": "2026-11-09",
+   "close": 69.95,
+   "change_pct": 2.04,
+   "score": -28.6,
+   "signal": "TUT",
+   "state": "BEKLE",
+   "score_5d_ago": -80.0,
+   "components": {
+    "ema200": -15.0,
+    "ema_cross": -15.0,
+    "adx": -9.8,
+    "rsi": 0.0,
+    "macd": 15.0,
+    "volume": 0.0,
+    "breakout": 0.0,
+    "relative": -3.8
+   },
+   "rsi": 52.54,
+   "adx": 29.7,
+   "atr_pct": 5.51,
+   "stop": 60.31,
+   "target": 85.38,
+   "position": null,
+   "reasons": [
+    "Fiyat EMA200 altında (uzun vade aşağı)",
+    "EMA20 < EMA50 (kısa vade negatif)",
+    "Güçlü trend (ADX 30, satıcılar baskın)",
+    "RSI 53",
+    "MACD histogramı pozitif",
+    "3 ayda endeksten kötü (%-5.7)"
+   ]
+  },
+  {
    "ticker": "SISE",
    "name": "Şişecam",
    "date": "2026-11-09",
@@ -725,6 +1004,41 @@
    ]
   },
   {
+   "ticker": "CANTE",
+   "name": "Çan2 Termik",
+   "date": "2026-11-09",
+   "close": 1.03,
+   "change_pct": 4.04,
+   "score": -30.3,
+   "signal": "TUT",
+   "state": "BEKLE",
+   "score_5d_ago": -88.9,
+   "components": {
+    "ema200": -15.0,
+    "ema_cross": -15.0,
+    "adx": -10.0,
+    "rsi": 0.0,
+    "macd": 15.0,
+    "volume": 0.0,
+    "breakout": 0.0,
+    "relative": -5.3
+   },
+   "rsi": 52.4,
+   "adx": 44.39,
+   "atr_pct": 4.69,
+   "stop": 0.91,
+   "target": 1.22,
+   "position": null,
+   "reasons": [
+    "Fiyat EMA200 altında (uzun vade aşağı)",
+    "EMA20 < EMA50 (kısa vade negatif)",
+    "Güçlü trend (ADX 44, satıcılar baskın)",
+    "RSI 52",
+    "MACD histogramı pozitif",
+    "3 ayda endeksten kötü (%-8.0)"
+   ]
+  },
+  {
    "ticker": "AEFES",
    "name": "Anadolu Efes",
    "date": "2026-11-09",
@@ -737,7 +1051,7 @@
    "components": {
     "ema200": -15.0,
     "ema_cross": -15.0,
-    "adx": -7.6,
+    "adx": -7.7,
     "rsi": 0.0,
     "macd": 15.0,
     "volume": 0.0,
@@ -745,8 +1059,8 @@
     "relative": -8.8
    },
    "rsi": 47.53,
-   "adx": 26.44,
-   "atr_pct": 3.74,
+   "adx": 26.48,
+   "atr_pct": 3.73,
    "stop": 15.36,
    "target": 19.47,
    "position": null,
@@ -831,6 +1145,181 @@
    ]
   },
   {
+   "ticker": "BTCIM",
+   "name": "Batıçim",
+   "date": "2026-11-09",
+   "close": 1.92,
+   "change_pct": 2.13,
+   "score": -35.0,
+   "signal": "TUT",
+   "state": "BEKLE",
+   "score_5d_ago": -40.0,
+   "components": {
+    "ema200": -15.0,
+    "ema_cross": -15.0,
+    "adx": -10.0,
+    "rsi": 0.0,
+    "macd": 15.0,
+    "volume": 0.0,
+    "breakout": 0.0,
+    "relative": -10.0
+   },
+   "rsi": 49.24,
+   "adx": 49.98,
+   "atr_pct": 7.41,
+   "stop": 1.56,
+   "target": 2.49,
+   "position": null,
+   "reasons": [
+    "Fiyat EMA200 altında (uzun vade aşağı)",
+    "EMA20 < EMA50 (kısa vade negatif)",
+    "Güçlü trend (ADX 50, satıcılar baskın)",
+    "RSI 49",
+    "MACD histogramı pozitif",
+    "3 ayda endeksten kötü (%-53.7)"
+   ]
+  },
+  {
+   "ticker": "CWENE",
+   "name": "CW Enerji",
+   "date": "2026-11-09",
+   "close": 17.87,
+   "change_pct": -1.71,
+   "score": -35.0,
+   "signal": "TUT",
+   "state": "BEKLE",
+   "score_5d_ago": -40.0,
+   "components": {
+    "ema200": -15.0,
+    "ema_cross": -15.0,
+    "adx": -10.0,
+    "rsi": 0.0,
+    "macd": 15.0,
+    "volume": 0.0,
+    "breakout": 0.0,
+    "relative": -10.0
+   },
+   "rsi": 49.8,
+   "adx": 40.46,
+   "atr_pct": 7.21,
+   "stop": 14.65,
+   "target": 23.02,
+   "position": null,
+   "reasons": [
+    "Fiyat EMA200 altında (uzun vade aşağı)",
+    "EMA20 < EMA50 (kısa vade negatif)",
+    "Güçlü trend (ADX 40, satıcılar baskın)",
+    "RSI 50",
+    "MACD histogramı pozitif",
+    "3 ayda endeksten kötü (%-51.2)"
+   ]
+  },
+  {
+   "ticker": "ECILC",
+   "name": "Eczacıbaşı İlaç",
+   "date": "2026-11-09",
+   "close": 51.5,
+   "change_pct": 4.38,
+   "score": -35.0,
+   "signal": "TUT",
+   "state": "BEKLE",
+   "score_5d_ago": -60.0,
+   "components": {
+    "ema200": -15.0,
+    "ema_cross": -15.0,
+    "adx": -10.0,
+    "rsi": 0.0,
+    "macd": 15.0,
+    "volume": 0.0,
+    "breakout": 0.0,
+    "relative": -10.0
+   },
+   "rsi": 45.94,
+   "adx": 43.81,
+   "atr_pct": 5.39,
+   "stop": 44.56,
+   "target": 62.61,
+   "position": null,
+   "reasons": [
+    "Fiyat EMA200 altında (uzun vade aşağı)",
+    "EMA20 < EMA50 (kısa vade negatif)",
+    "Güçlü trend (ADX 44, satıcılar baskın)",
+    "RSI 46",
+    "MACD histogramı pozitif",
+    "3 ayda endeksten kötü (%-21.2)"
+   ]
+  },
+  {
+   "ticker": "EUPWR",
+   "name": "Europower Enerji",
+   "date": "2026-11-09",
+   "close": 44.6,
+   "change_pct": 6.19,
+   "score": -35.0,
+   "signal": "TUT",
+   "state": "BEKLE",
+   "score_5d_ago": -50.0,
+   "components": {
+    "ema200": -15.0,
+    "ema_cross": -15.0,
+    "adx": -10.0,
+    "rsi": 0.0,
+    "macd": 15.0,
+    "volume": 0.0,
+    "breakout": 0.0,
+    "relative": -10.0
+   },
+   "rsi": 46.64,
+   "adx": 41.77,
+   "atr_pct": 8.85,
+   "stop": 34.73,
+   "target": 60.39,
+   "position": null,
+   "reasons": [
+    "Fiyat EMA200 altında (uzun vade aşağı)",
+    "EMA20 < EMA50 (kısa vade negatif)",
+    "Güçlü trend (ADX 42, satıcılar baskın)",
+    "RSI 47",
+    "MACD histogramı pozitif",
+    "3 ayda endeksten kötü (%-43.9)"
+   ]
+  },
+  {
+   "ticker": "GESAN",
+   "name": "Girişim Elektrik",
+   "date": "2026-11-09",
+   "close": 37.92,
+   "change_pct": 5.04,
+   "score": -35.0,
+   "signal": "TUT",
+   "state": "BEKLE",
+   "score_5d_ago": -50.0,
+   "components": {
+    "ema200": -15.0,
+    "ema_cross": -15.0,
+    "adx": -10.0,
+    "rsi": 0.0,
+    "macd": 15.0,
+    "volume": 0.0,
+    "breakout": 0.0,
+    "relative": -10.0
+   },
+   "rsi": 49.63,
+   "adx": 35.16,
+   "atr_pct": 7.34,
+   "stop": 30.96,
+   "target": 49.06,
+   "position": null,
+   "reasons": [
+    "Fiyat EMA200 altında (uzun vade aşağı)",
+    "EMA20 < EMA50 (kısa vade negatif)",
+    "Güçlü trend (ADX 35, satıcılar baskın)",
+    "RSI 50",
+    "MACD histogramı pozitif",
+    "3 ayda endeksten kötü (%-47.9)"
+   ]
+  },
+  {
    "ticker": "TUPRS",
    "name": "Tüpraş",
    "date": "2026-11-09",
@@ -903,6 +1392,40 @@
    ]
   },
   {
+   "ticker": "ALARK",
+   "name": "Alarko Holding",
+   "date": "2026-11-09",
+   "close": 98.7,
+   "change_pct": -3.05,
+   "score": -40.2,
+   "signal": "SAT",
+   "state": "BEKLE",
+   "score_5d_ago": -58.1,
+   "components": {
+    "ema200": -15.0,
+    "ema_cross": -15.0,
+    "adx": -10.0,
+    "rsi": -15.0,
+    "macd": 15.0,
+    "volume": 0.0,
+    "breakout": 0.0,
+    "relative": -0.2
+   },
+   "rsi": 44.62,
+   "adx": 30.41,
+   "atr_pct": 4.06,
+   "stop": null,
+   "target": null,
+   "position": null,
+   "reasons": [
+    "Fiyat EMA200 altında (uzun vade aşağı)",
+    "EMA20 < EMA50 (kısa vade negatif)",
+    "Güçlü trend (ADX 30, satıcılar baskın)",
+    "RSI 45",
+    "MACD histogramı pozitif"
+   ]
+  },
+  {
    "ticker": "ENKAI",
    "name": "Enka İnşaat",
    "date": "2026-11-09",
@@ -938,6 +1461,41 @@
    ]
   },
   {
+   "ticker": "FENER",
+   "name": "Fenerbahçe",
+   "date": "2026-11-09",
+   "close": 2.11,
+   "change_pct": -1.86,
+   "score": -50.0,
+   "signal": "SAT",
+   "state": "BEKLE",
+   "score_5d_ago": -70.0,
+   "components": {
+    "ema200": -15.0,
+    "ema_cross": -15.0,
+    "adx": -10.0,
+    "rsi": -15.0,
+    "macd": 15.0,
+    "volume": 0.0,
+    "breakout": 0.0,
+    "relative": -10.0
+   },
+   "rsi": 42.05,
+   "adx": 30.8,
+   "atr_pct": 4.8,
+   "stop": null,
+   "target": null,
+   "position": null,
+   "reasons": [
+    "Fiyat EMA200 altında (uzun vade aşağı)",
+    "EMA20 < EMA50 (kısa vade negatif)",
+    "Güçlü trend (ADX 31, satıcılar baskın)",
+    "RSI 42",
+    "MACD histogramı pozitif",
+    "3 ayda endeksten kötü (%-27.9)"
+   ]
+  },
+  {
    "ticker": "GUBRF",
    "name": "Gübre Fabrikaları",
    "date": "2026-11-09",
@@ -970,6 +1528,76 @@
     "RSI 42",
     "MACD histogramı pozitif",
     "3 ayda endeksten kötü (%-21.1)"
+   ]
+  },
+  {
+   "ticker": "HEKTS",
+   "name": "Hektaş",
+   "date": "2026-11-09",
+   "close": 1.8,
+   "change_pct": 2.27,
+   "score": -50.0,
+   "signal": "SAT",
+   "state": "BEKLE",
+   "score_5d_ago": -70.0,
+   "components": {
+    "ema200": -15.0,
+    "ema_cross": -15.0,
+    "adx": -10.0,
+    "rsi": -15.0,
+    "macd": 15.0,
+    "volume": 0.0,
+    "breakout": 0.0,
+    "relative": -10.0
+   },
+   "rsi": 41.29,
+   "adx": 34.51,
+   "atr_pct": 5.82,
+   "stop": null,
+   "target": null,
+   "position": null,
+   "reasons": [
+    "Fiyat EMA200 altında (uzun vade aşağı)",
+    "EMA20 < EMA50 (kısa vade negatif)",
+    "Güçlü trend (ADX 35, satıcılar baskın)",
+    "RSI 41",
+    "MACD histogramı pozitif",
+    "3 ayda endeksten kötü (%-30.7)"
+   ]
+  },
+  {
+   "ticker": "KLRHO",
+   "name": "Kiler Holding",
+   "date": "2026-11-09",
+   "close": 10.55,
+   "change_pct": 1.25,
+   "score": -50.0,
+   "signal": "SAT",
+   "state": "BEKLE",
+   "score_5d_ago": -60.0,
+   "components": {
+    "ema200": -15.0,
+    "ema_cross": -15.0,
+    "adx": -10.0,
+    "rsi": -15.0,
+    "macd": 15.0,
+    "volume": 0.0,
+    "breakout": 0.0,
+    "relative": -10.0
+   },
+   "rsi": 37.95,
+   "adx": 40.39,
+   "atr_pct": 10.22,
+   "stop": null,
+   "target": null,
+   "position": null,
+   "reasons": [
+    "Fiyat EMA200 altında (uzun vade aşağı)",
+    "EMA20 < EMA50 (kısa vade negatif)",
+    "Güçlü trend (ADX 40, satıcılar baskın)",
+    "RSI 38",
+    "MACD histogramı pozitif",
+    "3 ayda endeksten kötü (%-69.2)"
    ]
   },
   {
@@ -1072,6 +1700,77 @@
     "MACD histogramı pozitif",
     "3 ayda endeksten kötü (%-42.5)"
    ]
+  },
+  {
+   "ticker": "ULKER",
+   "name": "Ülker",
+   "date": "2026-11-09",
+   "close": 78.35,
+   "change_pct": -4.63,
+   "score": -63.5,
+   "signal": "SAT",
+   "state": "BEKLE",
+   "score_5d_ago": -61.3,
+   "components": {
+    "ema200": -15.0,
+    "ema_cross": -15.0,
+    "adx": -10.0,
+    "rsi": -15.0,
+    "macd": 5.0,
+    "volume": -10.0,
+    "breakout": 0.0,
+    "relative": -3.5
+   },
+   "rsi": 44.58,
+   "adx": 35.7,
+   "atr_pct": 3.67,
+   "stop": null,
+   "target": null,
+   "position": null,
+   "reasons": [
+    "Fiyat EMA200 altında (uzun vade aşağı)",
+    "EMA20 < EMA50 (kısa vade negatif)",
+    "Güçlü trend (ADX 36, satıcılar baskın)",
+    "RSI 45",
+    "MACD histogramı pozitif",
+    "Düşüşte yüksek hacim (ort. 2.6x)",
+    "3 ayda endeksten kötü (%-5.3)"
+   ]
+  },
+  {
+   "ticker": "TURSG",
+   "name": "Türkiye Sigorta",
+   "date": "2026-11-09",
+   "close": 3.46,
+   "change_pct": 3.28,
+   "score": -70.0,
+   "signal": "SAT",
+   "state": "BEKLE",
+   "score_5d_ago": -50.0,
+   "components": {
+    "ema200": -15.0,
+    "ema_cross": -15.0,
+    "adx": -10.0,
+    "rsi": -15.0,
+    "macd": -5.0,
+    "volume": 0.0,
+    "breakout": 0.0,
+    "relative": -10.0
+   },
+   "rsi": 30.09,
+   "adx": 52.89,
+   "atr_pct": 8.46,
+   "stop": null,
+   "target": null,
+   "position": null,
+   "reasons": [
+    "Fiyat EMA200 altında (uzun vade aşağı)",
+    "EMA20 < EMA50 (kısa vade negatif)",
+    "Güçlü trend (ADX 53, satıcılar baskın)",
+    "RSI 30",
+    "MACD histogramı negatif",
+    "3 ayda endeksten kötü (%-38.0)"
+   ]
   }
  ],
  "changes_days": 30,
@@ -1151,6 +1850,16 @@
   },
   {
    "date": "2026-11-09",
+   "ticker": "SKBNK",
+   "name": "Şekerbank",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -25.0,
+   "close": 3.88,
+   "since_pct": 0.0
+  },
+  {
+   "date": "2026-11-09",
    "ticker": "EREGL",
    "name": "Ereğli Demir Çelik",
    "from": "SAT",
@@ -1191,6 +1900,46 @@
   },
   {
    "date": "2026-11-09",
+   "ticker": "ECILC",
+   "name": "Eczacıbaşı İlaç",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -35.0,
+   "close": 51.5,
+   "since_pct": 0.0
+  },
+  {
+   "date": "2026-11-09",
+   "ticker": "EUPWR",
+   "name": "Europower Enerji",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -35.0,
+   "close": 44.6,
+   "since_pct": 0.0
+  },
+  {
+   "date": "2026-11-09",
+   "ticker": "GESAN",
+   "name": "Girişim Elektrik",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -35.0,
+   "close": 37.92,
+   "since_pct": 0.0
+  },
+  {
+   "date": "2026-11-09",
+   "ticker": "ALARK",
+   "name": "Alarko Holding",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -40.2,
+   "close": 98.7,
+   "since_pct": 0.0
+  },
+  {
+   "date": "2026-11-09",
    "ticker": "ENKAI",
    "name": "Enka İnşaat",
    "from": "TUT",
@@ -1198,6 +1947,26 @@
    "score": -43.5,
    "close": 80.6,
    "since_pct": 0.0
+  },
+  {
+   "date": "2026-11-09",
+   "ticker": "ULKER",
+   "name": "Ülker",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -63.5,
+   "close": 78.35,
+   "since_pct": 0.0
+  },
+  {
+   "date": "2026-11-06",
+   "ticker": "BRSAN",
+   "name": "Borusan Boru",
+   "from": "TUT",
+   "to": "AL",
+   "score": 80.0,
+   "close": 682.0,
+   "since_pct": 0.44
   },
   {
    "date": "2026-11-06",
@@ -1241,6 +2010,16 @@
   },
   {
    "date": "2026-11-06",
+   "ticker": "HALKB",
+   "name": "Halkbank",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -18.1,
+   "close": 41.04,
+   "since_pct": 4.43
+  },
+  {
+   "date": "2026-11-06",
    "ticker": "EKGYO",
    "name": "Emlak Konut GYO",
    "from": "SAT",
@@ -1248,6 +2027,16 @@
    "score": -20.0,
    "close": 17.66,
    "since_pct": 3.74
+  },
+  {
+   "date": "2026-11-06",
+   "ticker": "MIATK",
+   "name": "Mia Teknoloji",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -23.3,
+   "close": 24.16,
+   "since_pct": 2.15
   },
   {
    "date": "2026-11-06",
@@ -1268,6 +2057,16 @@
    "score": -25.0,
    "close": 468.75,
    "since_pct": 2.51
+  },
+  {
+   "date": "2026-11-06",
+   "ticker": "CANTE",
+   "name": "Çan2 Termik",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -31.0,
+   "close": 0.99,
+   "since_pct": 4.04
   },
   {
    "date": "2026-11-06",
@@ -1351,6 +2150,36 @@
   },
   {
    "date": "2026-11-05",
+   "ticker": "CWENE",
+   "name": "CW Enerji",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -25.0,
+   "close": 17.3,
+   "since_pct": 3.29
+  },
+  {
+   "date": "2026-11-05",
+   "ticker": "AKSEN",
+   "name": "Aksa Enerji",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -35.0,
+   "close": 66.55,
+   "since_pct": 5.11
+  },
+  {
+   "date": "2026-11-05",
+   "ticker": "BTCIM",
+   "name": "Batıçim",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -35.0,
+   "close": 1.89,
+   "since_pct": 1.59
+  },
+  {
+   "date": "2026-11-05",
    "ticker": "TUPRS",
    "name": "Tüpraş",
    "from": "TUT",
@@ -1378,6 +2207,16 @@
    "score": -42.4,
    "close": 67.85,
    "since_pct": 9.73
+  },
+  {
+   "date": "2026-11-05",
+   "ticker": "HALKB",
+   "name": "Halkbank",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -47.6,
+   "close": 40.1,
+   "since_pct": 6.88
   },
   {
    "date": "2026-11-05",
@@ -1441,6 +2280,16 @@
   },
   {
    "date": "2026-11-04",
+   "ticker": "OYAKC",
+   "name": "Oyak Çimento",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -13.5,
+   "close": 19.33,
+   "since_pct": 2.28
+  },
+  {
+   "date": "2026-11-04",
    "ticker": "BIMAS",
    "name": "BİM Mağazalar",
    "from": "SAT",
@@ -1471,6 +2320,16 @@
   },
   {
    "date": "2026-11-04",
+   "ticker": "ULKER",
+   "name": "Ülker",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -24.4,
+   "close": 80.5,
+   "since_pct": -2.67
+  },
+  {
+   "date": "2026-11-04",
    "ticker": "FROTO",
    "name": "Ford Otosan",
    "from": "SAT",
@@ -1491,6 +2350,16 @@
   },
   {
    "date": "2026-11-04",
+   "ticker": "ALARK",
+   "name": "Alarko Holding",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -29.6,
+   "close": 100.0,
+   "since_pct": -1.3
+  },
+  {
+   "date": "2026-11-04",
    "ticker": "AKBNK",
    "name": "Akbank",
    "from": "SAT",
@@ -1508,6 +2377,16 @@
    "score": -35.9,
    "close": 31.5,
    "since_pct": 6.73
+  },
+  {
+   "date": "2026-11-04",
+   "ticker": "HALKB",
+   "name": "Halkbank",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -37.3,
+   "close": 40.36,
+   "since_pct": 6.19
   },
   {
    "date": "2026-11-03",
@@ -1540,6 +2419,26 @@
    "since_pct": 11.64
   },
   {
+   "date": "2026-11-03",
+   "ticker": "HALKB",
+   "name": "Halkbank",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -57.1,
+   "close": 39.76,
+   "since_pct": 7.8
+  },
+  {
+   "date": "2026-11-02",
+   "ticker": "KONTR",
+   "name": "Kontrolmatik",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -15.0,
+   "close": 2.01,
+   "since_pct": 32.84
+  },
+  {
    "date": "2026-11-02",
    "ticker": "ENKAI",
    "name": "Enka İnşaat",
@@ -1548,6 +2447,16 @@
    "score": -21.7,
    "close": 80.05,
    "since_pct": 0.69
+  },
+  {
+   "date": "2026-11-02",
+   "ticker": "HALKB",
+   "name": "Halkbank",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -26.0,
+   "close": 40.56,
+   "since_pct": 5.67
   },
   {
    "date": "2026-11-02",
@@ -1611,6 +2520,16 @@
   },
   {
    "date": "2026-10-30",
+   "ticker": "CWENE",
+   "name": "CW Enerji",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -50.0,
+   "close": 13.64,
+   "since_pct": 31.01
+  },
+  {
+   "date": "2026-10-30",
    "ticker": "KCHOL",
    "name": "Koç Holding",
    "from": "TUT",
@@ -1618,6 +2537,16 @@
    "score": -63.5,
    "close": 192.8,
    "since_pct": 10.17
+  },
+  {
+   "date": "2026-10-30",
+   "ticker": "HALKB",
+   "name": "Halkbank",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -64.9,
+   "close": 39.6,
+   "since_pct": 8.23
   },
   {
    "date": "2026-10-28",
@@ -1661,6 +2590,26 @@
   },
   {
    "date": "2026-10-27",
+   "ticker": "CWENE",
+   "name": "CW Enerji",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -30.0,
+   "close": 14.32,
+   "since_pct": 24.79
+  },
+  {
+   "date": "2026-10-27",
+   "ticker": "BTCIM",
+   "name": "Batıçim",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -40.0,
+   "close": 1.54,
+   "since_pct": 24.68
+  },
+  {
+   "date": "2026-10-27",
    "ticker": "TAVHL",
    "name": "TAV Havalimanları",
    "from": "TUT",
@@ -1681,6 +2630,16 @@
   },
   {
    "date": "2026-10-26",
+   "ticker": "HALKB",
+   "name": "Halkbank",
+   "from": "AL",
+   "to": "TUT",
+   "score": 31.8,
+   "close": 42.94,
+   "since_pct": -0.19
+  },
+  {
+   "date": "2026-10-26",
    "ticker": "KCHOL",
    "name": "Koç Holding",
    "from": "SAT",
@@ -1688,6 +2647,46 @@
    "score": -21.7,
    "close": 200.6,
    "since_pct": 5.88
+  },
+  {
+   "date": "2026-10-26",
+   "ticker": "BTCIM",
+   "name": "Batıçim",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -30.0,
+   "close": 1.59,
+   "since_pct": 20.75
+  },
+  {
+   "date": "2026-10-26",
+   "ticker": "MIATK",
+   "name": "Mia Teknoloji",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -49.1,
+   "close": 24.42,
+   "since_pct": 1.06
+  },
+  {
+   "date": "2026-10-26",
+   "ticker": "ALARK",
+   "name": "Alarko Holding",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -60.8,
+   "close": 98.65,
+   "since_pct": 0.05
+  },
+  {
+   "date": "2026-10-23",
+   "ticker": "HALKB",
+   "name": "Halkbank",
+   "from": "TUT",
+   "to": "AL",
+   "score": 42.6,
+   "close": 43.1,
+   "since_pct": -0.56
   },
   {
    "date": "2026-10-23",
@@ -1761,6 +2760,16 @@
   },
   {
    "date": "2026-10-22",
+   "ticker": "MIATK",
+   "name": "Mia Teknoloji",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -24.7,
+   "close": 26.0,
+   "since_pct": -5.08
+  },
+  {
+   "date": "2026-10-22",
    "ticker": "BIMAS",
    "name": "BİM Mağazalar",
    "from": "TUT",
@@ -1811,6 +2820,16 @@
   },
   {
    "date": "2026-10-21",
+   "ticker": "BRSAN",
+   "name": "Borusan Boru",
+   "from": "AL",
+   "to": "TUT",
+   "score": 25.0,
+   "close": 646.5,
+   "since_pct": 5.96
+  },
+  {
+   "date": "2026-10-21",
    "ticker": "EKGYO",
    "name": "Emlak Konut GYO",
    "from": "TUT",
@@ -1848,6 +2867,16 @@
    "score": 71.9,
    "close": 134.6,
    "since_pct": 13.74
+  },
+  {
+   "date": "2026-10-20",
+   "ticker": "BRSAN",
+   "name": "Borusan Boru",
+   "from": "TUT",
+   "to": "AL",
+   "score": 70.0,
+   "close": 687.0,
+   "since_pct": -0.29
   },
   {
    "date": "2026-10-20",
@@ -1941,6 +2970,16 @@
   },
   {
    "date": "2026-10-16",
+   "ticker": "ALARK",
+   "name": "Alarko Holding",
+   "from": "AL",
+   "to": "TUT",
+   "score": 38.1,
+   "close": 107.0,
+   "since_pct": -7.76
+  },
+  {
+   "date": "2026-10-16",
    "ticker": "VAKBN",
    "name": "VakıfBank",
    "from": "AL",
@@ -1958,6 +2997,16 @@
    "score": 14.0,
    "close": 35.7,
    "since_pct": 8.52
+  },
+  {
+   "date": "2026-10-16",
+   "ticker": "MIATK",
+   "name": "Mia Teknoloji",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -43.0,
+   "close": 25.68,
+   "since_pct": -3.89
   },
   {
    "date": "2026-10-16",
@@ -2011,6 +3060,16 @@
   },
   {
    "date": "2026-10-15",
+   "ticker": "ALARK",
+   "name": "Alarko Holding",
+   "from": "TUT",
+   "to": "AL",
+   "score": 47.1,
+   "close": 109.1,
+   "since_pct": -9.53
+  },
+  {
+   "date": "2026-10-15",
    "ticker": "TRMET",
    "name": "TR Anadolu Metal Madencilik",
    "from": "AL",
@@ -2018,6 +3077,16 @@
    "score": 8.7,
    "close": 127.9,
    "since_pct": -9.38
+  },
+  {
+   "date": "2026-10-15",
+   "ticker": "MIATK",
+   "name": "Mia Teknoloji",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -20.9,
+   "close": 27.5,
+   "since_pct": -10.25
   },
   {
    "date": "2026-10-15",
@@ -2038,6 +3107,36 @@
    "score": -47.8,
    "close": 18.07,
    "since_pct": -6.25
+  },
+  {
+   "date": "2026-10-14",
+   "ticker": "ALARK",
+   "name": "Alarko Holding",
+   "from": "AL",
+   "to": "TUT",
+   "score": 38.8,
+   "close": 108.3,
+   "since_pct": -8.86
+  },
+  {
+   "date": "2026-10-14",
+   "ticker": "AKSEN",
+   "name": "Aksa Enerji",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -42.8,
+   "close": 72.9,
+   "since_pct": -4.05
+  },
+  {
+   "date": "2026-10-14",
+   "ticker": "MIATK",
+   "name": "Mia Teknoloji",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -50.7,
+   "close": 25.0,
+   "since_pct": -1.28
   },
   {
    "date": "2026-10-14",
@@ -2071,6 +3170,16 @@
   },
   {
    "date": "2026-10-13",
+   "ticker": "TKFEN",
+   "name": "Tekfen Holding",
+   "from": "AL",
+   "to": "TUT",
+   "score": 33.4,
+   "close": 231.8,
+   "since_pct": -16.26
+  },
+  {
+   "date": "2026-10-13",
    "ticker": "TCELL",
    "name": "Turkcell",
    "from": "SAT",
@@ -2078,6 +3187,16 @@
    "score": -24.4,
    "close": 99.45,
    "since_pct": -7.39
+  },
+  {
+   "date": "2026-10-13",
+   "ticker": "AKSEN",
+   "name": "Aksa Enerji",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -33.0,
+   "close": 73.3,
+   "since_pct": -4.57
   },
   {
    "date": "2026-10-13",
@@ -2098,6 +3217,36 @@
    "score": -39.4,
    "close": 13.05,
    "since_pct": 4.98
+  },
+  {
+   "date": "2026-10-13",
+   "ticker": "ULKER",
+   "name": "Ülker",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -50.0,
+   "close": 84.9,
+   "since_pct": -7.71
+  },
+  {
+   "date": "2026-10-13",
+   "ticker": "OYAKC",
+   "name": "Oyak Çimento",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -65.1,
+   "close": 20.4,
+   "since_pct": -3.09
+  },
+  {
+   "date": "2026-10-12",
+   "ticker": "ALARK",
+   "name": "Alarko Holding",
+   "from": "TUT",
+   "to": "AL",
+   "score": 74.1,
+   "close": 110.1,
+   "since_pct": -10.35
   },
   {
    "date": "2026-10-12",
@@ -2141,6 +3290,16 @@
   },
   {
    "date": "2026-10-12",
+   "ticker": "AKSEN",
+   "name": "Aksa Enerji",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -58.2,
+   "close": 71.75,
+   "since_pct": -2.51
+  },
+  {
+   "date": "2026-10-12",
    "ticker": "TTKOM",
    "name": "Türk Telekom",
    "from": "TUT",
@@ -2148,6 +3307,16 @@
    "score": -61.7,
    "close": 51.85,
    "since_pct": -5.0
+  },
+  {
+   "date": "2026-10-09",
+   "ticker": "BRSAN",
+   "name": "Borusan Boru",
+   "from": "AL",
+   "to": "TUT",
+   "score": 24.1,
+   "close": 659.0,
+   "since_pct": 3.95
   },
   {
    "date": "2026-10-09",
@@ -2161,6 +3330,16 @@
   },
   {
    "date": "2026-10-09",
+   "ticker": "ULKER",
+   "name": "Ülker",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -22.2,
+   "close": 88.0,
+   "since_pct": -10.97
+  },
+  {
+   "date": "2026-10-09",
    "ticker": "THYAO",
    "name": "Türk Hava Yolları",
    "from": "SAT",
@@ -2171,6 +3350,16 @@
   },
   {
    "date": "2026-10-09",
+   "ticker": "AKSEN",
+   "name": "Aksa Enerji",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -32.3,
+   "close": 73.85,
+   "since_pct": -5.28
+  },
+  {
+   "date": "2026-10-09",
    "ticker": "TTKOM",
    "name": "Türk Telekom",
    "from": "SAT",
@@ -2178,6 +3367,26 @@
    "score": -36.7,
    "close": 52.3,
    "since_pct": -5.81
+  },
+  {
+   "date": "2026-10-09",
+   "ticker": "OYAKC",
+   "name": "Oyak Çimento",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -38.0,
+   "close": 20.66,
+   "since_pct": -4.31
+  },
+  {
+   "date": "2026-10-09",
+   "ticker": "BTCIM",
+   "name": "Batıçim",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -40.0,
+   "close": 2.08,
+   "since_pct": -7.69
   },
   {
    "date": "2026-10-09",
@@ -2281,6 +3490,16 @@
   },
   {
    "date": "2026-10-07",
+   "ticker": "BTCIM",
+   "name": "Batıçim",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -30.0,
+   "close": 1.86,
+   "since_pct": 3.23
+  },
+  {
+   "date": "2026-10-07",
    "ticker": "ISCTR",
    "name": "İş Bankası (C)",
    "from": "SAT",
@@ -2288,6 +3507,16 @@
    "score": -39.4,
    "close": 12.97,
    "since_pct": 5.63
+  },
+  {
+   "date": "2026-10-07",
+   "ticker": "OYAKC",
+   "name": "Oyak Çimento",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -42.4,
+   "close": 20.5,
+   "since_pct": -3.56
   },
   {
    "date": "2026-10-07",
@@ -2331,6 +3560,16 @@
   },
   {
    "date": "2026-10-06",
+   "ticker": "MIATK",
+   "name": "Mia Teknoloji",
+   "from": "SAT",
+   "to": "TUT",
+   "score": 0.1,
+   "close": 30.24,
+   "since_pct": -18.39
+  },
+  {
+   "date": "2026-10-06",
    "ticker": "TOASO",
    "name": "Tofaş",
    "from": "SAT",
@@ -2348,6 +3587,16 @@
    "score": -43.6,
    "close": 19.78,
    "since_pct": -15.42
+  },
+  {
+   "date": "2026-10-06",
+   "ticker": "ECILC",
+   "name": "Eczacıbaşı İlaç",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -47.3,
+   "close": 63.55,
+   "since_pct": -18.96
   },
   {
    "date": "2026-10-05",
@@ -2388,6 +3637,36 @@
    "score": -38.9,
    "close": 68.95,
    "since_pct": 2.9
+  },
+  {
+   "date": "2026-10-05",
+   "ticker": "AKSEN",
+   "name": "Aksa Enerji",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -41.6,
+   "close": 72.85,
+   "since_pct": -3.98
+  },
+  {
+   "date": "2026-10-02",
+   "ticker": "BRSAN",
+   "name": "Borusan Boru",
+   "from": "TUT",
+   "to": "AL",
+   "score": 53.3,
+   "close": 703.5,
+   "since_pct": -2.63
+  },
+  {
+   "date": "2026-10-02",
+   "ticker": "AKSEN",
+   "name": "Aksa Enerji",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -27.3,
+   "close": 74.2,
+   "since_pct": -5.73
   },
   {
    "date": "2026-10-02",
@@ -2441,6 +3720,16 @@
   },
   {
    "date": "2026-10-01",
+   "ticker": "TKFEN",
+   "name": "Tekfen Holding",
+   "from": "TUT",
+   "to": "AL",
+   "score": 50.0,
+   "close": 252.0,
+   "since_pct": -22.98
+  },
+  {
+   "date": "2026-10-01",
    "ticker": "ASELS",
    "name": "Aselsan",
    "from": "SAT",
@@ -2451,6 +3740,16 @@
   },
   {
    "date": "2026-10-01",
+   "ticker": "ALARK",
+   "name": "Alarko Holding",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -23.9,
+   "close": 101.9,
+   "since_pct": -3.14
+  },
+  {
+   "date": "2026-10-01",
    "ticker": "EKGYO",
    "name": "Emlak Konut GYO",
    "from": "SAT",
@@ -2458,6 +3757,26 @@
    "score": -37.5,
    "close": 19.03,
    "since_pct": -3.73
+  },
+  {
+   "date": "2026-10-01",
+   "ticker": "OYAKC",
+   "name": "Oyak Çimento",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -38.6,
+   "close": 20.72,
+   "since_pct": -4.58
+  },
+  {
+   "date": "2026-10-01",
+   "ticker": "AKSEN",
+   "name": "Aksa Enerji",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -41.0,
+   "close": 72.35,
+   "since_pct": -3.32
   },
   {
    "date": "2026-10-01",
@@ -2481,6 +3800,26 @@
   },
   {
    "date": "2026-09-30",
+   "ticker": "TKFEN",
+   "name": "Tekfen Holding",
+   "from": "AL",
+   "to": "TUT",
+   "score": 15.0,
+   "close": 231.4,
+   "since_pct": -16.12
+  },
+  {
+   "date": "2026-09-30",
+   "ticker": "ALARK",
+   "name": "Alarko Holding",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -45.1,
+   "close": 98.65,
+   "since_pct": 0.05
+  },
+  {
+   "date": "2026-09-30",
    "ticker": "THYAO",
    "name": "Türk Hava Yolları",
    "from": "TUT",
@@ -2498,6 +3837,16 @@
    "score": -56.3,
    "close": 261.25,
    "since_pct": 16.27
+  },
+  {
+   "date": "2026-09-30",
+   "ticker": "OYAKC",
+   "name": "Oyak Çimento",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -62.4,
+   "close": 20.2,
+   "since_pct": -2.13
   },
   {
    "date": "2026-09-30",
@@ -2551,6 +3900,16 @@
   },
   {
    "date": "2026-09-29",
+   "ticker": "AKSEN",
+   "name": "Aksa Enerji",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -15.3,
+   "close": 74.25,
+   "since_pct": -5.79
+  },
+  {
+   "date": "2026-09-29",
    "ticker": "THYAO",
    "name": "Türk Hava Yolları",
    "from": "SAT",
@@ -2558,6 +3917,26 @@
    "score": -24.5,
    "close": 291.5,
    "since_pct": 6.35
+  },
+  {
+   "date": "2026-09-29",
+   "ticker": "OYAKC",
+   "name": "Oyak Çimento",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -37.3,
+   "close": 20.8,
+   "since_pct": -4.95
+  },
+  {
+   "date": "2026-09-29",
+   "ticker": "ECILC",
+   "name": "Eczacıbaşı İlaç",
+   "from": "SAT",
+   "to": "TUT",
+   "score": -39.4,
+   "close": 64.1,
+   "since_pct": -19.66
   },
   {
    "date": "2026-09-29",
@@ -2648,6 +4027,16 @@
    "score": -52.3,
    "close": 287.0,
    "since_pct": 8.01
+  },
+  {
+   "date": "2026-09-28",
+   "ticker": "OYAKC",
+   "name": "Oyak Çimento",
+   "from": "TUT",
+   "to": "SAT",
+   "score": -64.3,
+   "close": 20.64,
+   "since_pct": -4.22
   },
   {
    "date": "2026-09-28",

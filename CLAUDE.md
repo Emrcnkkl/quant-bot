@@ -1,10 +1,10 @@
-# CLAUDE.md — BIST30 Teknik Sinyal Botu
+# CLAUDE.md — BIST50 Teknik Sinyal Botu
 
 Bu dosya, projeye Claude Code ile devam ederken bağlam sağlamak içindir.
 Kullanıcıyla iletişim, arayüz metinleri ve kod yorumları **Türkçe**dir.
 
 ## Proje özeti
-BIST 30 hisseleri için günlük veriyle teknik analiz yapan, her hisseye −100…+100 arası
+Borsa İstanbul'un en büyük 50 hissesi (işlem hacmine göre, "BIST50 benzeri") için günlük veriyle teknik analiz yapan, her hisseye −100…+100 arası
 skor verip **AL / TUT / SAT** sinyali üreten, geriye dönük test (backtest) raporu çıkaran
 ve sonuçları statik bir web sayfasında gösteren bir bot. Şu an **Aşama 1** tamamlandı.
 
@@ -12,9 +12,12 @@ ve sonuçları statik bir web sayfasında gösteren bir bot. Şu an **Aşama 1**
 - Bot gerçek veriyle çalışıyor: GitHub Actions hafta içi 18:40 (+ yedek 19:25, 21:10) çalışıp JSON'ları commit ediyor; GitHub Pages
   açık (https://emrcnkkl.github.io/quant-bot/). Repo: Emrcnkkl/quant-bot, ana dal `claude/laughing-dijkstra-j1eqmj`.
 - Cloud oturumları için `quant-bot` ortamı Yahoo Finance ve www.tcmb.gov.tr'ye izinli → `python3 bot.py` oturumdan da çalışır (~1 dk).
-- **Portföy testi (sitedeki rakamlar)**: 2006'dan, noktasal evren (her çeyrek TL hacme göre en büyük 30), oynaklık ayarlı pozisyon,
-  reel faiz filtresi (+5). Sonuç (Kasım 2026): model %21/yıl, düşüş −%25 · XU030 %17.7, −%64 · faiz %15.5.
-  **Enflasyondan arındırılmış**: model +%1.7/yıl, XU030 −%1.2, faiz −%3.0. Dolar bazında model +%1.7, XU030 −%1.2.
+- **10 Kasım 2026'da 30 → 50 hisseye geçildi.** Evren = her çeyrek son 12 ayın (252 gün) TL hacmine göre en büyük 50 hisse
+  (`universe_size=50`, `universe_window=252`); sinyaller bugünkü üyeler için, liste otomatik — elle BIST listesi tutulmuyor.
+  Kıyas endeksi XU030 kalır (Yahoo'da XU050 geçmişi yok). Şirket adları `NAMES`, yoksa Yahoo → `names.json`.
+- **Portföy testi (sitedeki rakamlar)**: 2006'dan, noktasal evren, oynaklık ayarlı pozisyon, reel faiz filtresi (+5).
+  Sonuç: model %22.9/yıl, düşüş −%19.7, Sharpe 0.66 · XU030 %17.7, −%64 · büyük 50 al-bekle %20.3, −%67 · faiz %15.5.
+  **Enflasyondan arındırılmış**: model +%3.3/yıl, büyük 50 al-bekle +%1.0, XU030 −%1.2, faiz −%3.0.
 - Modelin değeri getiri değil **düşüş koruması** (2008: endeks −%50, model +%7). Teknik göstergelerle al-bekle'yi getiride
   belirgin geçmek gerçekçi testte mümkün olmadı; aşağıdaki "Araştırma bulguları"na bakmadan yeni kural ekleme.
 - **Canlı model portföy** (`live.json`): 9 Kasım 2026'da 100.000 ₺ ile başladı; her çalıştırmada yalnızca yeni günler eklenir,
@@ -37,6 +40,8 @@ ve sonuçları statik bir web sayfasında gösteren bir bot. Şu an **Aşama 1**
 | Oynaklığa göre pozisyon | iki dönemde de risk başına getiri arttı | **eklendi** (`vol_sizing`) |
 | Payı büyütmek (1.5×+) | testte daha kötü | eklenmedi |
 | Reel faiz filtresi 20 yıl (`research.py --faiz`) | +2.5…+7.5 arası eşikler iyileştiriyor; +5 iki dönemde de | **eklendi** (`real_rate_max=5`) |
+| 30 → 50 hisse | Sharpe 0.34→0.54 (2006–20), 0.73→0.90 (2021–26); 31–50. sıradakilerde de çalışıyor | **eklendi** |
+| Hacim penceresi 3 ay → 12 ay | aynı performans, liste çeyrekte 6.7 yerine 2.9 hisse değişiyor | **12 ay** |
 
 ## Dosya yapısı
 ```
@@ -53,6 +58,7 @@ YENİ PROJE/
 ├── stocks/TICKER.json # hisse detay grafiği verisi, son 500 gün (bot üretir)
 ├── live.json          # canlı model portföy kaydı (yalnızca eklenir, geçmişi değişmez)
 ├── notify.json        # son Telegram bildirimi tarihi
+├── names.json         # Yahoo'dan alınmış şirket adı önbelleği (NAMES'te olmayanlar için)
 ├── sensitivity.py     # parametre duyarlılık analizi (bot.py fonksiyonlarını kullanır, veriyi .cache/ altına kaydeder)
 ├── sensitivity.json   # analiz çıktısı
 ├── experiments.py     # giriş/çıkış kuralı deneyleri (al-bekle'yi geçen hisse sayısı), çıktı experiments.json
@@ -80,11 +86,10 @@ python3 -m http.server   # http://localhost:8000 — index.html file:// ile aç�
 | Otomasyon | GitHub Actions, hafta içi 18:40 TR (`40 15 * * 1-5` UTC) + yedek 19:25 ve 21:10; o günün verisi varsa yedekler atlanır. JSON'ları repoya commit eder (push öncesi `pull --rebase`) |
 | Hukuki | Her çıktıda "yatırım tavsiyesi değildir" uyarısı (SPK); disclaimer metni `bot.py` → `meta["disclaimer"]` |
 
-### Evren — BIST 30 (1 Ekim–31 Aralık 2026 dönemi)
-TRMET girdi, DSTKF çıktı. `bot.py` içindeki `BIST30` sözlüğü:
+### İsim kaynağı — `BIST30` sözlüğü (artık evreni belirlemiyor, yalnızca şirket adları için; Ekim–Aralık 2026 listesi)
 AEFES AKBNK ASELS ASTOR BIMAS EKGYO ENKAI EREGL FROTO GARAN GUBRF ISCTR KCHOL KRDMD MGROS
 PETKM PGSUS SAHOL SASA SISE TAVHL TCELL THYAO TOASO TRALT TRMET TTKOM TUPRS VAKBN YKBNK
-**Her çeyrek başında Borsa İstanbul duyurusuna göre güncellenmeli (sıradaki: Ocak 2027).**
+Evren `pit_membership` ile otomatik belirlenir; `CANDIDATES` (156 aday) ara ara yeni büyük hisselerle genişletilmeli.
 
 ### Skor (−100…+100) — `score_frame()`, ağırlıklar `W` sözlüğünde
 | Bileşen | Puan | Kural |
@@ -130,7 +135,7 @@ exit_rule ("score" varsayılan | ema50 | cross | ema200 | regime), entry_rule ("
 **backtest.json**: meta alanları + `backtest_universe, avg_exposure_pct, fx_start, units{real,usd}{strategy,benchmark,universe,cash}{full,oos}, settings, period{start,end,oos_start}, portfolio{full,oos,benchmark_full,benchmark_oos,cash_full,cash_oos}, portfolio{...,universe_full,universe_oos}, equity_curve[{date,strategy,benchmark,cash,universe,cpi,usd}] (haftalık), yearly[{year,from,to,partial,strategy,benchmark,cash,universe,cpi_pct,usd_pct}], stocks[{ticker,name,strategy,oos,buy_hold_pct}], recent_trades[]`
 - metrik alanları (`metrics()`): `total_return_pct, cagr_pct, sharpe, max_drawdown_pct, exposure_pct` (+ işlem listesi verilirse `trades, win_rate_pct, avg_trade_pct, profit_factor, avg_days`)
 
-**live.json**: `start_date, start_value, start_bench, points[{date,value,bench,stock_pct}], events[{date,ticker,name,type}], holdings[{ticker,name,weight_pct}], updated`
+**live.json**: `start_date, start_value, start_bench, points[{date,value,bench,stock_pct}], events[{date,ticker,name,type}], holdings[{ticker,name,weight_pct}], notes[{date,text}], updated`
 
 **history.json**: `[{date, signals: {TICKER: [signal, score, close]}}]`
 
@@ -157,6 +162,6 @@ exit_rule ("score" varsayılan | ema50 | cross | ema200 | regime), entry_rule ("
 
 ## Sıradaki adımlar
 1. ~~Telegram~~ — çalışıyor (9 Kasım 2026 deneme mesajı gönderildi; kullanıcının eski QuantBIST projesiyle aynı bot ve kanal).
-2. Ocak 2027'de BIST30 listesini (`BIST30` sözlüğü) Borsa İstanbul duyurusuna göre güncelle; `CANDIDATES`'e yeni büyük hisseleri ekle.
+2. `CANDIDATES`'e yeni halka arz olmuş büyük hisseleri ara ara ekle (evren otomatik; elle BIST listesi tutulmuyor).
 3. Fikirler: puan bileşenlerini tek tek sınamak (eğitim/test ayrımıyla), endeks EMA200 rejim filtresi (20 yıl testi),
    değerleme verisi (F/K) — veri kaynağı gerekli. Canlı portföy birkaç ay biriktikten sonra geriye dönük testle kıyasla.

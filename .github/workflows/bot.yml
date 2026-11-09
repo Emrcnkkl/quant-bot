@@ -1,4 +1,4 @@
-name: BIST30 sinyal botu
+name: BIST50 sinyal botu
 on:
   schedule:
     # Hafta içi her gün, seans kapanışından sonra (saatler UTC; TR = UTC+3).

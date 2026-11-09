@@ -1,6 +1,6 @@
-# BIST30 Teknik Sinyal Botu (Aşama 1)
+# BIST50 Teknik Sinyal Botu (Aşama 1)
 
-BIST 30 hisseleri için günlük veriyle çoklu indikatör skoru hesaplar, AL / TUT / SAT sinyali üretir ve geriye dönük test raporu çıkarır.
+Borsa İstanbul'un işlem hacmine göre en büyük 50 hissesi için günlük veriyle çoklu indikatör skoru hesaplar, AL / TUT / SAT sinyali üretir ve geriye dönük test raporu çıkarır.
 
 ## Dosyalar
 | Dosya | Açıklama |
