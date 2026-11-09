@@ -70,7 +70,26 @@ CFG = {
     "slippage": 0.0005,         # tek yön kayma (%0.05)
     "oos_fraction": 0.30,       # son %30'luk dönem örneklem dışı olarak raporlanır
     "min_bars": 260,
+    "cash_rate_factor": 1.0,    # nakit getirisi = politika faizi × bu katsayı (0 -> faiz yok)
 }
+
+# TCMB politika faizi (bir hafta vadeli repo), yıllık %. (yürürlük tarihi, oran)
+# Nakitte bekleyen para bu orandan günlük bileşik faiz kazanır.
+# Yeni PPK kararlarında listeye satır ekleyin; son oran sonraki günlere taşınır.
+# 2026 kararları henüz eklenmedi -> son satırı TCMB duyurularına göre kontrol edin.
+POLICY_RATES = [
+    ("2020-05-21", 8.25), ("2020-09-24", 10.25), ("2020-11-19", 15.00),
+    ("2020-12-24", 17.00), ("2021-03-18", 19.00), ("2021-09-23", 18.00),
+    ("2021-10-21", 16.00), ("2021-11-18", 15.00), ("2021-12-16", 14.00),
+    ("2022-08-18", 13.00), ("2022-09-22", 12.00), ("2022-10-20", 10.50),
+    ("2022-11-24", 9.00), ("2023-02-23", 8.50), ("2023-06-22", 15.00),
+    ("2023-07-20", 17.50), ("2023-08-24", 25.00), ("2023-09-21", 30.00),
+    ("2023-10-26", 35.00), ("2023-11-23", 40.00), ("2023-12-21", 42.50),
+    ("2024-01-25", 45.00), ("2024-03-21", 50.00), ("2024-12-26", 47.50),
+    ("2025-01-23", 45.00), ("2025-03-06", 42.50), ("2025-04-17", 46.00),
+    ("2025-07-24", 43.00), ("2025-09-11", 40.50), ("2025-10-23", 39.50),
+    ("2025-12-11", 38.00),
+]
 
 TR_TZ = timezone(timedelta(hours=3))
 OUT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -266,14 +285,27 @@ def reasons(row: pd.Series, comp: pd.Series) -> list[str]:
 # --------------------------------------------------------------------------- #
 #  BACKTEST
 # --------------------------------------------------------------------------- #
-def backtest(d: pd.DataFrame, sc: pd.Series) -> dict:
+def cash_returns(index: pd.DatetimeIndex) -> pd.Series:
+    """Her işlem günü için nakit getirisi: önceki işlem gününden bu yana geçen
+    takvim günleri kadar, o gün geçerli politika faiziyle bileşik faiz."""
+    rates = pd.Series({pd.Timestamp(k): v for k, v in POLICY_RATES}).sort_index()
+    annual = rates.reindex(rates.index.union(index)).ffill().reindex(index).fillna(0)
+    annual = annual / 100 * CFG["cash_rate_factor"]
+    gap = pd.Series(index, index=index).diff().dt.days.fillna(0)
+    prev_rate = annual.shift(1).fillna(0)          # faiz önceki günün oranıyla işler
+    return (1 + prev_rate) ** (gap / 365) - 1
+
+
+def backtest(d: pd.DataFrame, sc: pd.Series, cash: pd.Series | None = None) -> dict:
     """
     Long-only. t günü kapanışında skor >= buy_threshold ise t+1 açılışta al.
     Çıkış: skor < exit_score (t+1 açılışta) veya iz süren stop (gün içi).
+    Pozisyonda olunmayan günlerde para nakitte durur ve `cash` getirisini kazanır.
     Döner: günlük strateji getirisi serisi, işlemler, pozisyon durumu.
     """
     o, h, l, c, atr = (d[k].to_numpy() for k in ("Open", "High", "Low", "Close", "atr"))
     score = sc.to_numpy()
+    cash_r = cash.reindex(d.index).fillna(0).to_numpy() if cash is not None else np.zeros(len(d))
     n = len(d)
     cost = CFG["commission"] + CFG["slippage"]
     start = CFG["warmup_days"]
@@ -318,6 +350,7 @@ def backtest(d: pd.DataFrame, sc: pd.Series) -> dict:
                 daily[i] = c[i] / c[i - 1] - 1
         else:
             pending = None
+            daily[i] = cash_r[i]          # bütün gün nakitte
 
         # 3) Kapanışta: stopu yukarı taşı ve yarın için emir üret
         if in_pos:
@@ -351,7 +384,8 @@ def _trade(d, i0, i1, p0, p1, why):
             "ret_pct": round((p1 / p0 - 1) * 100, 2), "days": int(i1 - i0), "exit_reason": why}
 
 
-def metrics(daily: pd.Series, trades: list[dict] | None = None) -> dict:
+def metrics(daily: pd.Series, trades: list[dict] | None = None, rf: pd.Series | None = None) -> dict:
+    """rf verilirse Sharpe, nakit (faiz) getirisinin üzerindeki fazla getiriyle hesaplanır."""
     daily = daily.fillna(0)
     if len(daily) < 2:
         return {}
@@ -359,8 +393,9 @@ def metrics(daily: pd.Series, trades: list[dict] | None = None) -> dict:
     years = len(daily) / 252
     total = eq.iloc[-1] - 1
     cagr = eq.iloc[-1] ** (1 / years) - 1 if years > 0 and eq.iloc[-1] > 0 else float("nan")
-    std = daily.std()
-    sharpe = (daily.mean() / std * math.sqrt(252)) if std > 0 else 0.0
+    excess = daily - rf.reindex(daily.index).fillna(0) if rf is not None else daily
+    std = excess.std()
+    sharpe = (excess.mean() / std * math.sqrt(252)) if std > 0 else 0.0
     dd = (eq / eq.cummax() - 1).min()
     out = {
         "total_return_pct": round(total * 100, 2),
@@ -410,7 +445,8 @@ def run(demo: bool) -> None:
             continue
         d = add_indicators(df, bench_close)
         sc = score_frame(d)
-        bt = backtest(d, sc["score"])
+        cash_d = cash_returns(d.index)
+        bt = backtest(d, sc["score"], cash_d)
 
         last, comp = d.iloc[-1], sc.iloc[-1]
         prev_close = d["Close"].iloc[-2]
@@ -453,8 +489,9 @@ def run(demo: bool) -> None:
         bh = d["Close"].iloc[CFG["warmup_days"]:]
         per_stock.append({
             "ticker": t, "name": BIST30[t],
-            "strategy": metrics(daily, bt["trades"]),
-            "oos": metrics(daily.iloc[split:], [x for x in bt["trades"] if x["entry_date"] >= str(oos_start.date())]),
+            "strategy": metrics(daily, bt["trades"], rf=cash_d),
+            "oos": metrics(daily.iloc[split:], [x for x in bt["trades"] if x["entry_date"] >= str(oos_start.date())],
+                           rf=cash_d),
             "buy_hold_pct": r2((bh.iloc[-1] / bh.iloc[0] - 1) * 100),
         })
         for tr_ in bt["trades"][-5:]:
@@ -464,16 +501,21 @@ def run(demo: bool) -> None:
         sys.exit("Hiç veri işlenemedi. İnternet bağlantısını ve yfinance kurulumunu kontrol edin.")
 
     # --- Portföy: tüm hisselere eşit ağırlık (1/N), günlük yeniden dengeleme
-    port = pd.DataFrame(all_daily).fillna(0).mean(axis=1)
+    # Verisi daha kısa olan hisselerin (örn. sonradan halka arz) payı o günlerde nakitte bekler
+    port_df = pd.DataFrame(all_daily)
+    cash = cash_returns(port_df.index)
+    port = port_df.apply(lambda col: col.fillna(cash)).mean(axis=1)
     split = int(len(port) * (1 - CFG["oos_fraction"]))
     port_eq = (1 + port).cumprod()
     bench_eq = None
     if bench_close is not None:
         b = bench_close.reindex(port.index).ffill()
         bench_eq = b / b.iloc[0]
+    cash_eq = (1 + cash).cumprod()
     weekly = port_eq.resample("W-FRI").last()
     curve = [{"date": str(i.date()), "strategy": round(float(v), 4),
-              "benchmark": round(float(bench_eq.asof(i)), 4) if bench_eq is not None else None}
+              "benchmark": round(float(bench_eq.asof(i)), 4) if bench_eq is not None else None,
+              "cash": round(float(cash_eq.asof(i)), 4)}
              for i, v in weekly.items()]
 
     now = datetime.now(TR_TZ)
@@ -494,14 +536,20 @@ def run(demo: bool) -> None:
     write("backtest.json", {
         **meta,
         "settings": {k: CFG[k] for k in ("buy_threshold", "exit_score", "stop_atr",
-                                          "commission", "slippage", "oos_fraction")},
+                                          "commission", "slippage", "oos_fraction",
+                                          "cash_rate_factor")},
+        "cash_rate_last_pct": POLICY_RATES[-1][1],
+        "cash_rate_last_date": POLICY_RATES[-1][0],
         "period": {"start": str(port.index[0].date()), "end": str(port.index[-1].date()),
                    "oos_start": str(port.index[split].date())},
         "portfolio": {
-            "full": metrics(port),
-            "oos": metrics(port.iloc[split:]),
-            "benchmark_full": metrics(bench_eq.pct_change().fillna(0)) if bench_eq is not None else None,
-            "benchmark_oos": metrics(bench_eq.pct_change().fillna(0).iloc[split:]) if bench_eq is not None else None,
+            "full": metrics(port, rf=cash),
+            "oos": metrics(port.iloc[split:], rf=cash),
+            "benchmark_full": metrics(bench_eq.pct_change().fillna(0), rf=cash) if bench_eq is not None else None,
+            "benchmark_oos": metrics(bench_eq.pct_change().fillna(0).iloc[split:], rf=cash) if bench_eq is not None else None,
+            # Nakdin oynaklığı ~0 olduğu için Sharpe anlamsız -> None
+            "cash_full": {**metrics(cash), "sharpe": None},
+            "cash_oos": {**metrics(cash.iloc[split:]), "sharpe": None},
         },
         "equity_curve": curve,
         "stocks": sorted(per_stock, key=lambda x: -(x["strategy"].get("total_return_pct") or 0)),
@@ -523,7 +571,8 @@ def run(demo: bool) -> None:
 
     print(f"\nTamam: {counts['AL']} AL, {counts['TUT']} TUT, {counts['SAT']} SAT  "
           f"(veri tarihi {meta['data_date']})")
-    pf = metrics(port)
+    pf, cf = metrics(port, rf=cash), metrics(cash)
+    print(f"Nakit (politika faizi) aynı dönemde: toplam %{cf['total_return_pct']}")
     print(f"Backtest portföy: toplam %{pf['total_return_pct']}, MaxDD %{pf['max_drawdown_pct']}, "
           f"Sharpe {pf['sharpe']}")
 

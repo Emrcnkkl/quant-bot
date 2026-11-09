@@ -27,6 +27,7 @@ python3 -m http.server   # sonra tarayıcıda http://localhost:8000
 - Skor −100…+100: Trend (EMA200, EMA20/50, ADX) 40 · Momentum (RSI, MACD) 30 · Hacim 10 · 20g kırılım 10 · XU030'a göre göreli güç 10
 - Skor ≥ +40 → AL, ≤ −40 → SAT, arası TUT
 - Backtest: sadece alış, ertesi gün açılışta işlem, %0.15 tek yön maliyet, 2.5×ATR iz süren stop, skor < 0 olunca çıkış, son %30 örneklem dışı
+- Pozisyonda olunmayan günlerde para nakitte TCMB politika faizi kazanır (`bot.py` → `POLICY_RATES`; her faiz kararından sonra güncelleyin)
 - Ayarlar `bot.py` başındaki `CFG` sözlüğünde; BIST30 listesi her çeyrek güncellenmeli (`BIST30` sözlüğü).
 
 **Uyarı:** Çıktılar algoritmik teknik analizdir, yatırım tavsiyesi değildir.

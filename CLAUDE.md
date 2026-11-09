@@ -75,18 +75,20 @@ Bilgi amaçlı stop = kapanış − 2.5×ATR, hedef = kapanış + 4×ATR. Pozisy
 - Giriş: skor ≥ 40. Çıkış: skor < 0 (ertesi açılış) **veya** 2.5×ATR iz süren stop gün içinde (fiyat = min(açılış, stop)).
 - Maliyet tek yön %0.10 komisyon + %0.05 kayma.
 - İlk 210 gün ısınma (EMA200). Son %30 örneklem dışı (OOS) ayrı raporlanır.
-- Portföy: 30 hisseye eşit 1/N, sinyal yokken pay nakitte (faiz yok). XU030 al-tut ile kıyaslanır.
+- Portföy: 30 hisseye eşit 1/N, sinyal yokken pay nakitte ve **TCMB politika faizi** kazanır (`POLICY_RATES` tablosu, `cash_returns()`, takvim günü bazında bileşik). Verisi kısa olan hissenin payı da o günlerde nakitte. XU030 al-tut ve saf nakit ile kıyaslanır.
+- Sharpe, nakit getirisinin üzerindeki fazla getiriyle hesaplanır (`metrics(..., rf=cash)`); nakdin kendi Sharpe'ı `None`.
 - `state` alanı backtest durum makinesinden gelir: `POZİSYONDA`, `GİRİŞ` (yarın al), `ÇIKIŞ` (yarın sat), `BEKLE`.
 
 ### Tüm ayarlar
 `bot.py` başındaki `CFG` sözlüğü: history_period, warmup_days, buy/sell_threshold, exit_score,
-stop_atr, target_atr, commission, slippage, oos_fraction, min_bars.
+stop_atr, target_atr, commission, slippage, oos_fraction, min_bars, cash_rate_factor (0 = faiz yok).
+`POLICY_RATES`: (tarih, yıllık %) listesi — **her PPK kararından sonra satır ekle**. 2026 kararları henüz eklenmedi; son satır 2025-12-11 %38.
 
 ## JSON şemaları (index.html bunlara bağımlı — alan adı değiştirirken sayfayı da güncelle)
 **signals.json**: `generated_at, data_date, demo, universe, thresholds{buy,sell}, disclaimer, counts{AL,TUT,SAT}, signals[]`
 - `signals[]`: `ticker, name, date, close, change_pct, score, signal, state, score_5d_ago, components{ema200,...}, rsi, adx, atr_pct, stop, target, position{entry_date,entry_price,last_price,stop,pnl_pct,days}|null, reasons[]`
 
-**backtest.json**: meta alanları + `settings, period{start,end,oos_start}, portfolio{full,oos,benchmark_full,benchmark_oos}, equity_curve[{date,strategy,benchmark}] (haftalık), stocks[{ticker,name,strategy,oos,buy_hold_pct}], recent_trades[]`
+**backtest.json**: meta alanları + `settings, period{start,end,oos_start}, portfolio{full,oos,benchmark_full,benchmark_oos,cash_full,cash_oos}, equity_curve[{date,strategy,benchmark,cash}] (haftalık), stocks[{ticker,name,strategy,oos,buy_hold_pct}], recent_trades[]`
 - metrik alanları (`metrics()`): `total_return_pct, cagr_pct, sharpe, max_drawdown_pct, exposure_pct` (+ işlem listesi verilirse `trades, win_rate_pct, avg_trade_pct, profit_factor, avg_days`)
 
 **history.json**: `[{date, signals: {TICKER: [signal, score, close]}}]`
@@ -99,7 +101,7 @@ stop_atr, target_atr, commission, slippage, oos_fraction, min_bars.
 
 ## Bilinen sınırlamalar
 - **Hayatta kalma yanlılığı**: backtest bugünkü BIST30 listesiyle yapılıyor.
-- Nakitte bekleyen paraya faiz yok (Türkiye'de yüksek faiz ortamında stratejiyi olduğundan kötü gösterir).
+- Nakit getirisi politika faizi kabul ediliyor; gerçekte para piyasası fonu getirisi vergi/masraf nedeniyle biraz düşük olabilir (`cash_rate_factor` ile ayarlanır).
 - Portföy `exposure_pct` metriği anlamlı değil (günlük ortalama getiri ≠ 0 olduğu sürece ~%100 çıkar); sayfada gösterilmiyor.
 - Aynı gün stop olunca o günün kapanışındaki yeni giriş sinyali atlanıyor (küçük etki).
 - yfinance BIST verisinde zaman zaman eksik gün/bölünme hatası olabilir; gerçek veride kontrol edilmeli.
@@ -108,7 +110,7 @@ stop_atr, target_atr, commission, slippage, oos_fraction, min_bars.
 ## Sıradaki adımlar
 1. **Gerçek veriyle ilk çalıştırma** — `python3 bot.py`; eksik/hatalı hisse var mı, skor dağılımı makul mü (hepsi TUT ya da hepsi AL değil mi), backtest sayıları mantıklı mı kontrol et.
 2. GitHub Pages kurulumu; Actions'a yazma izni ver (Settings → Actions → General → Read and write), `workflow_dispatch` ile manuel test et. Repo: Emrcnkkl/quant-bot.
-3. Nakit getirisi (örn. TCMB politika faizi / para piyasası fonu) ile portföy backtest'ini düzelt.
+3. ~~Nakit getirisi~~ — yapıldı (TCMB politika faizi). 2026 PPK kararlarını `POLICY_RATES`'e ekle.
 4. Hayatta kalma yanlılığını azaltmak için geçmiş çeyreklerin BIST30 listeleriyle tarihsel evren.
 5. Eşik/parametre duyarlılık analizi (örn. AL eşiği 30/40/50, stop 2/2.5/3 ATR) — optimizasyon değil, sağlamlık kontrolü.
 6. Haftalık trend filtresi (opsiyonel), rejim filtresi (XU030 EMA200 altındayken yeni giriş yok).
