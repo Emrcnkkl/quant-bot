@@ -269,6 +269,21 @@ details.more>div{padding-top:14px}
 .acc .ex{font-size:11px;color:var(--muted);display:block}
 @media(max-width:520px){.acc th:nth-child(2),.acc th:nth-child(3),.acc td:nth-child(2),.acc td:nth-child(3){display:none}.acc th,.acc td{padding:10px 8px}}
 
+/* ---- Ucuzluk endeksi ---- */
+.cheap{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:0 0 18px}
+.cheap .card{padding:16px 18px}
+.cheap h4{margin:0 0 10px;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.cheap .list{display:flex;flex-wrap:wrap;gap:8px}
+.cheap .who{padding:6px 10px 6px 6px;border:1px solid var(--line);border-radius:12px;background:var(--surface);gap:8px;cursor:pointer}
+.cheap .who .av{width:28px;height:28px;font-size:10px}
+@media(max-width:700px){.cheap{grid-template-columns:1fr}}
+.vbar{position:relative;width:80px;height:6px;background:var(--line);border-radius:4px;display:inline-block;vertical-align:middle;margin-left:8px}
+.vbar i{position:absolute;left:0;top:0;bottom:0;border-radius:4px}
+#val td.loss{color:var(--muted);font-size:13px}
+#val th{cursor:pointer}
+#val th:nth-child(2){text-align:left}
+@media(max-width:620px){#val th:nth-child(8),#val td:nth-child(8),#val th:nth-child(2),#val td:nth-child(2),#val th:nth-child(5),#val td:nth-child(5),#val th:nth-child(6),#val td:nth-child(6){display:none}#val .vbar{width:40px}#val th,#val td{padding:11px 8px}#val .av{display:none}}
+
 /* ---- Sinyal geçmişi ---- */
 .hist .day{padding:10px 18px;font-size:12px;font-weight:650;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:var(--surface);border-bottom:1px solid var(--line);display:flex;justify-content:space-between}
 .hist .ch{display:grid;grid-template-columns:minmax(150px,1.4fr) auto minmax(60px,.6fr) minmax(80px,.7fr) minmax(100px,.8fr);align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid var(--line);cursor:pointer;font-variant-numeric:tabular-nums;transition:background .15s}
@@ -318,12 +333,12 @@ footer p{margin:0 0 8px;max-width:860px}
       <span>BIST50 <span class="gtext">Sinyal</span></span>
     </a>
     <div class="links">
-      <a href="#bugun">Bugün</a><a href="#sinyaller">Sinyaller</a><a href="#performans">Performans</a><a href="#nasil">Nasıl çalışır</a>
+      <a href="#bugun">Bugün</a><a href="#sinyaller">Sinyaller</a><a href="#performans">Performans</a><a href="#ucuzluk">Değerleme</a><a href="#nasil">Nasıl çalışır</a>
     </div>
     <span class="live" title="Her iş günü 18:40'ta otomatik güncellenir"><span class="dot"></span><span class="t" id="livetxt">GÜNCEL</span></span>
     <a class="help" href="#sss" title="Sık sorulan sorular">?</a>
   </div>
-  <div class="mnav"><a href="#bugun">Bugün</a><a href="#sinyaller">Sinyaller</a><a href="#performans">Performans</a><a href="#nasil">Nasıl çalışır</a><a href="#sss">SSS</a></div>
+  <div class="mnav"><a href="#bugun">Bugün</a><a href="#sinyaller">Sinyaller</a><a href="#performans">Performans</a><a href="#ucuzluk">Değerleme</a><a href="#nasil">Nasıl çalışır</a><a href="#sss">SSS</a></div>
 </nav>
 
 <main class="wrap">
@@ -433,8 +448,19 @@ footer p{margin:0 0 8px;max-width:860px}
   </section>
 
   <!-- ===== NASIL ÇALIŞIR ===== -->
+  <section id="ucuzluk">
+    <div class="kicker"><span class="gtext">03 · Değerleme</span></div>
+    <h2>Ucuzluk endeksi</h2>
+    <p class="lead">Hissenin fiyatı, şirketin kârına ve özsermayesine göre ucuz mu pahalı mı? Her hisse kendi sektöründeki büyük hisselerle karşılaştırılır: <b>100 = sektörünün en ucuzu, 0 = en pahalısı.</b></p>
+    <div class="filt"><span>ℹ️</span><div><b>Bu bölüm bilgi amaçlıdır.</b> AL / TUT / SAT modelinin parçası değildir ve geçmişte test edilmemiştir. Ucuz görünen bir hisse ucuz kalabilir (örneğin kârı düşüyorsa); pahalı görünen bir hisse büyümeye devam edebilir. 2023'ten beri şirketler enflasyon düzeltmeli bilanço yayınladığı için oranlar eski yıllarla doğrudan kıyaslanamaz.</div></div>
+    <div class="cheap" id="cheap"></div>
+    <div class="toolbar"><div class="tabs" id="vsec"></div></div>
+    <div class="tbl"><table id="val"></table></div>
+    <p class="muted small" id="valnote"></p>
+  </section>
+
   <section id="nasil">
-    <div class="kicker"><span class="gtext">03 · Yöntem</span></div>
+    <div class="kicker"><span class="gtext">04 · Yöntem</span></div>
     <h2>Nasıl çalışır?</h2>
     <p class="lead">Her iş günü borsa kapandıktan sonra (18:40) otomatik çalışır; kimse elle müdahale etmez.</p>
     <div class="steps">
@@ -470,7 +496,7 @@ footer p{margin:0 0 8px;max-width:860px}
 
   <!-- ===== SSS ===== -->
   <section id="sss" class="faq">
-    <div class="kicker"><span class="gtext">04 · SSS</span></div>
+    <div class="kicker"><span class="gtext">05 · SSS</span></div>
     <h2>Sık sorulan sorular</h2>
     <p class="lead"></p>
     <details><summary>Bu bir yatırım tavsiyesi mi?</summary><div><p>Hayır. Sayfa bir hobi/araştırma projesidir; kimsenin kişisel durumunu, risk tercihini ya da vergisini bilmez. Yatırım danışmanlığı yalnızca SPK lisanslı kuruluşlarca kişiye özel verilir.</p></div></details>
@@ -482,6 +508,7 @@ footer p{margin:0 0 8px;max-width:860px}
     </div></details>
     <details><summary>"Faiz ortamı" kutusu ne anlatıyor?</summary><div><p>Reel faiz = politika faizi − yıllık enflasyon. Pozitifse paranızı faizde tutmak enflasyonun üstünde getiri sağlar; bu dönemlerde hisseler cazibesini yitirebilir.</p>
       <p><b>Model bunu kullanıyor:</b> reel faiz %5'in üzerindeyken model portföy yeni hisse almaz, parayı faizde tutar (elindeki hisseleri normal kurallarla satar). 2006'dan beri yapılan testte bu kural hem 2006–2020'de hem 2021–2026'da sonucu iyileştirdi. AL / TUT / SAT etiketleri yine gösterilir; bunlar teknik görünümü anlatır.</p></div></details>
+    <details><summary>F/K ve PD/DD ne demek?</summary><div><p><b>F/K (fiyat / kazanç):</b> Hisse fiyatının, şirketin son 12 aydaki hisse başına kârına oranı. 5 ise, bugünkü kârla şirketin kendi değerini 5 yılda kazandığı anlamına gelir; düşük olan "ucuz" sayılır. Zarar eden şirketin F/K'sı yoktur.</p><p><b>PD/DD (piyasa değeri / defter değeri):</b> Fiyatın, hisse başına özsermayeye oranı. 1'in altı, şirketin borsada özsermayesinden ucuza alınıp satıldığını gösterir. Bankalar ve sanayi şirketleri için "normal" değerler çok farklı olduğundan her hisse kendi sektörüyle kıyaslanır.</p></div></details>
     <details><summary>Altın neden bu kadar iyi görünüyor?</summary><div id="faq-gold"><p>Yükleniyor…</p></div></details>
     <details><summary>Enflasyona göre gerçekte kazandırıyor mu?</summary><div id="faq-real"><p>Yükleniyor…</p></div></details>
     <details><summary>"Canlı model portföy" nedir?</summary><div><p>Sayfadaki diğer performans rakamları geriye dönük testtir: kurallar geçmişe uygulanarak hesaplanır. Canlı portföy ise 9 Kasım 2026'da 100.000 ₺ ile başlatıldı ve her gün yalnızca o günün sonucu eklenir; geçmiş kayıtlar sonradan değiştirilmez. Zamanla modelin gerçek performansının en güvenilir göstergesi olacak. Gerçek para değildir, işlem yapılmaz.</p></div></details>
@@ -548,6 +575,7 @@ async function load() {
     S = s; B = b;
     LIVE = await fetch("live.json?v=" + Date.now()).then(r => r.ok ? r.json() : null).catch(() => null);
     renderHero(); renderToday(); renderLive(); renderFilter(); renderSignals(); renderHistory(); renderAccuracy(); renderBacktest();
+    loadValuation();
   } catch (e) {
     $("#h-sub").textContent = "Veri yüklenemedi. Sayfayı bir web sunucusu üzerinden açın (örn. python3 -m http.server).";
   }
@@ -694,6 +722,42 @@ function renderSignals() {
   }).join("") || `<tr><td colspan="8" class="muted">Sonuç yok</td></tr>`;
   fitDetail();
   if (openRow) loadStock(openRow);
+}
+
+// ---------------- Ucuzluk endeksi ----------------
+let V = null, vSector = "Tümü", vSort = ["score", -1];
+async function loadValuation() {
+  V = await fetch("valuation.json?v=" + Date.now()).then(r => r.ok ? r.json() : null).catch(() => null);
+  if (!V || !V.items?.length) { $("#ucuzluk").hidden = true; document.querySelectorAll('a[href="#ucuzluk"]').forEach(a => a.hidden = true); return; }
+  renderValuation();
+}
+function renderValuation() {
+  const items = V.items, scored = items.filter(i => i.score != null);
+  const chip = i => `<div class="who" data-t="${i.ticker}"><span class="av" style="--h:${hue(i.ticker)}">${i.ticker.slice(0, 2)}</span><div><span class="tk">${i.ticker}</span><span class="nm">${i.sector} · ${i.score}</span></div></div>`;
+  const by = [...scored].sort((a, b) => b.score - a.score);
+  $("#cheap").innerHTML = `<div class="card"><h4>Sektörüne göre en ucuz 5</h4><div class="list">${by.slice(0, 5).map(chip).join("")}</div></div>
+    <div class="card"><h4>Sektörüne göre en pahalı 5</h4><div class="list">${by.slice(-5).reverse().map(chip).join("")}</div></div>`;
+  const secs = ["Tümü", ...[...new Set(items.map(i => i.sector))].sort((a, b) => a.localeCompare(b, "tr"))];
+  $("#vsec").innerHTML = secs.map(x => `<button data-s="${x}" class="${x === vSector ? "on" : ""}">${x}</button>`).join("");
+  const [k, dir] = vSort;
+  const rows = items.filter(i => vSector === "Tümü" || i.sector === vSector)
+    .sort((a, b) => ((a[k] ?? (dir < 0 ? -1e9 : 1e9)) > (b[k] ?? (dir < 0 ? -1e9 : 1e9)) ? 1 : -1) * dir);
+  const med = V.sectors || {};
+  const bar = v => v == null ? "–" : `<b>${v}</b><span class="vbar"><i style="width:${v}%;background:${v >= 67 ? "var(--al)" : v <= 33 ? "var(--sat)" : "var(--tut)"}"></i></span>`;
+  $("#val").innerHTML = `<thead><tr><th data-k="ticker">Hisse</th><th data-k="sector">Sektör</th>
+      <th data-k="pe" title="Fiyat / son 12 ay hisse başına kâr. Düşük = ucuz">F/K</th>
+      <th data-k="pb" title="Fiyat / hisse başına özsermaye. Düşük = ucuz">PD/DD</th>
+      <th data-k="div_yield" title="Son 12 ay temettü / fiyat">Temettü</th>
+      <th data-k="roe" title="Özsermaye kârlılığı: kâr / özsermaye">Kârlılık</th>
+      <th data-k="score" title="0–100: sektörüne göre ucuzluk (F/K ve PD/DD sıralamasının ortalaması)">Ucuzluk</th>
+      <th data-k="signal">Sinyal</th></tr></thead><tbody>` +
+    rows.map(i => `<tr><td>${who(i.ticker, i.name)}</td><td style="text-align:left;white-space:normal">${i.sector}<span class="nm">sektör F/K ${fmt(med[i.sector]?.pe, 1)} · PD/DD ${fmt(med[i.sector]?.pb, 2)}</span></td>
+      <td class="${i.loss ? "loss" : ""}">${i.pe != null ? fmt(i.pe, 1) : i.loss ? "zarar" : "–"}</td><td>${fmt(i.pb, 2)}</td>
+      <td>${i.div_yield ? "%" + fmt(i.div_yield, 1) : "–"}</td><td>${i.roe != null ? pct(i.roe, 0) : "–"}</td>
+      <td>${bar(i.score)}${i.loss && i.score != null ? `<span class="nm" title="Zarar eden şirketin F/K'sı olmadığı için puan yalnızca PD/DD'den geliyor">yalnızca PD/DD</span>` : i.peer === "tümü" ? `<span class="nm" title="Sektöründe yeterli hisse olmadığı için 50 hissenin tümüyle kıyaslandı">tümüyle kıyas</span>` : ""}</td>
+      <td><span class="badge ${i.signal}">${i.signal}</span></td></tr>`).join("") + `</tbody>`;
+  const fx = V.fx ? Object.entries(V.fx).map(([c, v]) => `${c}/TRY ${fmt(v, 2)}`).join(", ") : "";
+  $("#valnote").innerHTML = `Kaynak: Yahoo Finance (şirketlerin son 12 ay kârı ve son bilanço özsermayesi; haftada bir güncellenir, son: ${V.fundamentals_updated ? trDate(V.fundamentals_updated) : "–"}). Oranlar ${trDate(V.data_date)} kapanış fiyatıyla hesaplandı. Dolar ya da euro ile raporlayan şirketlerin rakamları kurla TL'ye çevrildi${fx ? ` (${fx})` : ""}. Yahoo verisinde hata olabilir; kararlarınızı şirketin KAP'taki finansal tablolarıyla doğrulayın. Bir hissenin üzerine dokunarak sinyal tablosunda açabilirsiniz.`;
 }
 
 // ---------------- Sinyal isabeti ----------------
@@ -962,6 +1026,21 @@ $("#hist").addEventListener("click", e => {
   const r = e.target.closest(".ch[data-t]"); if (!r) return;
   $("#q").value = ""; openRow = r.dataset.t; setFilter("ALL");
   document.querySelector(`#sig tr.row[data-t="${openRow}"]`)?.scrollIntoView({behavior: "smooth", block: "start"});
+});
+$("#vsec").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return; vSector = b.dataset.s; renderValuation();
+});
+$("#val").addEventListener("click", e => {
+  const th = e.target.closest("th[data-k]");
+  if (th) { const k = th.dataset.k; vSort = [k, vSort[0] === k ? -vSort[1] : (["ticker", "sector", "pe", "pb"].includes(k) ? 1 : -1)]; renderValuation(); return; }
+});
+document.addEventListener("click", e => {
+  const w = e.target.closest("#cheap .who[data-t], #val .who");
+  if (!w) return;
+  const t = w.dataset.t || w.querySelector(".tk")?.textContent;
+  if (!t || !S.signals.some(x => x.ticker === t)) return;
+  $("#q").value = ""; openRow = t; setFilter("ALL");
+  document.querySelector(`#sig tr.row[data-t="${t}"]`)?.scrollIntoView({behavior: "smooth", block: "start"});
 });
 $("#accseg").addEventListener("click", e => {
   if (!e.target.dataset.a) return; accMode = e.target.dataset.a;

@@ -27,6 +27,12 @@ ve sonuçları statik bir web sayfasında gösteren bir bot. Şu an **Aşama 1**
 - **Sinyal isabeti** (`signal_accuracy`, signals.json `accuracy`): AL'dan 1 ay sonra ort. +%2.3 vs herhangi bir gün +%1.8;
   SAT +%0.9. Son 3 yılda fark ~0. Sinyallerin tek tek tahmin gücü zayıf; modelin değeri risk kontrolü.
 - Paylaşım: og:image `img/og.png` (1200×630), ikonlar `img/`.
+- **Ucuzluk endeksi** (bilgi amaçlı, modelden bağımsız, test edilmedi): `fetch_fundamentals` (Yahoo .info; eps, bookValue,
+  currency, dividendYield, ROE, sektör; haftada bir → `fundamentals.json`), `valuation()` → `valuation.json`. F/K ve PD/DD bizim
+  fiyatımızla hesaplanır; Yahoo yabancı para raporlayanlarda tutarsız (THY USD, ENKA TL) → çevrilmiş/çevrilmemiş PD/DD'den
+  0,1–15 aralığında olan seçilir. F/K>100 gösterilmez. Puan 0–100 = sektör içi (≥4 hisse, yoksa tümü) F/K ve PD/DD sıralaması ort.
+- Workflow zamanlama: GitHub görevleri saatlerce geciktirebiliyor. "Beklenen veri günü" 18:00 (TR) öncesi bir önceki iş günü;
+  Yahoo eski veri verirse bot hata vermeden çıkar; son denemede (21:10) veri hâlâ yoksa Telegram'a bilgi mesajı.
 - Modelin değeri getiri değil **düşüş koruması** (2008: endeks −%50, model +%7). Teknik göstergelerle al-bekle'yi getiride
   belirgin geçmek gerçekçi testte mümkün olmadı; aşağıdaki "Araştırma bulguları"na bakmadan yeni kural ekleme.
 - **Canlı model portföy** (`live.json`): 9 Kasım 2026'da 100.000 ₺ ile başladı; her çalıştırmada yalnızca yeni günler eklenir,
@@ -70,6 +76,7 @@ YENİ PROJE/
 ├── live.json          # canlı model portföy kaydı (yalnızca eklenir, geçmişi değişmez)
 ├── notify.json        # son Telegram bildirimi tarihi
 ├── names.json         # Yahoo'dan alınmış şirket adı önbelleği (NAMES'te olmayanlar için)
+├── valuation.json     # ucuzluk endeksi (her gün) · fundamentals.json: temel veri önbelleği (haftalık)
 ├── tests/test_bot.py  # birim testler (python3 -m unittest discover -s tests); workflow her çalıştırmada koşar
 ├── img/               # og.png paylaşım görseli, ikonlar
 ├── sensitivity.py     # parametre duyarlılık analizi (bot.py fonksiyonlarını kullanır, veriyi .cache/ altına kaydeder)
