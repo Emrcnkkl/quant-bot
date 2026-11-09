@@ -454,6 +454,16 @@ const MONTHS = ["Ocak","Şubat","Mart","Nisan","Mayıs","Haziran","Temmuz","Ağu
 const monthName = ym => { const [y, m] = ym.split("-"); return `${MONTHS[+m - 1]} ${y}`; };
 const trDate = iso => new Date(iso + "T00:00:00").toLocaleDateString("tr-TR", {day: "numeric", month: "long", year: "numeric"});
 const START = 100000;
+// Bot hafta içi 18:40'ta (TR) çalışır: bir sonraki güncellemenin zamanı (resmi tatiller hesaba katılmaz)
+function nextUpdate() {
+  const trNow = new Date(Date.now() + 3 * 3600e3), d = new Date(trNow);   // UTC alanlarında TR saati
+  d.setUTCHours(18, 40, 0, 0);
+  if (trNow >= d) d.setUTCDate(d.getUTCDate() + 1);
+  while (d.getUTCDay() === 0 || d.getUTCDay() === 6) d.setUTCDate(d.getUTCDate() + 1);
+  const days = Math.round((Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()) - Date.UTC(trNow.getUTCFullYear(), trNow.getUTCMonth(), trNow.getUTCDate())) / 864e5);
+  const day = days === 0 ? "bugün" : days === 1 ? "yarın" : d.toLocaleDateString("tr-TR", {weekday: "long", timeZone: "UTC"});
+  return `${day} 18:40`;
+}
 // Hisse simgesi: koda göre sabit bir renk tonu
 const hue = t => [...t].reduce((a, c) => (a * 31 + c.charCodeAt(0)) % 360, 7);
 const who = (t, name, extra = "") => `<div class="who">${extra}<span class="av" style="--h:${hue(t)}">${t.slice(0, 2)}</span><div><span class="tk">${t}</span><span class="nm">${name}</span></div></div>`;
@@ -486,7 +496,8 @@ function renderHero() {
   const val = START * last.strategy, gain = val - START, ret = (last.strategy - 1) * 100;
   const yrs = (new Date(B.period.end) - new Date(B.period.start)) / 3.156e10;
   countUp($("#h-big"), val, v => fmt(v, 0) + " ₺");
-  $("#bugun .hero .top").insertAdjacentHTML("beforeend", `<span class="tag"><span class="dot"></span>${trDate(S.data_date)} kapanışı</span>`);
+  const wd = new Date(S.data_date + "T00:00:00").toLocaleDateString("tr-TR", {weekday: "long"});
+  $("#bugun .hero .top").insertAdjacentHTML("beforeend", `<span class="tag" title="Sıradaki güncelleme: ${nextUpdate()}"><span class="dot"></span>${trDate(S.data_date)} ${wd} kapanışı</span>`);
   $("#livetxt").textContent = new Date(S.data_date + "T00:00:00").toLocaleDateString("tr-TR", {day: "numeric", month: "short"}).toLocaleUpperCase("tr-TR");
   $("#h-delta").innerHTML = `<span class="${gain >= 0 ? "pos" : "neg"}">${gain >= 0 ? "↗ +" : "↘ "}%${fmt(ret, 0)} (${gain >= 0 ? "+" : ""}${tl(gain)})</span>`;
   $("#h-sub").innerHTML = `${trDate(B.period.start)} tarihinde 100.000 ₺ ile başlansaydı · yaklaşık ${fmt(yrs, 1)} yıl, yıllık %${fmt(B.portfolio.full.cagr_pct, 0)}<br>Aynı parayla BIST30 endeksi alınsaydı veya faize yatırılsaydı:`;
@@ -512,7 +523,7 @@ function renderToday() {
   document.querySelectorAll("#today .tile[data-go]").forEach(t => t.onclick = () => { setFilter(t.dataset.go); location.hash = "#sinyaller"; });
   const todayCh = (S.changes || []).filter(c => c.date === S.data_date);
   const nIn = todayCh.filter(c => c.to === "AL").length, nOut = todayCh.filter(c => c.from === "AL").length;
-  $("#today").insertAdjacentHTML("afterend", `<p class="muted small note">${trDate(S.data_date)} kapanışına göre · modelin şu an elinde <b>${inPos}</b> hisse var` +
+  $("#today").insertAdjacentHTML("afterend", `<p class="muted small note">${trDate(S.data_date)} kapanışına göre (en son kapanan işlem günü; sıradaki güncelleme ${nextUpdate()}) · modelin şu an elinde <b>${inPos}</b> hisse var` +
     (todayCh.length ? ` · bugün <a href="#gecmis">${todayCh.length} hissenin sinyali değişti</a>${nIn ? ` (${nIn} AL'a girdi${nOut ? `, ${nOut} AL'dan çıktı` : ""})` : nOut ? ` (${nOut} AL'dan çıktı)` : ""}` : "") + `</p>`);
 }
 
