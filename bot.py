@@ -440,7 +440,8 @@ def entry_allowed(index: pd.DatetimeIndex) -> pd.Series:
     return ~(real > lim)          # veri yoksa (NaN) alıma izin ver
 
 
-def backtest(d: pd.DataFrame, sc: pd.Series, cash: pd.Series | None = None) -> dict:
+def backtest(d: pd.DataFrame, sc: pd.Series, cash: pd.Series | None = None,
+             entry_mask: pd.Series | None = None) -> dict:
     """
     Long-only. t günü kapanışında skor >= buy_threshold ise t+1 açılışta al.
     Çıkış: skor < exit_score (t+1 açılışta) veya iz süren stop (gün içi).
@@ -451,6 +452,8 @@ def backtest(d: pd.DataFrame, sc: pd.Series, cash: pd.Series | None = None) -> d
     score = sc.to_numpy()
     cash_r = cash.reindex(d.index).fillna(0).to_numpy() if cash is not None else np.zeros(len(d))
     allow = entry_allowed(d.index).to_numpy()
+    if entry_mask is not None:            # örn. hisse o gün evrende mi (araştırma için)
+        allow = allow & entry_mask.reindex(d.index).fillna(False).to_numpy(dtype=bool)
     rule = CFG["exit_rule"]
     if rule == "score":
         exit_sig = score < CFG["exit_score"]

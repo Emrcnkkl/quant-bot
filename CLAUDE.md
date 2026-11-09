@@ -28,7 +28,10 @@ ve sonuçları statik bir web sayfasında gösteren bir bot. Şu an **Aşama 1**
   → mevcut kural korunuyor (`docs/kural-deneyleri.md`).
 - Uzun dönem (2009–2026, `docs/uzun-donem-arastirma.md`): bugünkü listeyle test yanlılığı çok büyük — bugünkü 30 hisse eşit ağırlık
   al-bekle %38/yıl vs XU030 %23. Mevcut strateji %25/yıl ama düşüş −%21 (2008: +%8). 12-1 ay momentum rotasyonu (en iyi 5) %47/yıl,
-  düşüş −%41 — yanlılıktan en çok etkilenecek strateji. **Sıradaki iş: tarihsel/likiditeye dayalı hisse evreni, sonra rotasyonu yeniden test.**
+  düşüş −%41 — yanlılıktan en çok etkilenecek strateji.
+- Noktasal evren (`research.py --pit`; 156 aday, her çeyrek TL hacme göre ilk 30, gerçek BIST30 ile 25/30 örtüşme): evren al-bekle %25.9
+  vs XU030 %23.4 → yanlılık büyük ölçüde temizlendi. Momentum rotasyonu %26–27 / düşüş −%50–58 → avantajı yanlılıktı, eklenmedi.
+  Mevcut strateji %21 / −%24: Sharpe al-bekle ile aynı, **değeri düşüş koruması**. Bot ayarları değişmedi.
 
 ## Dosya yapısı
 ```
@@ -47,6 +50,7 @@ YENİ PROJE/
 ├── sensitivity.json   # analiz çıktısı
 ├── experiments.py     # giriş/çıkış kuralı deneyleri (al-bekle'yi geçen hisse sayısı), çıktı experiments.json
 ├── research.py        # 2005–bugün uzun dönem testi, momentum rotasyonu, kayan pencereli seçim; veri .cache/long.pkl, çıktı research.json
+│                      # --pit: noktasal evren (.cache/wide.pkl, 156 aday hisse), çıktı research_pit.json
 └── history.json       # günlük sinyal geçmişi (yalnızca gerçek veriyle çalışınca oluşur/eklenir, son 500 gün)
 ```
 
@@ -143,7 +147,7 @@ exit_rule ("score" varsayılan | ema50 | cross | ema200 | regime), entry_rule ("
 1. **Gerçek veriyle ilk çalıştırma** — `python3 bot.py`; eksik/hatalı hisse var mı, skor dağılımı makul mü (hepsi TUT ya da hepsi AL değil mi), backtest sayıları mantıklı mı kontrol et.
 2. GitHub Pages kurulumu; Actions'a yazma izni ver (Settings → Actions → General → Read and write), `workflow_dispatch` ile manuel test et. Repo: Emrcnkkl/quant-bot.
 3. ~~Nakit getirisi~~ — yapıldı (TCMB politika faizi). 2026 PPK kararlarını `POLICY_RATES`'e ekle.
-4. **Hayatta kalma yanlılığı** — ölçüldü (yılda ~15 puan!). Çözüm planı: BIST100 aday listesinden her çeyrek işlem hacmine göre ilk 30 → noktasal evren.
+4. ~~Hayatta kalma yanlılığı~~ — ölçüldü (~15 puan/yıl) ve araştırmada noktasal evrenle giderildi. Bot/site backtest'i hâlâ bugünkü listeyle (uyarı var).
 5. ~~Duyarlılık analizi~~ — yapıldı (`sensitivity.py`, sonuç `docs/duyarlilik-analizi.md`): sonuç ayarlara duyarsız, ayar oynamak OOS'u iyileştirmiyor, hiçbir ayar OOS'ta faizi geçmiyor → mevcut ayarlar korunuyor.
 6. ~~Reel faiz filtresi~~ — kodda var, varsayılan kapalı (`docs/reel-faiz-filtresi.md`). Haftalık trend / XU030 EMA200 rejim filtresi denenmedi.
 7. Sinyal değişimlerinde Telegram bildirimi (yalnızca AL↔TUT↔SAT değişince).

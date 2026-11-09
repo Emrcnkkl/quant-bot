@@ -38,3 +38,39 @@ Bot ayarları değişmedi. Momentum rotasyonuna geçmeden önce **geçmiş döne
 hisseler) test şart. Plan: geniş bir aday listesi (BIST100) içinden her çeyrek işlem hacmine göre en büyük 30'u seçen bir evren kurmak;
 bu evrenin eşit ağırlıklı al-bekle'si XU030'a yaklaşıyorsa yanlılık büyük ölçüde giderilmiş demektir. Sonra rotasyon yeniden test edilir.
 Sınırlama: Yahoo'da borsadan çıkmış hisselerin verisi genelde yok; yanlılık tamamen sıfırlanamaz.
+
+---
+
+# Ek: Noktasal evrenle yeniden test (`python3 research.py --pit`)
+
+Evren: 181 adaydan Yahoo'da verisi olan 156 hisse (borsadan çıkmış 25 hisse — Finansbank, Petrol Ofisi, Trakya Cam,
+Asya Katılım vb. — Yahoo'da yok). Her çeyrek başında önceki 3 ayın ortalama TL işlem hacmine göre ilk 30 hisse o çeyreğin evreni.
+2005'ten beri 100 farklı hisse en az bir kez evrene girdi; çeyrek başına ortalama 4.4 hisse değişiyor.
+Bugünkü evren gerçek BIST30 ile 25/30 örtüşüyor → yöntem gerçek endeks seçimine yakın.
+
+**Doğrulama:** Evrenin eşit ağırlıklı al-bekle'si yıllık %25.9, gerçek XU030 %23.4. Fark ~15 puandan ~2.5 puana indi
+(kalan fark: eşit ağırlık + borsadan çıkmış hisselerin eksikliği). Yanlılık büyük ölçüde temizlendi.
+
+## 2009–2026
+| Strateji | Yıllık | En büyük düşüş | Sharpe | Endeksi geçtiği yıl | Evreni geçtiği yıl |
+|---|---|---|---|---|---|
+| mevcut | %20.9 | −%24.1 | 0.43 | 9/18 | 8/18 |
+| kesişim | %23.0 | −%22.5 | 0.46 | 9/18 | 8/18 |
+| rotasyon: skora göre en iyi 8 | %12.1 | −%53.8 | 0.00 | 6/18 | 2/18 |
+| rotasyon: momentum en iyi 5 | %26.3 | −%57.7 | 0.44 | 9/18 | 9/18 |
+| rotasyon: momentum en iyi 8 | %26.5 | −%53.2 | 0.46 | 7/18 | 10/18 |
+| rotasyon: momentum en iyi 10 | %26.8 | −%49.8 | 0.47 | 10/18 | 8/18 |
+| kayan pencereli seçim | %20.8 | −%24.1 | 0.37 | 8/18 | 8/18 |
+| evren eşit ağırlık al-bekle | %25.9 | −%39.2 | 0.46 | 8/18 | – |
+| XU030 | %23.4 | −%35.7 | 0.39 | – | 10/18 |
+| Faiz | %15.3 | 0 | – | 7/18 | 8/18 |
+
+## Sonuç
+1. **Momentum rotasyonunun %47'lik getirisinin neredeyse tamamı yanlılıktı.** Doğru evrenle %26–27; al-bekle ile aynı, düşüşü −%50–58 (daha kötü).
+   Bota eklenmeyecek.
+2. **Mevcut strateji gerçekçi testte:** yıllık %21, düşüş −%24 (al-bekle −%39, endeks −%36). Risk başına getirisi (Sharpe 0.43–0.46)
+   al-bekle ile aynı; yani **getiri üstünlüğü yok, değeri düşüşleri yarıya indirmesi** (2008: +%4, evren −%60).
+3. Kesişim çıkışı uzun dönemde biraz daha iyi (%23 / −%22.5) ama son 1.5 yılda mevcut kuraldan kötü ve fark küçük → kural değişmiyor.
+4. Kayan pencereli seçim sabit kuraldan iyi değil → geçmişe göre kural değiştirmek değer katmıyor.
+
+Bot ayarları değişmedi. Sitedeki geriye dönük test hâlâ bugünkü listeyle yapılıyor (yanlılık uyarısı sitede var).
