@@ -1,0 +1,2625 @@
+{
+ "generated_at": "2026-11-09T05:21+03:00",
+ "data_date": "2026-11-09",
+ "demo": true,
+ "universe": "BIST 30 (Ekim-Aralık 2026)",
+ "thresholds": {
+  "buy": 40,
+  "sell": -40
+ },
+ "disclaimer": "Buradaki bilgiler algoritmik teknik analiz çıktısıdır; yatırım tavsiyesi değildir. Yatırım danışmanlığı hizmeti, SPK lisanslı kuruluşlar tarafından kişiye özel sunulur.",
+ "settings": {
+  "buy_threshold": 40,
+  "exit_score": 0,
+  "stop_atr": 2.5,
+  "commission": 0.001,
+  "slippage": 0.0005,
+  "oos_fraction": 0.3
+ },
+ "period": {
+  "start": "2021-11-30",
+  "end": "2026-11-09",
+  "oos_start": "2025-05-15"
+ },
+ "portfolio": {
+  "full": {
+   "total_return_pct": 4.72,
+   "cagr_pct": 0.9,
+   "sharpe": 0.14,
+   "max_drawdown_pct": -13.81,
+   "exposure_pct": 99.1
+  },
+  "oos": {
+   "total_return_pct": -7.38,
+   "cagr_pct": -4.86,
+   "sharpe": -0.42,
+   "max_drawdown_pct": -13.81,
+   "exposure_pct": 98.5
+  },
+  "benchmark_full": {
+   "total_return_pct": 260.39,
+   "cagr_pct": 28.46,
+   "sharpe": 0.92,
+   "max_drawdown_pct": -47.92,
+   "exposure_pct": 99.9
+  },
+  "benchmark_oos": {
+   "total_return_pct": 24.3,
+   "cagr_pct": 15.17,
+   "sharpe": 0.58,
+   "max_drawdown_pct": -40.39,
+   "exposure_pct": 100.0
+  }
+ },
+ "equity_curve": [
+  {
+   "date": "2021-12-03",
+   "strategy": 0.9923,
+   "benchmark": 1.0009
+  },
+  {
+   "date": "2021-12-10",
+   "strategy": 0.9977,
+   "benchmark": 1.0283
+  },
+  {
+   "date": "2021-12-17",
+   "strategy": 0.988,
+   "benchmark": 0.9937
+  },
+  {
+   "date": "2021-12-24",
+   "strategy": 0.9994,
+   "benchmark": 1.0259
+  },
+  {
+   "date": "2021-12-31",
+   "strategy": 0.9958,
+   "benchmark": 0.9807
+  },
+  {
+   "date": "2022-01-07",
+   "strategy": 0.9684,
+   "benchmark": 0.9017
+  },
+  {
+   "date": "2022-01-14",
+   "strategy": 0.9596,
+   "benchmark": 0.9202
+  },
+  {
+   "date": "2022-01-21",
+   "strategy": 0.9587,
+   "benchmark": 0.9905
+  },
+  {
+   "date": "2022-01-28",
+   "strategy": 0.9585,
+   "benchmark": 1.0777
+  },
+  {
+   "date": "2022-02-04",
+   "strategy": 0.9591,
+   "benchmark": 1.1048
+  },
+  {
+   "date": "2022-02-11",
+   "strategy": 0.9554,
+   "benchmark": 1.099
+  },
+  {
+   "date": "2022-02-18",
+   "strategy": 0.9713,
+   "benchmark": 1.2556
+  },
+  {
+   "date": "2022-02-25",
+   "strategy": 0.9758,
+   "benchmark": 1.3293
+  },
+  {
+   "date": "2022-03-04",
+   "strategy": 0.9833,
+   "benchmark": 1.406
+  },
+  {
+   "date": "2022-03-11",
+   "strategy": 0.9825,
+   "benchmark": 1.4458
+  },
+  {
+   "date": "2022-03-18",
+   "strategy": 0.9724,
+   "benchmark": 1.3628
+  },
+  {
+   "date": "2022-03-25",
+   "strategy": 0.9699,
+   "benchmark": 1.3472
+  },
+  {
+   "date": "2022-04-01",
+   "strategy": 0.9644,
+   "benchmark": 1.3817
+  },
+  {
+   "date": "2022-04-08",
+   "strategy": 0.9678,
+   "benchmark": 1.4298
+  },
+  {
+   "date": "2022-04-15",
+   "strategy": 0.9681,
+   "benchmark": 1.4605
+  },
+  {
+   "date": "2022-04-22",
+   "strategy": 1.0021,
+   "benchmark": 1.6917
+  },
+  {
+   "date": "2022-04-29",
+   "strategy": 1.0092,
+   "benchmark": 1.7076
+  },
+  {
+   "date": "2022-05-06",
+   "strategy": 1.0262,
+   "benchmark": 1.8422
+  },
+  {
+   "date": "2022-05-13",
+   "strategy": 1.0221,
+   "benchmark": 1.8548
+  },
+  {
+   "date": "2022-05-20",
+   "strategy": 1.0142,
+   "benchmark": 1.7859
+  },
+  {
+   "date": "2022-05-27",
+   "strategy": 1.0025,
+   "benchmark": 1.7721
+  },
+  {
+   "date": "2022-06-03",
+   "strategy": 0.9979,
+   "benchmark": 1.8169
+  },
+  {
+   "date": "2022-06-10",
+   "strategy": 0.9887,
+   "benchmark": 1.8449
+  },
+  {
+   "date": "2022-06-17",
+   "strategy": 1.0034,
+   "benchmark": 1.8743
+  },
+  {
+   "date": "2022-06-24",
+   "strategy": 1.015,
+   "benchmark": 1.9339
+  },
+  {
+   "date": "2022-07-01",
+   "strategy": 1.0129,
+   "benchmark": 1.9789
+  },
+  {
+   "date": "2022-07-08",
+   "strategy": 1.0122,
+   "benchmark": 1.9677
+  },
+  {
+   "date": "2022-07-15",
+   "strategy": 1.0559,
+   "benchmark": 1.9257
+  },
+  {
+   "date": "2022-07-22",
+   "strategy": 1.0806,
+   "benchmark": 2.0838
+  },
+  {
+   "date": "2022-07-29",
+   "strategy": 1.0519,
+   "benchmark": 2.0007
+  },
+  {
+   "date": "2022-08-05",
+   "strategy": 1.0375,
+   "benchmark": 1.9874
+  },
+  {
+   "date": "2022-08-12",
+   "strategy": 1.0322,
+   "benchmark": 1.8533
+  },
+  {
+   "date": "2022-08-19",
+   "strategy": 1.0478,
+   "benchmark": 2.1047
+  },
+  {
+   "date": "2022-08-26",
+   "strategy": 1.0453,
+   "benchmark": 2.1105
+  },
+  {
+   "date": "2022-09-02",
+   "strategy": 1.0366,
+   "benchmark": 2.2059
+  },
+  {
+   "date": "2022-09-09",
+   "strategy": 1.019,
+   "benchmark": 2.078
+  },
+  {
+   "date": "2022-09-16",
+   "strategy": 1.0233,
+   "benchmark": 2.3043
+  },
+  {
+   "date": "2022-09-23",
+   "strategy": 1.0269,
+   "benchmark": 2.1608
+  },
+  {
+   "date": "2022-09-30",
+   "strategy": 1.0213,
+   "benchmark": 2.137
+  },
+  {
+   "date": "2022-10-07",
+   "strategy": 1.0144,
+   "benchmark": 2.0913
+  },
+  {
+   "date": "2022-10-14",
+   "strategy": 1.0046,
+   "benchmark": 2.0498
+  },
+  {
+   "date": "2022-10-21",
+   "strategy": 1.0079,
+   "benchmark": 1.8849
+  },
+  {
+   "date": "2022-10-28",
+   "strategy": 1.0108,
+   "benchmark": 1.8131
+  },
+  {
+   "date": "2022-11-04",
+   "strategy": 1.0433,
+   "benchmark": 1.9819
+  },
+  {
+   "date": "2022-11-11",
+   "strategy": 1.0451,
+   "benchmark": 2.1994
+  },
+  {
+   "date": "2022-11-18",
+   "strategy": 1.0165,
+   "benchmark": 2.1392
+  },
+  {
+   "date": "2022-11-25",
+   "strategy": 1.0189,
+   "benchmark": 2.1188
+  },
+  {
+   "date": "2022-12-02",
+   "strategy": 1.0163,
+   "benchmark": 2.0536
+  },
+  {
+   "date": "2022-12-09",
+   "strategy": 1.0186,
+   "benchmark": 1.9917
+  },
+  {
+   "date": "2022-12-16",
+   "strategy": 1.0472,
+   "benchmark": 2.1543
+  },
+  {
+   "date": "2022-12-23",
+   "strategy": 1.0294,
+   "benchmark": 2.1379
+  },
+  {
+   "date": "2022-12-30",
+   "strategy": 1.0487,
+   "benchmark": 2.2881
+  },
+  {
+   "date": "2023-01-06",
+   "strategy": 1.0203,
+   "benchmark": 2.1238
+  },
+  {
+   "date": "2023-01-13",
+   "strategy": 1.0146,
+   "benchmark": 2.0795
+  },
+  {
+   "date": "2023-01-20",
+   "strategy": 1.0074,
+   "benchmark": 2.1072
+  },
+  {
+   "date": "2023-01-27",
+   "strategy": 1.0086,
+   "benchmark": 2.1167
+  },
+  {
+   "date": "2023-02-03",
+   "strategy": 1.0152,
+   "benchmark": 2.1728
+  },
+  {
+   "date": "2023-02-10",
+   "strategy": 1.0248,
+   "benchmark": 2.048
+  },
+  {
+   "date": "2023-02-17",
+   "strategy": 1.0476,
+   "benchmark": 2.2981
+  },
+  {
+   "date": "2023-02-24",
+   "strategy": 1.0458,
+   "benchmark": 2.3094
+  },
+  {
+   "date": "2023-03-03",
+   "strategy": 1.0294,
+   "benchmark": 2.3967
+  },
+  {
+   "date": "2023-03-10",
+   "strategy": 1.0209,
+   "benchmark": 2.3959
+  },
+  {
+   "date": "2023-03-17",
+   "strategy": 1.0211,
+   "benchmark": 2.4884
+  },
+  {
+   "date": "2023-03-24",
+   "strategy": 1.0358,
+   "benchmark": 2.383
+  },
+  {
+   "date": "2023-03-31",
+   "strategy": 1.0109,
+   "benchmark": 2.3687
+  },
+  {
+   "date": "2023-04-07",
+   "strategy": 1.0153,
+   "benchmark": 2.3485
+  },
+  {
+   "date": "2023-04-14",
+   "strategy": 1.0236,
+   "benchmark": 2.3355
+  },
+  {
+   "date": "2023-04-21",
+   "strategy": 1.0149,
+   "benchmark": 2.2724
+  },
+  {
+   "date": "2023-04-28",
+   "strategy": 1.0156,
+   "benchmark": 2.2943
+  },
+  {
+   "date": "2023-05-05",
+   "strategy": 1.0028,
+   "benchmark": 2.2877
+  },
+  {
+   "date": "2023-05-12",
+   "strategy": 1.0042,
+   "benchmark": 2.1823
+  },
+  {
+   "date": "2023-05-19",
+   "strategy": 1.0056,
+   "benchmark": 2.3219
+  },
+  {
+   "date": "2023-05-26",
+   "strategy": 1.0057,
+   "benchmark": 2.341
+  },
+  {
+   "date": "2023-06-02",
+   "strategy": 1.0039,
+   "benchmark": 2.1885
+  },
+  {
+   "date": "2023-06-09",
+   "strategy": 1.0035,
+   "benchmark": 2.011
+  },
+  {
+   "date": "2023-06-16",
+   "strategy": 0.9989,
+   "benchmark": 1.953
+  },
+  {
+   "date": "2023-06-23",
+   "strategy": 0.9984,
+   "benchmark": 1.7914
+  },
+  {
+   "date": "2023-06-30",
+   "strategy": 0.9976,
+   "benchmark": 1.7338
+  },
+  {
+   "date": "2023-07-07",
+   "strategy": 0.9988,
+   "benchmark": 1.7494
+  },
+  {
+   "date": "2023-07-14",
+   "strategy": 0.9939,
+   "benchmark": 1.6454
+  },
+  {
+   "date": "2023-07-21",
+   "strategy": 0.9921,
+   "benchmark": 1.6274
+  },
+  {
+   "date": "2023-07-28",
+   "strategy": 0.997,
+   "benchmark": 1.718
+  },
+  {
+   "date": "2023-08-04",
+   "strategy": 0.9889,
+   "benchmark": 1.7509
+  },
+  {
+   "date": "2023-08-11",
+   "strategy": 0.993,
+   "benchmark": 1.8659
+  },
+  {
+   "date": "2023-08-18",
+   "strategy": 0.9966,
+   "benchmark": 1.9423
+  },
+  {
+   "date": "2023-08-25",
+   "strategy": 0.9819,
+   "benchmark": 2.0295
+  },
+  {
+   "date": "2023-09-01",
+   "strategy": 0.9759,
+   "benchmark": 1.9597
+  },
+  {
+   "date": "2023-09-08",
+   "strategy": 0.9716,
+   "benchmark": 1.8113
+  },
+  {
+   "date": "2023-09-15",
+   "strategy": 0.9785,
+   "benchmark": 1.8547
+  },
+  {
+   "date": "2023-09-22",
+   "strategy": 0.9872,
+   "benchmark": 1.883
+  },
+  {
+   "date": "2023-09-29",
+   "strategy": 0.9892,
+   "benchmark": 1.892
+  },
+  {
+   "date": "2023-10-06",
+   "strategy": 0.98,
+   "benchmark": 1.8531
+  },
+  {
+   "date": "2023-10-13",
+   "strategy": 0.9664,
+   "benchmark": 1.6388
+  },
+  {
+   "date": "2023-10-20",
+   "strategy": 0.9677,
+   "benchmark": 1.5664
+  },
+  {
+   "date": "2023-10-27",
+   "strategy": 0.9706,
+   "benchmark": 1.4383
+  },
+  {
+   "date": "2023-11-03",
+   "strategy": 0.9764,
+   "benchmark": 1.4245
+  },
+  {
+   "date": "2023-11-10",
+   "strategy": 0.9676,
+   "benchmark": 1.3796
+  },
+  {
+   "date": "2023-11-17",
+   "strategy": 0.9591,
+   "benchmark": 1.3414
+  },
+  {
+   "date": "2023-11-24",
+   "strategy": 0.962,
+   "benchmark": 1.3671
+  },
+  {
+   "date": "2023-12-01",
+   "strategy": 0.9649,
+   "benchmark": 1.3745
+  },
+  {
+   "date": "2023-12-08",
+   "strategy": 0.9635,
+   "benchmark": 1.3338
+  },
+  {
+   "date": "2023-12-15",
+   "strategy": 0.9546,
+   "benchmark": 1.3038
+  },
+  {
+   "date": "2023-12-22",
+   "strategy": 0.9556,
+   "benchmark": 1.3782
+  },
+  {
+   "date": "2023-12-29",
+   "strategy": 0.9529,
+   "benchmark": 1.3438
+  },
+  {
+   "date": "2024-01-05",
+   "strategy": 0.9752,
+   "benchmark": 1.3535
+  },
+  {
+   "date": "2024-01-12",
+   "strategy": 1.0037,
+   "benchmark": 1.4752
+  },
+  {
+   "date": "2024-01-19",
+   "strategy": 0.9787,
+   "benchmark": 1.4247
+  },
+  {
+   "date": "2024-01-26",
+   "strategy": 1.0241,
+   "benchmark": 1.6191
+  },
+  {
+   "date": "2024-02-02",
+   "strategy": 1.0166,
+   "benchmark": 1.6401
+  },
+  {
+   "date": "2024-02-09",
+   "strategy": 1.0314,
+   "benchmark": 1.7201
+  },
+  {
+   "date": "2024-02-16",
+   "strategy": 1.027,
+   "benchmark": 1.7677
+  },
+  {
+   "date": "2024-02-23",
+   "strategy": 1.0185,
+   "benchmark": 1.771
+  },
+  {
+   "date": "2024-03-01",
+   "strategy": 1.0194,
+   "benchmark": 1.8492
+  },
+  {
+   "date": "2024-03-08",
+   "strategy": 1.0118,
+   "benchmark": 1.8617
+  },
+  {
+   "date": "2024-03-15",
+   "strategy": 1.0077,
+   "benchmark": 1.9246
+  },
+  {
+   "date": "2024-03-22",
+   "strategy": 1.002,
+   "benchmark": 1.8951
+  },
+  {
+   "date": "2024-03-29",
+   "strategy": 1.0085,
+   "benchmark": 1.81
+  },
+  {
+   "date": "2024-04-05",
+   "strategy": 0.9972,
+   "benchmark": 1.7519
+  },
+  {
+   "date": "2024-04-12",
+   "strategy": 0.9862,
+   "benchmark": 1.7237
+  },
+  {
+   "date": "2024-04-19",
+   "strategy": 0.9805,
+   "benchmark": 1.6149
+  },
+  {
+   "date": "2024-04-26",
+   "strategy": 0.9832,
+   "benchmark": 1.6883
+  },
+  {
+   "date": "2024-05-03",
+   "strategy": 1.0038,
+   "benchmark": 1.7108
+  },
+  {
+   "date": "2024-05-10",
+   "strategy": 1.0411,
+   "benchmark": 1.7834
+  },
+  {
+   "date": "2024-05-17",
+   "strategy": 1.0441,
+   "benchmark": 1.8457
+  },
+  {
+   "date": "2024-05-24",
+   "strategy": 1.0318,
+   "benchmark": 1.7811
+  },
+  {
+   "date": "2024-05-31",
+   "strategy": 1.024,
+   "benchmark": 1.7098
+  },
+  {
+   "date": "2024-06-07",
+   "strategy": 1.0208,
+   "benchmark": 1.5431
+  },
+  {
+   "date": "2024-06-14",
+   "strategy": 1.0192,
+   "benchmark": 1.5324
+  },
+  {
+   "date": "2024-06-21",
+   "strategy": 1.005,
+   "benchmark": 1.4641
+  },
+  {
+   "date": "2024-06-28",
+   "strategy": 1.0055,
+   "benchmark": 1.4251
+  },
+  {
+   "date": "2024-07-05",
+   "strategy": 1.002,
+   "benchmark": 1.4205
+  },
+  {
+   "date": "2024-07-12",
+   "strategy": 0.9993,
+   "benchmark": 1.3727
+  },
+  {
+   "date": "2024-07-19",
+   "strategy": 1.0,
+   "benchmark": 1.339
+  },
+  {
+   "date": "2024-07-26",
+   "strategy": 0.9974,
+   "benchmark": 1.4687
+  },
+  {
+   "date": "2024-08-02",
+   "strategy": 0.9969,
+   "benchmark": 1.4181
+  },
+  {
+   "date": "2024-08-09",
+   "strategy": 0.9969,
+   "benchmark": 1.3923
+  },
+  {
+   "date": "2024-08-16",
+   "strategy": 1.0085,
+   "benchmark": 1.4775
+  },
+  {
+   "date": "2024-08-23",
+   "strategy": 1.0016,
+   "benchmark": 1.3894
+  },
+  {
+   "date": "2024-08-30",
+   "strategy": 1.0079,
+   "benchmark": 1.4772
+  },
+  {
+   "date": "2024-09-06",
+   "strategy": 1.013,
+   "benchmark": 1.6011
+  },
+  {
+   "date": "2024-09-13",
+   "strategy": 1.0136,
+   "benchmark": 1.6581
+  },
+  {
+   "date": "2024-09-20",
+   "strategy": 1.0349,
+   "benchmark": 1.7331
+  },
+  {
+   "date": "2024-09-27",
+   "strategy": 1.0114,
+   "benchmark": 1.6276
+  },
+  {
+   "date": "2024-10-04",
+   "strategy": 0.9897,
+   "benchmark": 1.5826
+  },
+  {
+   "date": "2024-10-11",
+   "strategy": 0.9901,
+   "benchmark": 1.6211
+  },
+  {
+   "date": "2024-10-18",
+   "strategy": 0.9957,
+   "benchmark": 1.6607
+  },
+  {
+   "date": "2024-10-25",
+   "strategy": 0.9894,
+   "benchmark": 1.7397
+  },
+  {
+   "date": "2024-11-01",
+   "strategy": 0.9908,
+   "benchmark": 1.7074
+  },
+  {
+   "date": "2024-11-08",
+   "strategy": 0.9899,
+   "benchmark": 1.7146
+  },
+  {
+   "date": "2024-11-15",
+   "strategy": 0.9929,
+   "benchmark": 1.7665
+  },
+  {
+   "date": "2024-11-22",
+   "strategy": 0.9947,
+   "benchmark": 1.7927
+  },
+  {
+   "date": "2024-11-29",
+   "strategy": 1.0134,
+   "benchmark": 1.9329
+  },
+  {
+   "date": "2024-12-06",
+   "strategy": 1.0243,
+   "benchmark": 2.0066
+  },
+  {
+   "date": "2024-12-13",
+   "strategy": 1.0282,
+   "benchmark": 2.1527
+  },
+  {
+   "date": "2024-12-20",
+   "strategy": 1.042,
+   "benchmark": 2.2719
+  },
+  {
+   "date": "2024-12-27",
+   "strategy": 1.0344,
+   "benchmark": 2.2312
+  },
+  {
+   "date": "2025-01-03",
+   "strategy": 1.0252,
+   "benchmark": 2.2291
+  },
+  {
+   "date": "2025-01-10",
+   "strategy": 1.0362,
+   "benchmark": 2.3483
+  },
+  {
+   "date": "2025-01-17",
+   "strategy": 1.022,
+   "benchmark": 2.2689
+  },
+  {
+   "date": "2025-01-24",
+   "strategy": 1.0291,
+   "benchmark": 2.3815
+  },
+  {
+   "date": "2025-01-31",
+   "strategy": 1.0288,
+   "benchmark": 2.4784
+  },
+  {
+   "date": "2025-02-07",
+   "strategy": 1.0331,
+   "benchmark": 2.3648
+  },
+  {
+   "date": "2025-02-14",
+   "strategy": 1.0222,
+   "benchmark": 2.2793
+  },
+  {
+   "date": "2025-02-21",
+   "strategy": 1.0285,
+   "benchmark": 2.3427
+  },
+  {
+   "date": "2025-02-28",
+   "strategy": 1.0409,
+   "benchmark": 2.191
+  },
+  {
+   "date": "2025-03-07",
+   "strategy": 1.0598,
+   "benchmark": 2.2482
+  },
+  {
+   "date": "2025-03-14",
+   "strategy": 1.0617,
+   "benchmark": 2.4242
+  },
+  {
+   "date": "2025-03-21",
+   "strategy": 1.0382,
+   "benchmark": 2.3149
+  },
+  {
+   "date": "2025-03-28",
+   "strategy": 1.0516,
+   "benchmark": 2.2633
+  },
+  {
+   "date": "2025-04-04",
+   "strategy": 1.0731,
+   "benchmark": 2.3084
+  },
+  {
+   "date": "2025-04-11",
+   "strategy": 1.0488,
+   "benchmark": 2.3427
+  },
+  {
+   "date": "2025-04-18",
+   "strategy": 1.0481,
+   "benchmark": 2.4042
+  },
+  {
+   "date": "2025-04-25",
+   "strategy": 1.0744,
+   "benchmark": 2.5423
+  },
+  {
+   "date": "2025-05-02",
+   "strategy": 1.137,
+   "benchmark": 2.7693
+  },
+  {
+   "date": "2025-05-09",
+   "strategy": 1.1077,
+   "benchmark": 2.7861
+  },
+  {
+   "date": "2025-05-16",
+   "strategy": 1.1211,
+   "benchmark": 2.7487
+  },
+  {
+   "date": "2025-05-23",
+   "strategy": 1.1502,
+   "benchmark": 2.7515
+  },
+  {
+   "date": "2025-05-30",
+   "strategy": 1.1365,
+   "benchmark": 2.7379
+  },
+  {
+   "date": "2025-06-06",
+   "strategy": 1.1499,
+   "benchmark": 2.8076
+  },
+  {
+   "date": "2025-06-13",
+   "strategy": 1.1231,
+   "benchmark": 2.535
+  },
+  {
+   "date": "2025-06-20",
+   "strategy": 1.1276,
+   "benchmark": 2.4896
+  },
+  {
+   "date": "2025-06-27",
+   "strategy": 1.0985,
+   "benchmark": 2.4815
+  },
+  {
+   "date": "2025-07-04",
+   "strategy": 1.1102,
+   "benchmark": 2.4529
+  },
+  {
+   "date": "2025-07-11",
+   "strategy": 1.1244,
+   "benchmark": 2.5629
+  },
+  {
+   "date": "2025-07-18",
+   "strategy": 1.115,
+   "benchmark": 2.5837
+  },
+  {
+   "date": "2025-07-25",
+   "strategy": 1.0777,
+   "benchmark": 2.3389
+  },
+  {
+   "date": "2025-08-01",
+   "strategy": 1.078,
+   "benchmark": 2.2533
+  },
+  {
+   "date": "2025-08-08",
+   "strategy": 1.0567,
+   "benchmark": 2.176
+  },
+  {
+   "date": "2025-08-15",
+   "strategy": 1.0523,
+   "benchmark": 2.0142
+  },
+  {
+   "date": "2025-08-22",
+   "strategy": 1.047,
+   "benchmark": 1.9425
+  },
+  {
+   "date": "2025-08-29",
+   "strategy": 1.0488,
+   "benchmark": 1.7902
+  },
+  {
+   "date": "2025-09-05",
+   "strategy": 1.0553,
+   "benchmark": 2.0172
+  },
+  {
+   "date": "2025-09-12",
+   "strategy": 1.081,
+   "benchmark": 2.1646
+  },
+  {
+   "date": "2025-09-19",
+   "strategy": 1.0564,
+   "benchmark": 2.0103
+  },
+  {
+   "date": "2025-09-26",
+   "strategy": 1.0494,
+   "benchmark": 2.0847
+  },
+  {
+   "date": "2025-10-03",
+   "strategy": 1.045,
+   "benchmark": 1.9281
+  },
+  {
+   "date": "2025-10-10",
+   "strategy": 1.0178,
+   "benchmark": 1.7305
+  },
+  {
+   "date": "2025-10-17",
+   "strategy": 1.0218,
+   "benchmark": 1.7974
+  },
+  {
+   "date": "2025-10-24",
+   "strategy": 1.0252,
+   "benchmark": 1.7803
+  },
+  {
+   "date": "2025-10-31",
+   "strategy": 1.0211,
+   "benchmark": 1.7592
+  },
+  {
+   "date": "2025-11-07",
+   "strategy": 1.0213,
+   "benchmark": 1.7958
+  },
+  {
+   "date": "2025-11-14",
+   "strategy": 1.0313,
+   "benchmark": 1.9053
+  },
+  {
+   "date": "2025-11-21",
+   "strategy": 1.028,
+   "benchmark": 1.8519
+  },
+  {
+   "date": "2025-11-28",
+   "strategy": 1.0285,
+   "benchmark": 1.8746
+  },
+  {
+   "date": "2025-12-05",
+   "strategy": 1.0358,
+   "benchmark": 1.9591
+  },
+  {
+   "date": "2025-12-12",
+   "strategy": 1.0355,
+   "benchmark": 2.1705
+  },
+  {
+   "date": "2025-12-19",
+   "strategy": 1.0334,
+   "benchmark": 2.401
+  },
+  {
+   "date": "2025-12-26",
+   "strategy": 1.0548,
+   "benchmark": 2.4662
+  },
+  {
+   "date": "2026-01-02",
+   "strategy": 1.064,
+   "benchmark": 2.5287
+  },
+  {
+   "date": "2026-01-09",
+   "strategy": 1.0439,
+   "benchmark": 2.3854
+  },
+  {
+   "date": "2026-01-16",
+   "strategy": 1.0486,
+   "benchmark": 2.5837
+  },
+  {
+   "date": "2026-01-23",
+   "strategy": 1.0384,
+   "benchmark": 2.7288
+  },
+  {
+   "date": "2026-01-30",
+   "strategy": 1.0232,
+   "benchmark": 2.8419
+  },
+  {
+   "date": "2026-02-06",
+   "strategy": 1.0181,
+   "benchmark": 2.5825
+  },
+  {
+   "date": "2026-02-13",
+   "strategy": 1.0144,
+   "benchmark": 2.4098
+  },
+  {
+   "date": "2026-02-20",
+   "strategy": 1.0126,
+   "benchmark": 2.3025
+  },
+  {
+   "date": "2026-02-27",
+   "strategy": 1.0094,
+   "benchmark": 2.3858
+  },
+  {
+   "date": "2026-03-06",
+   "strategy": 1.008,
+   "benchmark": 2.27
+  },
+  {
+   "date": "2026-03-13",
+   "strategy": 1.0052,
+   "benchmark": 2.3189
+  },
+  {
+   "date": "2026-03-20",
+   "strategy": 1.0029,
+   "benchmark": 2.3032
+  },
+  {
+   "date": "2026-03-27",
+   "strategy": 1.024,
+   "benchmark": 2.5583
+  },
+  {
+   "date": "2026-04-03",
+   "strategy": 1.0116,
+   "benchmark": 2.7087
+  },
+  {
+   "date": "2026-04-10",
+   "strategy": 1.0128,
+   "benchmark": 2.7785
+  },
+  {
+   "date": "2026-04-17",
+   "strategy": 1.0028,
+   "benchmark": 2.8213
+  },
+  {
+   "date": "2026-04-24",
+   "strategy": 1.0214,
+   "benchmark": 2.809
+  },
+  {
+   "date": "2026-05-01",
+   "strategy": 1.0154,
+   "benchmark": 2.7356
+  },
+  {
+   "date": "2026-05-08",
+   "strategy": 1.0179,
+   "benchmark": 2.7922
+  },
+  {
+   "date": "2026-05-15",
+   "strategy": 1.0113,
+   "benchmark": 2.6389
+  },
+  {
+   "date": "2026-05-22",
+   "strategy": 1.0254,
+   "benchmark": 2.6274
+  },
+  {
+   "date": "2026-05-29",
+   "strategy": 1.0243,
+   "benchmark": 2.6765
+  },
+  {
+   "date": "2026-06-05",
+   "strategy": 1.0096,
+   "benchmark": 2.6398
+  },
+  {
+   "date": "2026-06-12",
+   "strategy": 1.007,
+   "benchmark": 2.5364
+  },
+  {
+   "date": "2026-06-19",
+   "strategy": 1.006,
+   "benchmark": 2.661
+  },
+  {
+   "date": "2026-06-26",
+   "strategy": 0.9934,
+   "benchmark": 2.6412
+  },
+  {
+   "date": "2026-07-03",
+   "strategy": 0.9998,
+   "benchmark": 2.6886
+  },
+  {
+   "date": "2026-07-10",
+   "strategy": 1.0112,
+   "benchmark": 2.8255
+  },
+  {
+   "date": "2026-07-17",
+   "strategy": 1.0565,
+   "benchmark": 3.1333
+  },
+  {
+   "date": "2026-07-24",
+   "strategy": 1.0791,
+   "benchmark": 3.3535
+  },
+  {
+   "date": "2026-07-31",
+   "strategy": 1.111,
+   "benchmark": 3.5514
+  },
+  {
+   "date": "2026-08-07",
+   "strategy": 1.0704,
+   "benchmark": 3.464
+  },
+  {
+   "date": "2026-08-14",
+   "strategy": 1.0526,
+   "benchmark": 3.3429
+  },
+  {
+   "date": "2026-08-21",
+   "strategy": 1.0564,
+   "benchmark": 3.3563
+  },
+  {
+   "date": "2026-08-28",
+   "strategy": 1.0654,
+   "benchmark": 3.6303
+  },
+  {
+   "date": "2026-09-04",
+   "strategy": 1.0582,
+   "benchmark": 3.3621
+  },
+  {
+   "date": "2026-09-11",
+   "strategy": 1.1115,
+   "benchmark": 3.5213
+  },
+  {
+   "date": "2026-09-18",
+   "strategy": 1.119,
+   "benchmark": 3.6764
+  },
+  {
+   "date": "2026-09-25",
+   "strategy": 1.0864,
+   "benchmark": 3.6171
+  },
+  {
+   "date": "2026-10-02",
+   "strategy": 1.0763,
+   "benchmark": 3.6216
+  },
+  {
+   "date": "2026-10-09",
+   "strategy": 1.0715,
+   "benchmark": 3.4928
+  },
+  {
+   "date": "2026-10-16",
+   "strategy": 1.0802,
+   "benchmark": 3.7144
+  },
+  {
+   "date": "2026-10-23",
+   "strategy": 1.0833,
+   "benchmark": 3.754
+  },
+  {
+   "date": "2026-10-30",
+   "strategy": 1.0607,
+   "benchmark": 3.714
+  },
+  {
+   "date": "2026-11-06",
+   "strategy": 1.052,
+   "benchmark": 3.5424
+  },
+  {
+   "date": "2026-11-13",
+   "strategy": 1.0472,
+   "benchmark": 3.6039
+  }
+ ],
+ "stocks": [
+  {
+   "ticker": "VAKBN",
+   "name": "VakıfBank",
+   "strategy": {
+    "total_return_pct": 138.43,
+    "cagr_pct": 18.5,
+    "sharpe": 0.8,
+    "max_drawdown_pct": -38.36,
+    "exposure_pct": 51.6,
+    "trades": 41,
+    "win_rate_pct": 46.3,
+    "avg_trade_pct": 2.69,
+    "profit_factor": 2.03,
+    "avg_days": 15.2
+   },
+   "oos": {
+    "total_return_pct": 22.77,
+    "cagr_pct": 14.25,
+    "sharpe": 0.64,
+    "max_drawdown_pct": -27.21,
+    "exposure_pct": 52.8,
+    "trades": 12,
+    "win_rate_pct": 41.7,
+    "avg_trade_pct": 2.28,
+    "profit_factor": 1.75,
+    "avg_days": 14.5
+   },
+   "buy_hold_pct": 365.43
+  },
+  {
+   "ticker": "GARAN",
+   "name": "Garanti BBVA",
+   "strategy": {
+    "total_return_pct": 116.12,
+    "cagr_pct": 16.25,
+    "sharpe": 0.75,
+    "max_drawdown_pct": -22.88,
+    "exposure_pct": 50.5,
+    "trades": 35,
+    "win_rate_pct": 45.7,
+    "avg_trade_pct": 2.85,
+    "profit_factor": 2.2,
+    "avg_days": 17.2
+   },
+   "oos": {
+    "total_return_pct": -8.51,
+    "cagr_pct": -5.62,
+    "sharpe": -0.1,
+    "max_drawdown_pct": -21.85,
+    "exposure_pct": 54.6,
+    "trades": 13,
+    "win_rate_pct": 46.2,
+    "avg_trade_pct": 0.51,
+    "profit_factor": 1.18,
+    "avg_days": 13.3
+   },
+   "buy_hold_pct": 212.52
+  },
+  {
+   "ticker": "TUPRS",
+   "name": "Tüpraş",
+   "strategy": {
+    "total_return_pct": 114.43,
+    "cagr_pct": 16.07,
+    "sharpe": 0.81,
+    "max_drawdown_pct": -40.56,
+    "exposure_pct": 37.1,
+    "trades": 33,
+    "win_rate_pct": 42.4,
+    "avg_trade_pct": 3.04,
+    "profit_factor": 2.35,
+    "avg_days": 13.5
+   },
+   "oos": {
+    "total_return_pct": 10.66,
+    "cagr_pct": 6.8,
+    "sharpe": 0.43,
+    "max_drawdown_pct": -31.02,
+    "exposure_pct": 28.6,
+    "trades": 9,
+    "win_rate_pct": 11.1,
+    "avg_trade_pct": 3.39,
+    "profit_factor": 1.89,
+    "avg_days": 10.1
+   },
+   "buy_hold_pct": 112.76
+  },
+  {
+   "ticker": "TRALT",
+   "name": "Türk Altın İşletmeleri",
+   "strategy": {
+    "total_return_pct": 63.98,
+    "cagr_pct": 10.14,
+    "sharpe": 0.58,
+    "max_drawdown_pct": -35.17,
+    "exposure_pct": 37.9,
+    "trades": 33,
+    "win_rate_pct": 36.4,
+    "avg_trade_pct": 2.14,
+    "profit_factor": 1.85,
+    "avg_days": 13.8
+   },
+   "oos": {
+    "total_return_pct": -19.6,
+    "cagr_pct": -13.21,
+    "sharpe": -0.57,
+    "max_drawdown_pct": -35.17,
+    "exposure_pct": 47.2,
+    "trades": 13,
+    "win_rate_pct": 23.1,
+    "avg_trade_pct": -2.49,
+    "profit_factor": 0.21,
+    "avg_days": 10.5
+   },
+   "buy_hold_pct": 93.98
+  },
+  {
+   "ticker": "SAHOL",
+   "name": "Sabancı Holding",
+   "strategy": {
+    "total_return_pct": 55.69,
+    "cagr_pct": 9.03,
+    "sharpe": 0.58,
+    "max_drawdown_pct": -20.34,
+    "exposure_pct": 31.5,
+    "trades": 23,
+    "win_rate_pct": 43.5,
+    "avg_trade_pct": 2.26,
+    "profit_factor": 2.29,
+    "avg_days": 16.7
+   },
+   "oos": {
+    "total_return_pct": -2.37,
+    "cagr_pct": -1.55,
+    "sharpe": -0.12,
+    "max_drawdown_pct": -8.19,
+    "exposure_pct": 8.2,
+    "trades": 1,
+    "win_rate_pct": 0.0,
+    "avg_trade_pct": -0.32,
+    "profit_factor": 0.0,
+    "avg_days": 10.0
+   },
+   "buy_hold_pct": -27.36
+  },
+  {
+   "ticker": "TTKOM",
+   "name": "Türk Telekom",
+   "strategy": {
+    "total_return_pct": 43.39,
+    "cagr_pct": 7.29,
+    "sharpe": 0.44,
+    "max_drawdown_pct": -42.32,
+    "exposure_pct": 35.6,
+    "trades": 31,
+    "win_rate_pct": 41.9,
+    "avg_trade_pct": 1.45,
+    "profit_factor": 1.59,
+    "avg_days": 13.7
+   },
+   "oos": {
+    "total_return_pct": 55.42,
+    "cagr_pct": 33.16,
+    "sharpe": 1.28,
+    "max_drawdown_pct": -24.49,
+    "exposure_pct": 56.2,
+    "trades": 10,
+    "win_rate_pct": 50.0,
+    "avg_trade_pct": 5.55,
+    "profit_factor": 3.11,
+    "avg_days": 19.3
+   },
+   "buy_hold_pct": 24.21
+  },
+  {
+   "ticker": "ISCTR",
+   "name": "İş Bankası (C)",
+   "strategy": {
+    "total_return_pct": 33.34,
+    "cagr_pct": 5.78,
+    "sharpe": 0.36,
+    "max_drawdown_pct": -34.68,
+    "exposure_pct": 45.2,
+    "trades": 38,
+    "win_rate_pct": 42.1,
+    "avg_trade_pct": 1.24,
+    "profit_factor": 1.51,
+    "avg_days": 14.1
+   },
+   "oos": {
+    "total_return_pct": -13.48,
+    "cagr_pct": -8.97,
+    "sharpe": -0.23,
+    "max_drawdown_pct": -21.94,
+    "exposure_pct": 58.8,
+    "trades": 13,
+    "win_rate_pct": 38.5,
+    "avg_trade_pct": 0.24,
+    "profit_factor": 1.08,
+    "avg_days": 14.9
+   },
+   "buy_hold_pct": 214.33
+  },
+  {
+   "ticker": "BIMAS",
+   "name": "BİM Mağazalar",
+   "strategy": {
+    "total_return_pct": 27.19,
+    "cagr_pct": 4.81,
+    "sharpe": 0.32,
+    "max_drawdown_pct": -52.44,
+    "exposure_pct": 43.3,
+    "trades": 40,
+    "win_rate_pct": 32.5,
+    "avg_trade_pct": 1.11,
+    "profit_factor": 1.4,
+    "avg_days": 13.0
+   },
+   "oos": {
+    "total_return_pct": -7.83,
+    "cagr_pct": -5.16,
+    "sharpe": -0.14,
+    "max_drawdown_pct": -31.79,
+    "exposure_pct": 38.7,
+    "trades": 12,
+    "win_rate_pct": 33.3,
+    "avg_trade_pct": -1.54,
+    "profit_factor": 0.43,
+    "avg_days": 9.8
+   },
+   "buy_hold_pct": 199.58
+  },
+  {
+   "ticker": "EKGYO",
+   "name": "Emlak Konut GYO",
+   "strategy": {
+    "total_return_pct": 23.18,
+    "cagr_pct": 4.16,
+    "sharpe": 0.29,
+    "max_drawdown_pct": -35.3,
+    "exposure_pct": 51.9,
+    "trades": 38,
+    "win_rate_pct": 42.1,
+    "avg_trade_pct": 0.85,
+    "profit_factor": 1.35,
+    "avg_days": 16.6
+   },
+   "oos": {
+    "total_return_pct": -20.4,
+    "cagr_pct": -13.77,
+    "sharpe": -0.46,
+    "max_drawdown_pct": -35.3,
+    "exposure_pct": 56.2,
+    "trades": 13,
+    "win_rate_pct": 30.8,
+    "avg_trade_pct": -1.29,
+    "profit_factor": 0.61,
+    "avg_days": 14.2
+   },
+   "buy_hold_pct": 197.31
+  },
+  {
+   "ticker": "TAVHL",
+   "name": "TAV Havalimanları",
+   "strategy": {
+    "total_return_pct": 17.16,
+    "cagr_pct": 3.14,
+    "sharpe": 0.25,
+    "max_drawdown_pct": -34.09,
+    "exposure_pct": 44.7,
+    "trades": 35,
+    "win_rate_pct": 37.1,
+    "avg_trade_pct": 0.86,
+    "profit_factor": 1.32,
+    "avg_days": 15.5
+   },
+   "oos": {
+    "total_return_pct": -19.1,
+    "cagr_pct": -12.86,
+    "sharpe": -0.66,
+    "max_drawdown_pct": -31.54,
+    "exposure_pct": 34.3,
+    "trades": 10,
+    "win_rate_pct": 30.0,
+    "avg_trade_pct": -1.88,
+    "profit_factor": 0.47,
+    "avg_days": 10.3
+   },
+   "buy_hold_pct": 100.21
+  },
+  {
+   "ticker": "AKBNK",
+   "name": "Akbank",
+   "strategy": {
+    "total_return_pct": 15.15,
+    "cagr_pct": 2.79,
+    "sharpe": 0.24,
+    "max_drawdown_pct": -38.23,
+    "exposure_pct": 34.7,
+    "trades": 27,
+    "win_rate_pct": 37.0,
+    "avg_trade_pct": 1.16,
+    "profit_factor": 1.39,
+    "avg_days": 15.5
+   },
+   "oos": {
+    "total_return_pct": 0.53,
+    "cagr_pct": 0.34,
+    "sharpe": 0.13,
+    "max_drawdown_pct": -24.72,
+    "exposure_pct": 55.7,
+    "trades": 12,
+    "win_rate_pct": 41.7,
+    "avg_trade_pct": 0.25,
+    "profit_factor": 1.1,
+    "avg_days": 15.2
+   },
+   "buy_hold_pct": 44.87
+  },
+  {
+   "ticker": "TOASO",
+   "name": "Tofaş",
+   "strategy": {
+    "total_return_pct": 12.11,
+    "cagr_pct": 2.26,
+    "sharpe": 0.21,
+    "max_drawdown_pct": -41.47,
+    "exposure_pct": 44.7,
+    "trades": 41,
+    "win_rate_pct": 34.1,
+    "avg_trade_pct": 0.7,
+    "profit_factor": 1.24,
+    "avg_days": 13.0
+   },
+   "oos": {
+    "total_return_pct": 11.16,
+    "cagr_pct": 7.11,
+    "sharpe": 0.4,
+    "max_drawdown_pct": -27.73,
+    "exposure_pct": 50.3,
+    "trades": 14,
+    "win_rate_pct": 35.7,
+    "avg_trade_pct": 1.24,
+    "profit_factor": 1.49,
+    "avg_days": 11.9
+   },
+   "buy_hold_pct": 163.97
+  },
+  {
+   "ticker": "YKBNK",
+   "name": "Yapı Kredi",
+   "strategy": {
+    "total_return_pct": 6.56,
+    "cagr_pct": 1.25,
+    "sharpe": 0.16,
+    "max_drawdown_pct": -29.59,
+    "exposure_pct": 34.0,
+    "trades": 31,
+    "win_rate_pct": 41.9,
+    "avg_trade_pct": 0.49,
+    "profit_factor": 1.17,
+    "avg_days": 13.2
+   },
+   "oos": {
+    "total_return_pct": 2.62,
+    "cagr_pct": 1.7,
+    "sharpe": 0.19,
+    "max_drawdown_pct": -19.99,
+    "exposure_pct": 39.9,
+    "trades": 10,
+    "win_rate_pct": 40.0,
+    "avg_trade_pct": 0.6,
+    "profit_factor": 1.19,
+    "avg_days": 11.4
+   },
+   "buy_hold_pct": -17.26
+  },
+  {
+   "ticker": "KCHOL",
+   "name": "Koç Holding",
+   "strategy": {
+    "total_return_pct": 5.01,
+    "cagr_pct": 0.96,
+    "sharpe": 0.15,
+    "max_drawdown_pct": -35.01,
+    "exposure_pct": 39.4,
+    "trades": 30,
+    "win_rate_pct": 33.3,
+    "avg_trade_pct": 0.3,
+    "profit_factor": 1.1,
+    "avg_days": 15.3
+   },
+   "oos": {
+    "total_return_pct": 6.03,
+    "cagr_pct": 3.88,
+    "sharpe": 0.28,
+    "max_drawdown_pct": -23.87,
+    "exposure_pct": 45.1,
+    "trades": 7,
+    "win_rate_pct": 42.9,
+    "avg_trade_pct": 0.7,
+    "profit_factor": 1.18,
+    "avg_days": 21.4
+   },
+   "buy_hold_pct": 2.02
+  },
+  {
+   "ticker": "KRDMD",
+   "name": "Kardemir (D)",
+   "strategy": {
+    "total_return_pct": 4.26,
+    "cagr_pct": 0.82,
+    "sharpe": 0.14,
+    "max_drawdown_pct": -34.03,
+    "exposure_pct": 40.2,
+    "trades": 28,
+    "win_rate_pct": 28.6,
+    "avg_trade_pct": 0.48,
+    "profit_factor": 1.15,
+    "avg_days": 17.5
+   },
+   "oos": {
+    "total_return_pct": -17.88,
+    "cagr_pct": -12.01,
+    "sharpe": -0.47,
+    "max_drawdown_pct": -27.57,
+    "exposure_pct": 47.9,
+    "trades": 11,
+    "win_rate_pct": 18.2,
+    "avg_trade_pct": -0.93,
+    "profit_factor": 0.72,
+    "avg_days": 14.2
+   },
+   "buy_hold_pct": -27.87
+  },
+  {
+   "ticker": "EREGL",
+   "name": "Ereğli Demir Çelik",
+   "strategy": {
+    "total_return_pct": -6.6,
+    "cagr_pct": -1.33,
+    "sharpe": 0.02,
+    "max_drawdown_pct": -47.36,
+    "exposure_pct": 35.3,
+    "trades": 31,
+    "win_rate_pct": 35.5,
+    "avg_trade_pct": 0.05,
+    "profit_factor": 1.02,
+    "avg_days": 13.7
+   },
+   "oos": {
+    "total_return_pct": -16.43,
+    "cagr_pct": -11.0,
+    "sharpe": -1.04,
+    "max_drawdown_pct": -19.45,
+    "exposure_pct": 11.9,
+    "trades": 4,
+    "win_rate_pct": 25.0,
+    "avg_trade_pct": -2.97,
+    "profit_factor": 0.29,
+    "avg_days": 9.2
+   },
+   "buy_hold_pct": 6.77
+  },
+  {
+   "ticker": "FROTO",
+   "name": "Ford Otosan",
+   "strategy": {
+    "total_return_pct": -12.29,
+    "cagr_pct": -2.53,
+    "sharpe": -0.08,
+    "max_drawdown_pct": -31.7,
+    "exposure_pct": 25.7,
+    "trades": 25,
+    "win_rate_pct": 44.0,
+    "avg_trade_pct": -0.38,
+    "profit_factor": 0.85,
+    "avg_days": 12.3
+   },
+   "oos": {
+    "total_return_pct": -4.9,
+    "cagr_pct": -3.21,
+    "sharpe": -0.12,
+    "max_drawdown_pct": -16.73,
+    "exposure_pct": 28.6,
+    "trades": 7,
+    "win_rate_pct": 28.6,
+    "avg_trade_pct": -0.39,
+    "profit_factor": 0.86,
+    "avg_days": 14.4
+   },
+   "buy_hold_pct": -50.28
+  },
+  {
+   "ticker": "PETKM",
+   "name": "Petkim",
+   "strategy": {
+    "total_return_pct": -15.42,
+    "cagr_pct": -3.22,
+    "sharpe": -0.07,
+    "max_drawdown_pct": -34.27,
+    "exposure_pct": 40.4,
+    "trades": 37,
+    "win_rate_pct": 35.1,
+    "avg_trade_pct": -0.25,
+    "profit_factor": 0.9,
+    "avg_days": 13.1
+   },
+   "oos": {
+    "total_return_pct": -26.86,
+    "cagr_pct": -18.39,
+    "sharpe": -1.16,
+    "max_drawdown_pct": -34.27,
+    "exposure_pct": 32.7,
+    "trades": 10,
+    "win_rate_pct": 20.0,
+    "avg_trade_pct": -2.89,
+    "profit_factor": 0.23,
+    "avg_days": 10.4
+   },
+   "buy_hold_pct": 14.64
+  },
+  {
+   "ticker": "AEFES",
+   "name": "Anadolu Efes",
+   "strategy": {
+    "total_return_pct": -19.64,
+    "cagr_pct": -4.18,
+    "sharpe": -0.13,
+    "max_drawdown_pct": -45.55,
+    "exposure_pct": 32.8,
+    "trades": 29,
+    "win_rate_pct": 34.5,
+    "avg_trade_pct": -0.38,
+    "profit_factor": 0.89,
+    "avg_days": 13.6
+   },
+   "oos": {
+    "total_return_pct": -19.82,
+    "cagr_pct": -13.37,
+    "sharpe": -0.49,
+    "max_drawdown_pct": -23.41,
+    "exposure_pct": 52.1,
+    "trades": 12,
+    "win_rate_pct": 41.7,
+    "avg_trade_pct": -1.19,
+    "profit_factor": 0.6,
+    "avg_days": 14.3
+   },
+   "buy_hold_pct": 0.88
+  },
+  {
+   "ticker": "SASA",
+   "name": "SASA Polyester",
+   "strategy": {
+    "total_return_pct": -24.8,
+    "cagr_pct": -5.41,
+    "sharpe": -0.2,
+    "max_drawdown_pct": -34.33,
+    "exposure_pct": 38.4,
+    "trades": 34,
+    "win_rate_pct": 29.4,
+    "avg_trade_pct": -0.62,
+    "profit_factor": 0.78,
+    "avg_days": 13.6
+   },
+   "oos": {
+    "total_return_pct": -11.02,
+    "cagr_pct": -7.3,
+    "sharpe": -0.24,
+    "max_drawdown_pct": -26.87,
+    "exposure_pct": 51.8,
+    "trades": 11,
+    "win_rate_pct": 27.3,
+    "avg_trade_pct": -0.89,
+    "profit_factor": 0.72,
+    "avg_days": 14.4
+   },
+   "buy_hold_pct": 46.94
+  },
+  {
+   "ticker": "PGSUS",
+   "name": "Pegasus",
+   "strategy": {
+    "total_return_pct": -25.69,
+    "cagr_pct": -5.63,
+    "sharpe": -0.16,
+    "max_drawdown_pct": -51.5,
+    "exposure_pct": 44.3,
+    "trades": 38,
+    "win_rate_pct": 28.9,
+    "avg_trade_pct": -0.59,
+    "profit_factor": 0.77,
+    "avg_days": 13.8
+   },
+   "oos": {
+    "total_return_pct": 8.33,
+    "cagr_pct": 5.33,
+    "sharpe": 0.34,
+    "max_drawdown_pct": -17.58,
+    "exposure_pct": 53.9,
+    "trades": 11,
+    "win_rate_pct": 36.4,
+    "avg_trade_pct": 0.55,
+    "profit_factor": 1.35,
+    "avg_days": 14.4
+   },
+   "buy_hold_pct": 76.06
+  },
+  {
+   "ticker": "THYAO",
+   "name": "Türk Hava Yolları",
+   "strategy": {
+    "total_return_pct": -27.15,
+    "cagr_pct": -6.0,
+    "sharpe": -0.24,
+    "max_drawdown_pct": -40.69,
+    "exposure_pct": 29.5,
+    "trades": 30,
+    "win_rate_pct": 30.0,
+    "avg_trade_pct": -0.83,
+    "profit_factor": 0.74,
+    "avg_days": 11.6
+   },
+   "oos": {
+    "total_return_pct": -20.65,
+    "cagr_pct": -13.95,
+    "sharpe": -0.66,
+    "max_drawdown_pct": -26.54,
+    "exposure_pct": 34.3,
+    "trades": 12,
+    "win_rate_pct": 16.7,
+    "avg_trade_pct": -1.75,
+    "profit_factor": 0.44,
+    "avg_days": 10.0
+   },
+   "buy_hold_pct": -3.7
+  },
+  {
+   "ticker": "GUBRF",
+   "name": "Gübre Fabrikaları",
+   "strategy": {
+    "total_return_pct": -30.22,
+    "cagr_pct": -6.79,
+    "sharpe": -0.24,
+    "max_drawdown_pct": -58.98,
+    "exposure_pct": 40.1,
+    "trades": 41,
+    "win_rate_pct": 22.0,
+    "avg_trade_pct": -0.45,
+    "profit_factor": 0.87,
+    "avg_days": 11.6
+   },
+   "oos": {
+    "total_return_pct": -3.27,
+    "cagr_pct": -2.14,
+    "sharpe": 0.01,
+    "max_drawdown_pct": -24.78,
+    "exposure_pct": 46.1,
+    "trades": 13,
+    "win_rate_pct": 23.1,
+    "avg_trade_pct": -0.02,
+    "profit_factor": 0.99,
+    "avg_days": 11.9
+   },
+   "buy_hold_pct": 71.19
+  },
+  {
+   "ticker": "TRMET",
+   "name": "TR Anadolu Metal Madencilik",
+   "strategy": {
+    "total_return_pct": -33.24,
+    "cagr_pct": -7.59,
+    "sharpe": -0.3,
+    "max_drawdown_pct": -41.26,
+    "exposure_pct": 34.8,
+    "trades": 33,
+    "win_rate_pct": 36.4,
+    "avg_trade_pct": -1.06,
+    "profit_factor": 0.63,
+    "avg_days": 12.6
+   },
+   "oos": {
+    "total_return_pct": -13.97,
+    "cagr_pct": -9.31,
+    "sharpe": -0.43,
+    "max_drawdown_pct": -21.88,
+    "exposure_pct": 35.1,
+    "trades": 9,
+    "win_rate_pct": 22.2,
+    "avg_trade_pct": -1.69,
+    "profit_factor": 0.42,
+    "avg_days": 11.8
+   },
+   "buy_hold_pct": 21.06
+  },
+  {
+   "ticker": "ENKAI",
+   "name": "Enka İnşaat",
+   "strategy": {
+    "total_return_pct": -38.32,
+    "cagr_pct": -9.01,
+    "sharpe": -0.44,
+    "max_drawdown_pct": -47.11,
+    "exposure_pct": 29.4,
+    "trades": 30,
+    "win_rate_pct": 20.0,
+    "avg_trade_pct": -1.45,
+    "profit_factor": 0.53,
+    "avg_days": 11.6
+   },
+   "oos": {
+    "total_return_pct": -20.48,
+    "cagr_pct": -13.83,
+    "sharpe": -0.82,
+    "max_drawdown_pct": -23.85,
+    "exposure_pct": 27.3,
+    "trades": 8,
+    "win_rate_pct": 0.0,
+    "avg_trade_pct": -2.67,
+    "profit_factor": 0.0,
+    "avg_days": 10.5
+   },
+   "buy_hold_pct": -35.1
+  },
+  {
+   "ticker": "ASELS",
+   "name": "Aselsan",
+   "strategy": {
+    "total_return_pct": -39.35,
+    "cagr_pct": -9.31,
+    "sharpe": -0.46,
+    "max_drawdown_pct": -57.81,
+    "exposure_pct": 29.1,
+    "trades": 33,
+    "win_rate_pct": 24.2,
+    "avg_trade_pct": -1.35,
+    "profit_factor": 0.52,
+    "avg_days": 10.4
+   },
+   "oos": {
+    "total_return_pct": 2.81,
+    "cagr_pct": 1.82,
+    "sharpe": 0.19,
+    "max_drawdown_pct": -27.48,
+    "exposure_pct": 34.0,
+    "trades": 11,
+    "win_rate_pct": 27.3,
+    "avg_trade_pct": 0.57,
+    "profit_factor": 1.22,
+    "avg_days": 11.0
+   },
+   "buy_hold_pct": -8.89
+  },
+  {
+   "ticker": "SISE",
+   "name": "Şişecam",
+   "strategy": {
+    "total_return_pct": -42.73,
+    "cagr_pct": -10.32,
+    "sharpe": -0.42,
+    "max_drawdown_pct": -47.78,
+    "exposure_pct": 41.8,
+    "trades": 40,
+    "win_rate_pct": 30.0,
+    "avg_trade_pct": -1.08,
+    "profit_factor": 0.68,
+    "avg_days": 12.5
+   },
+   "oos": {
+    "total_return_pct": -16.78,
+    "cagr_pct": -11.24,
+    "sharpe": -0.39,
+    "max_drawdown_pct": -36.04,
+    "exposure_pct": 45.1,
+    "trades": 12,
+    "win_rate_pct": 25.0,
+    "avg_trade_pct": -3.0,
+    "profit_factor": 0.22,
+    "avg_days": 9.7
+   },
+   "buy_hold_pct": 43.46
+  },
+  {
+   "ticker": "TCELL",
+   "name": "Turkcell",
+   "strategy": {
+    "total_return_pct": -43.33,
+    "cagr_pct": -10.5,
+    "sharpe": -0.65,
+    "max_drawdown_pct": -46.82,
+    "exposure_pct": 20.8,
+    "trades": 27,
+    "win_rate_pct": 25.9,
+    "avg_trade_pct": -1.98,
+    "profit_factor": 0.39,
+    "avg_days": 8.9
+   },
+   "oos": {
+    "total_return_pct": -28.88,
+    "cagr_pct": -19.86,
+    "sharpe": -1.08,
+    "max_drawdown_pct": -41.9,
+    "exposure_pct": 32.0,
+    "trades": 15,
+    "win_rate_pct": 20.0,
+    "avg_trade_pct": -2.15,
+    "profit_factor": 0.34,
+    "avg_days": 7.3
+   },
+   "buy_hold_pct": -69.76
+  },
+  {
+   "ticker": "MGROS",
+   "name": "Migros",
+   "strategy": {
+    "total_return_pct": -55.87,
+    "cagr_pct": -14.77,
+    "sharpe": -0.83,
+    "max_drawdown_pct": -55.87,
+    "exposure_pct": 27.3,
+    "trades": 34,
+    "win_rate_pct": 17.6,
+    "avg_trade_pct": -2.24,
+    "profit_factor": 0.37,
+    "avg_days": 9.4
+   },
+   "oos": {
+    "total_return_pct": -36.5,
+    "cagr_pct": -25.55,
+    "sharpe": -1.44,
+    "max_drawdown_pct": -35.32,
+    "exposure_pct": 32.2,
+    "trades": 12,
+    "win_rate_pct": 16.7,
+    "avg_trade_pct": -3.31,
+    "profit_factor": 0.27,
+    "avg_days": 9.2
+   },
+   "buy_hold_pct": -26.05
+  },
+  {
+   "ticker": "ASTOR",
+   "name": "Astor Enerji",
+   "strategy": {
+    "total_return_pct": -56.81,
+    "cagr_pct": -15.13,
+    "sharpe": -1.1,
+    "max_drawdown_pct": -56.81,
+    "exposure_pct": 19.4,
+    "trades": 25,
+    "win_rate_pct": 12.0,
+    "avg_trade_pct": -3.22,
+    "profit_factor": 0.17,
+    "avg_days": 9.0
+   },
+   "oos": {
+    "total_return_pct": -33.95,
+    "cagr_pct": -23.62,
+    "sharpe": -2.33,
+    "max_drawdown_pct": -33.95,
+    "exposure_pct": 11.1,
+    "trades": 8,
+    "win_rate_pct": 0.0,
+    "avg_trade_pct": -5.04,
+    "profit_factor": 0.0,
+    "avg_days": 4.4
+   },
+   "buy_hold_pct": -73.97
+  }
+ ],
+ "recent_trades": [
+  {
+   "ticker": "AKBNK",
+   "entry_date": "2026-10-13",
+   "exit_date": "2026-11-06",
+   "entry": 66.47,
+   "exit": 69.52,
+   "ret_pct": 4.59,
+   "days": 18,
+   "exit_reason": "stop"
+  },
+  {
+   "ticker": "AEFES",
+   "entry_date": "2026-10-19",
+   "exit_date": "2026-11-05",
+   "entry": 28.62,
+   "exit": 28.39,
+   "ret_pct": -0.81,
+   "days": 13,
+   "exit_reason": "sinyal"
+  },
+  {
+   "ticker": "MGROS",
+   "entry_date": "2026-10-27",
+   "exit_date": "2026-11-05",
+   "entry": 13.0,
+   "exit": 12.32,
+   "ret_pct": -5.21,
+   "days": 7,
+   "exit_reason": "sinyal"
+  },
+  {
+   "ticker": "TRMET",
+   "entry_date": "2026-10-20",
+   "exit_date": "2026-11-05",
+   "entry": 104.05,
+   "exit": 101.01,
+   "ret_pct": -2.92,
+   "days": 12,
+   "exit_reason": "stop"
+  },
+  {
+   "ticker": "VAKBN",
+   "entry_date": "2026-10-13",
+   "exit_date": "2026-11-05",
+   "entry": 98.33,
+   "exit": 94.77,
+   "ret_pct": -3.62,
+   "days": 17,
+   "exit_reason": "stop"
+  },
+  {
+   "ticker": "GUBRF",
+   "entry_date": "2026-10-14",
+   "exit_date": "2026-11-03",
+   "entry": 123.9,
+   "exit": 117.09,
+   "ret_pct": -5.5,
+   "days": 14,
+   "exit_reason": "stop"
+  },
+  {
+   "ticker": "TAVHL",
+   "entry_date": "2026-10-12",
+   "exit_date": "2026-11-03",
+   "entry": 336.53,
+   "exit": 336.94,
+   "ret_pct": 0.12,
+   "days": 16,
+   "exit_reason": "stop"
+  },
+  {
+   "ticker": "TRALT",
+   "entry_date": "2026-10-22",
+   "exit_date": "2026-11-03",
+   "entry": 119.79,
+   "exit": 113.54,
+   "ret_pct": -5.21,
+   "days": 8,
+   "exit_reason": "stop"
+  },
+  {
+   "ticker": "ASELS",
+   "entry_date": "2026-10-15",
+   "exit_date": "2026-11-02",
+   "entry": 44.93,
+   "exit": 43.76,
+   "ret_pct": -2.61,
+   "days": 12,
+   "exit_reason": "stop"
+  },
+  {
+   "ticker": "EKGYO",
+   "entry_date": "2026-10-14",
+   "exit_date": "2026-11-02",
+   "entry": 273.44,
+   "exit": 255.96,
+   "ret_pct": -6.39,
+   "days": 13,
+   "exit_reason": "sinyal"
+  },
+  {
+   "ticker": "SASA",
+   "entry_date": "2026-08-27",
+   "exit_date": "2026-11-02",
+   "entry": 159.73,
+   "exit": 168.53,
+   "ret_pct": 5.51,
+   "days": 47,
+   "exit_reason": "stop"
+  },
+  {
+   "ticker": "THYAO",
+   "entry_date": "2026-10-26",
+   "exit_date": "2026-11-02",
+   "entry": 48.56,
+   "exit": 45.32,
+   "ret_pct": -6.66,
+   "days": 5,
+   "exit_reason": "sinyal"
+  },
+  {
+   "ticker": "TCELL",
+   "entry_date": "2026-10-16",
+   "exit_date": "2026-10-30",
+   "entry": 12.73,
+   "exit": 12.19,
+   "ret_pct": -4.22,
+   "days": 10,
+   "exit_reason": "sinyal"
+  },
+  {
+   "ticker": "SISE",
+   "entry_date": "2026-10-09",
+   "exit_date": "2026-10-29",
+   "entry": 203.03,
+   "exit": 196.68,
+   "ret_pct": -3.13,
+   "days": 14,
+   "exit_reason": "stop"
+  },
+  {
+   "ticker": "PETKM",
+   "entry_date": "2026-10-22",
+   "exit_date": "2026-10-28",
+   "entry": 49.52,
+   "exit": 46.95,
+   "ret_pct": -5.19,
+   "days": 4,
+   "exit_reason": "sinyal"
+  },
+  {
+   "ticker": "TTKOM",
+   "entry_date": "2026-10-23",
+   "exit_date": "2026-10-28",
+   "entry": 156.14,
+   "exit": 152.71,
+   "ret_pct": -2.2,
+   "days": 3,
+   "exit_reason": "sinyal"
+  },
+  {
+   "ticker": "YKBNK",
+   "entry_date": "2026-10-15",
+   "exit_date": "2026-10-28",
+   "entry": 59.26,
+   "exit": 54.66,
+   "ret_pct": -7.76,
+   "days": 9,
+   "exit_reason": "sinyal"
+  },
+  {
+   "ticker": "BIMAS",
+   "entry_date": "2026-09-30",
+   "exit_date": "2026-10-27",
+   "entry": 232.12,
+   "exit": 239.05,
+   "ret_pct": 2.98,
+   "days": 19,
+   "exit_reason": "stop"
+  },
+  {
+   "ticker": "PGSUS",
+   "entry_date": "2026-09-15",
+   "exit_date": "2026-10-27",
+   "entry": 94.84,
+   "exit": 99.22,
+   "ret_pct": 4.61,
+   "days": 30,
+   "exit_reason": "stop"
+  },
+  {
+   "ticker": "ISCTR",
+   "entry_date": "2026-10-16",
+   "exit_date": "2026-10-21",
+   "entry": 194.72,
+   "exit": 186.62,
+   "ret_pct": -4.16,
+   "days": 3,
+   "exit_reason": "sinyal"
+  },
+  {
+   "ticker": "EKGYO",
+   "entry_date": "2026-09-04",
+   "exit_date": "2026-10-12",
+   "entry": 255.18,
+   "exit": 262.83,
+   "ret_pct": 3.0,
+   "days": 26,
+   "exit_reason": "sinyal"
+  },
+  {
+   "ticker": "YKBNK",
+   "entry_date": "2026-09-29",
+   "exit_date": "2026-10-09",
+   "entry": 57.63,
+   "exit": 54.07,
+   "ret_pct": -6.19,
+   "days": 8,
+   "exit_reason": "stop"
+  },
+  {
+   "ticker": "GUBRF",
+   "entry_date": "2026-10-02",
+   "exit_date": "2026-10-07",
+   "entry": 120.95,
+   "exit": 113.86,
+   "ret_pct": -5.86,
+   "days": 3,
+   "exit_reason": "sinyal"
+  },
+  {
+   "ticker": "TAVHL",
+   "entry_date": "2026-08-25",
+   "exit_date": "2026-10-06",
+   "entry": 316.16,
+   "exit": 317.7,
+   "ret_pct": 0.49,
+   "days": 30,
+   "exit_reason": "stop"
+  },
+  {
+   "ticker": "KRDMD",
+   "entry_date": "2026-09-15",
+   "exit_date": "2026-10-02",
+   "entry": 168.92,
+   "exit": 163.19,
+   "ret_pct": -3.39,
+   "days": 13,
+   "exit_reason": "stop"
+  },
+  {
+   "ticker": "TUPRS",
+   "entry_date": "2026-09-25",
+   "exit_date": "2026-10-02",
+   "entry": 300.84,
+   "exit": 277.03,
+   "ret_pct": -7.92,
+   "days": 5,
+   "exit_reason": "stop"
+  },
+  {
+   "ticker": "AEFES",
+   "entry_date": "2026-09-11",
+   "exit_date": "2026-09-28",
+   "entry": 29.25,
+   "exit": 27.92,
+   "ret_pct": -4.55,
+   "days": 11,
+   "exit_reason": "stop"
+  },
+  {
+   "ticker": "BIMAS",
+   "entry_date": "2026-08-27",
+   "exit_date": "2026-09-28",
+   "entry": 208.19,
+   "exit": 226.45,
+   "ret_pct": 8.77,
+   "days": 22,
+   "exit_reason": "stop"
+  },
+  {
+   "ticker": "ENKAI",
+   "entry_date": "2026-09-11",
+   "exit_date": "2026-09-28",
+   "entry": 77.41,
+   "exit": 76.43,
+   "ret_pct": -1.26,
+   "days": 11,
+   "exit_reason": "stop"
+  },
+  {
+   "ticker": "FROTO",
+   "entry_date": "2026-09-16",
+   "exit_date": "2026-09-28",
+   "entry": 17.87,
+   "exit": 16.92,
+   "ret_pct": -5.29,
+   "days": 8,
+   "exit_reason": "stop"
+  },
+  {
+   "ticker": "ISCTR",
+   "entry_date": "2026-08-27",
+   "exit_date": "2026-09-28",
+   "entry": 192.2,
+   "exit": 196.34,
+   "ret_pct": 2.16,
+   "days": 22,
+   "exit_reason": "stop"
+  },
+  {
+   "ticker": "THYAO",
+   "entry_date": "2026-09-08",
+   "exit_date": "2026-09-28",
+   "entry": 46.61,
+   "exit": 49.52,
+   "ret_pct": 6.23,
+   "days": 14,
+   "exit_reason": "stop"
+  },
+  {
+   "ticker": "TTKOM",
+   "entry_date": "2026-08-28",
+   "exit_date": "2026-09-28",
+   "entry": 146.14,
+   "exit": 164.36,
+   "ret_pct": 12.47,
+   "days": 21,
+   "exit_reason": "stop"
+  },
+  {
+   "ticker": "YKBNK",
+   "entry_date": "2026-08-25",
+   "exit_date": "2026-09-28",
+   "entry": 49.38,
+   "exit": 59.03,
+   "ret_pct": 19.53,
+   "days": 24,
+   "exit_reason": "stop"
+  },
+  {
+   "ticker": "GARAN",
+   "entry_date": "2026-09-01",
+   "exit_date": "2026-09-25",
+   "entry": 191.93,
+   "exit": 189.13,
+   "ret_pct": -1.46,
+   "days": 18,
+   "exit_reason": "stop"
+  },
+  {
+   "ticker": "GUBRF",
+   "entry_date": "2026-09-02",
+   "exit_date": "2026-09-25",
+   "entry": 116.24,
+   "exit": 113.67,
+   "ret_pct": -2.21,
+   "days": 17,
+   "exit_reason": "stop"
+  },
+  {
+   "ticker": "TOASO",
+   "entry_date": "2026-08-26",
+   "exit_date": "2026-09-25",
+   "entry": 237.66,
+   "exit": 245.26,
+   "ret_pct": 3.2,
+   "days": 22,
+   "exit_reason": "stop"
+  },
+  {
+   "ticker": "TRALT",
+   "entry_date": "2026-08-27",
+   "exit_date": "2026-09-25",
+   "entry": 111.23,
+   "exit": 119.55,
+   "ret_pct": 7.48,
+   "days": 21,
+   "exit_reason": "stop"
+  },
+  {
+   "ticker": "AKBNK",
+   "entry_date": "2026-09-08",
+   "exit_date": "2026-09-24",
+   "entry": 62.68,
+   "exit": 63.86,
+   "ret_pct": 1.87,
+   "days": 12,
+   "exit_reason": "stop"
+  },
+  {
+   "ticker": "ASELS",
+   "entry_date": "2026-08-11",
+   "exit_date": "2026-09-24",
+   "entry": 40.49,
+   "exit": 43.3,
+   "ret_pct": 6.94,
+   "days": 32,
+   "exit_reason": "stop"
+  }
+ ]
+}
