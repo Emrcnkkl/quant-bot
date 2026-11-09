@@ -27,6 +27,8 @@ YENİ PROJE/
 ├── .github/workflows/bot.yml  # GitHub Actions workflow
 ├── signals.json       # güncel sinyaller (bot üretir)
 ├── backtest.json      # backtest raporu (bot üretir)
+├── sensitivity.py     # parametre duyarlılık analizi (bot.py fonksiyonlarını kullanır, veriyi .cache/ altına kaydeder)
+├── sensitivity.json   # analiz çıktısı
 └── history.json       # günlük sinyal geçmişi (yalnızca gerçek veriyle çalışınca oluşur/eklenir, son 500 gün)
 ```
 
@@ -112,7 +114,7 @@ stop_atr, target_atr, commission, slippage, oos_fraction, min_bars, cash_rate_fa
 2. GitHub Pages kurulumu; Actions'a yazma izni ver (Settings → Actions → General → Read and write), `workflow_dispatch` ile manuel test et. Repo: Emrcnkkl/quant-bot.
 3. ~~Nakit getirisi~~ — yapıldı (TCMB politika faizi). 2026 PPK kararlarını `POLICY_RATES`'e ekle.
 4. Hayatta kalma yanlılığını azaltmak için geçmiş çeyreklerin BIST30 listeleriyle tarihsel evren.
-5. Eşik/parametre duyarlılık analizi (örn. AL eşiği 30/40/50, stop 2/2.5/3 ATR) — optimizasyon değil, sağlamlık kontrolü.
+5. ~~Duyarlılık analizi~~ — yapıldı (`sensitivity.py`, sonuç `docs/duyarlilik-analizi.md`): sonuç ayarlara duyarsız, ayar oynamak OOS'u iyileştirmiyor, hiçbir ayar OOS'ta faizi geçmiyor → mevcut ayarlar korunuyor.
 6. Haftalık trend filtresi (opsiyonel), rejim filtresi (XU030 EMA200 altındayken yeni giriş yok).
 7. Sinyal değişimlerinde Telegram bildirimi (yalnızca AL↔TUT↔SAT değişince).
 8. Sayfaya hisse detay grafiği (fiyat + EMA + sinyal noktaları), history.json'dan sinyal geçmişi.
