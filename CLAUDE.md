@@ -14,7 +14,11 @@ ve sonuçları statik bir web sayfasında gösteren bir bot. Şu an **Aşama 1**
 - Cloud oturumları için `quant-bot` ortamı Yahoo Finance hostlarına izinli → `python3 bot.py` oturumdan da çalışır.
 - Algoritma tarafı (nakit faizi, duyarlılık analizi, reel faiz filtresi) tamamlandı; **odak web sitesi**.
 - Sitede yapılanlar: faiz ortamı kutusu (reel faiz), satıra tıklayınca hisse grafiği (fiyat+EMA, alış/satış işaretleri,
-  skor şeridi, 3A/6A/1Y/2Y, üzerine gelince ayrıntı), yıl yıl getiri tablosu. Kalan fikirler: sinyal geçmişi listesi, mobil tasarım.
+  skor şeridi, 3A/6A/1Y/2Y, üzerine gelince ayrıntı), yıl yıl getiri tablosu.
+- Site arkadaşlara açılacak → genel kitleye yönelik: koyu tema varsayılan (açık tema `prefers-color-scheme: light`),
+  üstte sabit menü (Bugün / Sinyaller / Performans / Nasıl çalışır / SSS), "yatırım tavsiyesi değildir" bandı,
+  "100.000 ₺ ile başlasaydı" özet kartı (endeks ve faizle dürüst kıyas), sade dil (Puan, Zarar-kes, modelde...).
+  Tasarım referansı kullanıcının diğer projesi (emrcnkkl.github.io/anlik_bot). Kalan fikir: sinyal geçmişi listesi.
 - Bulgular: strateji test döneminde endeksle başa baş, düşüşü ~1/3; ama 2024 sonrası faizin gerisinde
   (`docs/duyarlilik-analizi.md`, `docs/reel-faiz-filtresi.md`).
 
@@ -107,7 +111,8 @@ real_rate_max (None = kapalı; reel faiz bunun üstündeyse yeni alım yok — `
 ## Kod kuralları
 - `bot.py` tek dosya kalsın, ta ki belirgin şekilde büyüyene kadar; Python 3.10 uyumlu olmalı (kullanıcının makinesi 3.10).
 - JSON `allow_nan=False` ile yazılır → NaN değerleri `r2()` ile `None`'a çevir.
-- `index.html` dışa bağımlılık içermez; açık/koyu tema CSS değişkenleriyle (`:root` + `prefers-color-scheme`).
+- `index.html` dışa bağımlılık içermez; koyu tema `:root`'ta, açık tema `@media (prefers-color-scheme: light)` içinde.
+- Sayfa metinleri teknik bilgisi olmayan okura göre yazılır; jargon gerekiyorsa `title` ipucu ya da SSS ile açıklanır.
 - Sayılar `tr-TR` formatında gösterilir.
 
 ## Bilinen sınırlamalar

@@ -3,169 +3,350 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>BIST30 Sinyal Botu</title>
+<title>BIST30 Sinyal</title>
+<meta name="description" content="BIST 30 hisseleri için her iş günü güncellenen teknik analiz sinyalleri ve geriye dönük test sonuçları. Yatırım tavsiyesi değildir.">
 <style>
+/* ---- Renk değişkenleri: koyu tema varsayılan, açık tema sistem tercihine göre ---- */
 :root{
-  --bg:#f6f7f9;--card:#fff;--ink:#14181f;--muted:#5f6b7a;--line:#e3e7ec;
-  --al:#0f8a5f;--al-bg:#e3f5ec;--sat:#c23b3b;--sat-bg:#fbe7e7;--tut:#8a6d0f;--tut-bg:#f7f0da;
-  --accent:#2d5bd7;--bench:#9aa4b2;--cash:#b07a1f;--e20:#2d5bd7;--e50:#c2410c;--e200:#7c3aed;
+  --bg:#0a0c0f;--bg2:#0e1115;--card:#12161b;--card2:#161b21;--ink:#e9edf1;--muted:#8b96a4;--line:#222a33;--line2:#2c3540;
+  --accent:#3b82f6;--grad:linear-gradient(90deg,#3b82f6,#10b981);
+  --al:#22c55e;--al-bg:rgba(34,197,94,.12);--sat:#f05252;--sat-bg:rgba(240,82,82,.12);--tut:#f5a524;--tut-bg:rgba(245,165,36,.12);
+  --strat:#22c55e;--bench:#3b82f6;--cash:#f5a524;--e20:#60a5fa;--e50:#fb923c;--e200:#c084fc;
+  --warn-bg:rgba(245,165,36,.07);--warn-line:rgba(245,165,36,.45);--shadow:0 10px 40px rgba(0,0,0,.35);
+  color-scheme:dark;
 }
-@media (prefers-color-scheme:dark){:root{
-  --bg:#0e1116;--card:#161b22;--ink:#e6e9ee;--muted:#8d97a5;--line:#262d37;
-  --al:#3ccf91;--al-bg:#11291f;--sat:#ff7272;--sat-bg:#2e1616;--tut:#e0bd4f;--tut-bg:#2a2412;
-  --accent:#6f95ff;--bench:#5d6775;--cash:#d4a548;--e20:#6f95ff;--e50:#fb923c;--e200:#b794f6;
+@media (prefers-color-scheme:light){:root{
+  --bg:#f5f7fa;--bg2:#eef1f5;--card:#fff;--card2:#f9fafb;--ink:#121820;--muted:#5e6a79;--line:#e3e8ee;--line2:#d5dce5;
+  --al:#0f9d58;--al-bg:#e3f6ec;--sat:#d93636;--sat-bg:#fdeaea;--tut:#b7791f;--tut-bg:#fbf1dc;
+  --strat:#0f9d58;--bench:#2563eb;--cash:#d97706;--e20:#2563eb;--e50:#ea580c;--e200:#9333ea;
+  --warn-bg:#fff8e8;--warn-line:#f0c46a;--shadow:0 10px 30px rgba(20,30,50,.08);
+  color-scheme:light;
 }}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,sans-serif}
-.wrap{max-width:1180px;margin:0 auto;padding:24px 16px 60px}
-header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px;margin-bottom:18px}
-h1{font-size:26px;margin:0;letter-spacing:-.02em}
-h2{font-size:18px;margin:34px 0 12px}
-.muted{color:var(--muted)}
-.small{font-size:13px}
-.banner{background:var(--tut-bg);color:var(--tut);border-radius:10px;padding:10px 14px;margin-bottom:16px;font-size:14px}
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
-.card .k{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
-.card .v{font-size:26px;font-weight:650;font-variant-numeric:tabular-nums}
-.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:20px 0 10px}
-.tabs button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:6px 12px;border-radius:999px;cursor:pointer;font:inherit;font-size:14px}
-.tabs button.on{background:var(--ink);color:var(--card);border-color:var(--ink)}
-input[type=search]{flex:1;min-width:160px;max-width:260px;margin-left:auto;padding:7px 12px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit}
-.tbl{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow-x:auto}
+html{scroll-behavior:smooth;scroll-padding-top:76px}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-decoration:none}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+.muted{color:var(--muted)}.small{font-size:13px}
+.pos{color:var(--al)}.neg{color:var(--sat)}
+
+/* ---- Üst menü ---- */
+nav{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+nav .wrap{display:flex;align-items:center;gap:8px;height:64px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:750;font-size:21px;letter-spacing:-.02em;color:var(--ink);margin-right:auto}
+.brand span{color:var(--accent)}
+nav .links{display:flex;gap:4px}
+nav .links a{color:var(--muted);padding:8px 14px;border-radius:8px;font-size:15px;font-weight:500}
+nav .links a:hover{color:var(--ink);background:var(--card)}
+nav .links a.on{color:var(--ink)}
+nav .help{display:grid;place-items:center;width:30px;height:30px;border:1.5px solid var(--muted);border-radius:50%;color:var(--muted);font-weight:700;font-size:14px;margin-left:6px}
+@media(max-width:820px){nav .links{display:none}}
+.mnav{display:none;gap:6px;overflow-x:auto;padding:0 20px 10px;scrollbar-width:none}
+.mnav a{flex:none;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:13px}
+.mnav a.on{color:var(--ink);border-color:var(--line2);background:var(--card)}
+@media(max-width:820px){.mnav{display:flex}}
+
+/* ---- Uyarı bandı ---- */
+.warn{display:flex;gap:10px;align-items:flex-start;background:var(--warn-bg);border:1px solid var(--warn-line);border-radius:12px;padding:14px 18px;margin:28px 0 30px;color:var(--tut);font-size:14px}
+.warn svg{flex:none;margin-top:2px}
+.warn b{font-weight:700}
+.demo{background:var(--sat-bg);border-color:var(--sat);color:var(--sat)}
+
+/* ---- Kartlar ---- */
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px 24px}
+.hero{position:relative;max-width:820px;margin:0 auto;text-align:center;padding:40px 28px 30px;box-shadow:var(--shadow);overflow:hidden}
+.hero::before{content:"";position:absolute;inset:0 0 auto 0;height:3px;background:var(--grad)}
+.eyebrow{font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.big{font-size:clamp(44px,8vw,72px);font-weight:800;letter-spacing:-.035em;line-height:1.05;margin:14px 0 8px;font-variant-numeric:tabular-nums}
+.delta{font-size:20px;font-weight:650;display:inline-flex;align-items:center;gap:8px}
+.sub{color:var(--muted);font-size:14px;margin-top:10px}
+.chips{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:22px}
+.chip{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line2);background:var(--card2);border-radius:10px;padding:8px 14px;font-size:14px;color:var(--muted)}
+.chip b{color:var(--ink);font-variant-numeric:tabular-nums}
+.chip i{width:8px;height:8px;border-radius:50%;display:inline-block}
+
+.today{display:grid;grid-template-columns:repeat(3,1fr) 1.4fr;gap:14px;margin-top:22px}
+.tile{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;cursor:pointer;transition:border-color .15s}
+.tile .go{margin-top:auto;padding-top:12px;font-size:13px;color:var(--accent)}
+.tile:hover{border-color:var(--line2)}
+.tile .k{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.tile .v{font-size:34px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.15}
+.tile .d{font-size:13px;color:var(--muted)}
+.macro{cursor:default}
+.macro .row1{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.macro .v{font-size:30px}
+.macro p{margin:6px 0 0;font-size:13px;color:var(--muted)}
+.pill{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;letter-spacing:.02em}
+@media(max-width:900px){.today{grid-template-columns:repeat(3,1fr)}.macro{grid-column:1/-1}}
+@media(max-width:480px){.tile{padding:12px 14px}.tile .v{font-size:28px}}
+
+/* ---- Bölümler ---- */
+section{padding-top:56px}
+h2{font-size:26px;letter-spacing:-.02em;margin:0 0 6px}
+.lead{color:var(--muted);margin:0 0 18px;max-width:760px}
+.legend-sig{display:flex;flex-wrap:wrap;gap:10px 22px;margin:0 0 16px;font-size:14px;color:var(--muted)}
+
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:12px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap}
+.tabs button,.seg button{border:1px solid var(--line2);background:var(--card);color:var(--muted);padding:7px 14px;border-radius:999px;cursor:pointer;font:inherit;font-size:14px}
+.tabs button.on,.seg button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+input[type=search]{flex:1;min-width:150px;max-width:280px;margin-left:auto;padding:8px 14px;border-radius:999px;border:1px solid var(--line2);background:var(--card);color:var(--ink);font:inherit}
+
+.tbl{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow-x:auto}
 table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
-th,td{padding:10px 12px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--line)}
-th{font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.03em;cursor:pointer;user-select:none}
+th,td{padding:12px 14px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--line)}
+th{font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em;background:var(--card2)}
+#sig th{cursor:pointer;user-select:none}
+th[title]{text-decoration:underline dotted;text-underline-offset:3px}
 th:first-child,td:first-child{text-align:left}
 tbody tr.row{cursor:pointer}
-tbody tr.row:hover{background:color-mix(in srgb,var(--accent) 6%,transparent)}
-tr:last-child td{border-bottom:0}
-.tk{font-weight:650}
+tbody tr.row:hover{background:color-mix(in srgb,var(--accent) 7%,transparent)}
+tr.row.open{background:color-mix(in srgb,var(--accent) 9%,transparent)}
+tbody tr:last-child td,tfoot td{border-bottom:0}
+.tk{font-weight:700}
 .nm{display:block;font-size:12px;color:var(--muted);font-weight:400}
-.badge{display:inline-block;min-width:44px;text-align:center;padding:2px 8px;border-radius:6px;font-weight:700;font-size:13px}
+.badge{display:inline-block;min-width:48px;text-align:center;padding:3px 9px;border-radius:7px;font-weight:750;font-size:13px}
 .AL{background:var(--al-bg);color:var(--al)}.SAT{background:var(--sat-bg);color:var(--sat)}.TUT{background:var(--tut-bg);color:var(--tut)}
-.pos{color:var(--al)}.neg{color:var(--sat)}
-.bar{position:relative;width:110px;height:8px;background:var(--line);border-radius:4px;display:inline-block;vertical-align:middle;margin-left:8px}
+.bar{position:relative;width:96px;height:7px;background:var(--line);border-radius:4px;display:inline-block;vertical-align:middle;margin-left:8px}
 .bar i{position:absolute;top:0;bottom:0;border-radius:4px}
 .bar::after{content:"";position:absolute;left:50%;top:-3px;bottom:-3px;width:1px;background:var(--muted)}
 .state{font-size:12px;color:var(--muted)}
-.detail td{background:color-mix(in srgb,var(--bg) 60%,var(--card));text-align:left;white-space:normal}
-.detail ul{margin:6px 0;padding-left:18px}
-.comp{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:6px 16px;margin-top:8px;font-size:13px}
+.chev{display:inline-block;color:var(--muted);transition:transform .15s;margin-right:6px;font-size:11px}
+tr.open .chev{transform:rotate(90deg)}
+@media(max-width:720px){
+  #sig th:nth-child(n+6),#sig td:nth-child(n+6){display:none}
+  #sig tr.detail td{display:table-cell}
+  th,td{padding:11px 10px}.bar{width:52px}
+}
+@media(max-width:420px){#sig th:nth-child(3),#sig tr.row td:nth-child(3){display:none}}
+
+.detail>td{background:var(--bg2);text-align:left;white-space:normal;padding:18px 14px}
+.dw{position:sticky;left:14px;max-width:100%}
+.detail h4{margin:4px 0 6px;font-size:14px}
+.detail ul{margin:0 0 10px;padding-left:18px}
+.comp{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px 18px;margin-top:8px;font-size:13px}
 .comp span b{float:right;font-variant-numeric:tabular-nums}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-@media(max-width:760px){.grid2{grid-template-columns:1fr}.bar{width:60px}}
+.posbox{border:1px solid var(--line2);background:var(--card);border-radius:10px;padding:10px 12px;font-size:13px;margin:6px 0 12px}
+
+/* ---- Grafikler ---- */
 svg text{fill:var(--muted);font-size:11px}
-.legend{display:flex;gap:16px;font-size:13px;color:var(--muted);margin:4px 0 8px}
-.legend i{display:inline-block;width:14px;height:3px;border-radius:2px;vertical-align:middle;margin-right:6px}
-.macro{display:grid;grid-template-columns:auto 1fr;gap:4px 20px;align-items:center;margin-top:12px}
-.macro .big{font-size:30px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.1}
-.macro .eq{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
-.macro p{margin:0;font-size:14px;grid-row:span 2}
-.pill{display:inline-block;font-size:12px;font-weight:600;padding:2px 8px;border-radius:999px;margin-left:6px;vertical-align:middle}
-@media(max-width:620px){.macro{grid-template-columns:1fr}.macro p{grid-row:auto}}
-.dw{position:sticky;left:12px;max-width:100%}
-.sc{position:relative;margin:4px 0 14px}
-.sc .rng{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:6px;font-size:12px;color:var(--muted)}
-.sc .rng button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:2px 9px;border-radius:999px;cursor:pointer;font:inherit}
-.sc .rng button.on{background:var(--ink);color:var(--card);border-color:var(--ink)}
-.sc .rng .lg{margin-left:auto;display:flex;gap:10px;flex-wrap:wrap}
-.sc .tip{position:absolute;pointer-events:none;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:6px 9px;font-size:12px;line-height:1.4;box-shadow:0 4px 14px rgba(0,0,0,.12);display:none;white-space:nowrap;z-index:2}
-.yr td.best{font-weight:700}
-.yr td.best::after{content:" ●";font-size:9px;vertical-align:middle;color:var(--accent)}
-.mt td,.mt th{padding:8px 10px}
-footer{margin-top:40px;font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:16px}
-details summary{cursor:pointer;font-weight:600;color:var(--ink)}
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:14px;color:var(--ink)}
+.legend span{display:inline-flex;align-items:center;gap:7px}
+.legend i{width:12px;height:12px;border-radius:50%;display:inline-block}
+.legend i.ln{width:16px;height:3px;border-radius:2px}
+.chart-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}
+.chart-head h3{margin:0;font-size:20px}
+.chartbox{position:relative}
+.tip{position:absolute;pointer-events:none;background:var(--card2);border:1px solid var(--line2);border-radius:10px;padding:8px 11px;font-size:12px;line-height:1.5;box-shadow:var(--shadow);display:none;white-space:nowrap;z-index:3;color:var(--ink)}
+.tip i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}
+.sc{position:relative;margin:2px 0 16px}
+.sc .rng{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
+.sc .rng button{border:1px solid var(--line2);background:var(--card);color:var(--muted);padding:3px 10px;border-radius:999px;cursor:pointer;font:inherit;font-size:12px}
+.sc .rng button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.sc .legend{font-size:12px;margin-left:auto;gap:6px 12px}
+
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:14px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+.stat .k{display:flex;align-items:center;gap:8px;font-weight:650}
+.stat .k i{width:10px;height:10px;border-radius:50%}
+.stat .v{font-size:28px;font-weight:800;margin:6px 0 2px;font-variant-numeric:tabular-nums}
+.stat dl{display:grid;grid-template-columns:1fr auto;gap:2px 10px;margin:8px 0 0;font-size:13px;color:var(--muted)}
+.stat dd{margin:0;text-align:right;font-variant-numeric:tabular-nums;color:var(--ink)}
+@media(max-width:760px){.stats{grid-template-columns:1fr}}
+.seg{display:flex;gap:6px}
+.yr td.best{font-weight:750}
+.yr td.best::before{content:"● ";font-size:9px;vertical-align:middle;color:var(--accent)}
+h3.sm{font-size:18px;margin:30px 0 10px}
+details.more{margin-top:22px}
+details.more>summary{cursor:pointer;font-weight:650;padding:14px 18px;background:var(--card);border:1px solid var(--line);border-radius:12px;list-style:none}
+details.more>summary::before{content:"▸ ";color:var(--muted)}
+details.more[open]>summary::before{content:"▾ "}
+details.more>div{padding-top:12px}
+
+/* ---- Nasıl çalışır / SSS ---- */
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.step{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}
+.step .n{display:grid;place-items:center;width:30px;height:30px;border-radius:9px;background:var(--grad);color:#fff;font-weight:800;font-size:14px;margin-bottom:10px}
+.step h4{margin:0 0 6px;font-size:16px}
+.step p{margin:0;color:var(--muted);font-size:14px}
+@media(max-width:900px){.steps{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.steps{grid-template-columns:1fr}}
+.faq details{background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:10px}
+.faq summary{cursor:pointer;padding:15px 18px;font-weight:650;list-style:none;display:flex;justify-content:space-between;gap:12px}
+.faq summary::after{content:"+";color:var(--muted);font-size:18px;line-height:1}
+.faq details[open] summary::after{content:"–"}
+.faq details>div{padding:0 18px 16px;color:var(--muted)}
+.faq details>div p{margin:0 0 8px}
+.tech ul{margin:6px 0 12px;padding-left:18px}
+
+footer{margin-top:70px;border-top:1px solid var(--line);padding:26px 0 50px;font-size:13px;color:var(--muted)}
+footer p{margin:0 0 8px}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <div>
-      <h1>BIST30 Teknik Sinyal Botu</h1>
-      <div class="muted small" id="meta">Yükleniyor…</div>
+<nav>
+  <div class="wrap">
+    <a class="brand" href="#bugun">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3 2 8l10 5 10-5-10-5Z" fill="#3b82f6"/><path d="m2 12 10 5 10-5" stroke="#3b82f6" stroke-width="2" stroke-linejoin="round" opacity=".7"/><path d="m2 16 10 5 10-5" stroke="#10b981" stroke-width="2" stroke-linejoin="round"/></svg>
+      BIST30<span>Sinyal</span>
+    </a>
+    <div class="links">
+      <a href="#bugun">Bugün</a><a href="#sinyaller">Sinyaller</a><a href="#performans">Performans</a><a href="#nasil">Nasıl çalışır</a>
     </div>
-    <div class="muted small">Günlük veri · çoklu indikatör skoru</div>
-  </header>
+    <a class="help" href="#sss" title="Sık sorulan sorular">?</a>
+  </div>
+  <div class="mnav"><a href="#bugun">Bugün</a><a href="#sinyaller">Sinyaller</a><a href="#performans">Performans</a><a href="#nasil">Nasıl çalışır</a><a href="#sss">SSS</a></div>
+</nav>
 
-  <div id="banner"></div>
+<main class="wrap">
+  <div id="demo"></div>
+  <div class="warn">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+    <div><b>Yatırım tavsiyesi değildir.</b> Bu sayfa, kişisel durumunuzu bilmeden çalışan otomatik bir modelin geçmiş fiyatlara dayalı çıktılarını gösterir; kimseye al-sat önerisi değildir. Geçmiş performans geleceğin garantisi değildir.</div>
+  </div>
 
-  <div class="cards" id="cards"></div>
-  <div class="card" id="macro" hidden></div>
-
-  <div class="toolbar">
-    <div class="tabs" id="tabs">
-      <button data-f="ALL" class="on">Tümü</button>
-      <button data-f="AL">AL</button>
-      <button data-f="TUT">TUT</button>
-      <button data-f="SAT">SAT</button>
+  <!-- ===== BUGÜN ===== -->
+  <section id="bugun" style="padding-top:0">
+    <div class="card hero">
+      <div class="eyebrow">Model portföy · geriye dönük test</div>
+      <div class="big" id="h-big">—</div>
+      <div class="delta" id="h-delta"></div>
+      <div class="sub" id="h-sub">Yükleniyor…</div>
+      <div class="chips" id="h-chips"></div>
     </div>
-    <input type="search" id="q" placeholder="Hisse ara…">
-  </div>
 
-  <div class="tbl">
-    <table id="sig">
-      <thead><tr>
-        <th data-k="ticker">Hisse</th><th data-k="close">Fiyat</th><th data-k="change_pct">Gün %</th>
-        <th data-k="signal">Sinyal</th><th data-k="score">Skor</th><th data-k="rsi">RSI</th>
-        <th data-k="stop">Stop</th><th data-k="target">Hedef</th>
-      </tr></thead>
-      <tbody></tbody>
-    </table>
-  </div>
-  <p class="muted small">Satıra tıklayarak sinyalin gerekçelerini ve skor bileşenlerini görebilirsiniz. Stop = fiyat − 2.5×ATR, Hedef = fiyat + 4×ATR. Pozisyondaki hisselerde iz süren stop gösterilir.</p>
+    <div class="today" id="today"></div>
+  </section>
 
-  <h2>Geriye dönük test (backtest)</h2>
-  <div class="muted small" id="btmeta"></div>
-  <div class="card" style="margin-top:10px">
-    <div class="legend"><span><i style="background:var(--accent)"></i>Strateji (30 hisse, eşit ağırlık)</span><span><i style="background:var(--bench)"></i>XU030 al-tut</span><span><i style="background:var(--cash)"></i>Nakit (politika faizi)</span></div>
-    <div id="chart"></div>
-  </div>
+  <!-- ===== SİNYALLER ===== -->
+  <section id="sinyaller">
+    <h2>Bugünün sinyalleri</h2>
+    <p class="lead">Her hisseye 8 teknik göstergeye bakılarak −100 ile +100 arasında bir puan verilir. Puan yükseldikçe fiyat hareketi o kadar güçlü görünür. <b>Ayrıntı ve grafik için bir hisseye dokunun.</b></p>
+    <div class="legend-sig">
+      <span><span class="badge AL">AL</span>&nbsp; puan +40 ve üstü: teknik görünüm güçlü</span>
+      <span><span class="badge TUT">TUT</span>&nbsp; arada: belirgin bir yön yok</span>
+      <span><span class="badge SAT">SAT</span>&nbsp; puan −40 ve altı: teknik görünüm zayıf, uzak dur</span>
+    </div>
+    <div class="toolbar">
+      <div class="tabs" id="tabs">
+        <button data-f="ALL" class="on">Tümü</button><button data-f="AL">AL</button><button data-f="TUT">TUT</button><button data-f="SAT">SAT</button><button data-f="POS">Modelde olanlar</button>
+      </div>
+      <input type="search" id="q" placeholder="Hisse ara (ör. THYAO)">
+    </div>
+    <div class="tbl">
+      <table id="sig">
+        <thead><tr>
+          <th data-k="ticker">Hisse</th><th data-k="close">Fiyat</th><th data-k="change_pct">Gün</th>
+          <th data-k="signal">Sinyal</th><th data-k="score" title="−100 (çok zayıf) … +100 (çok güçlü)">Puan</th>
+          <th data-k="rsi" title="Göreceli güç endeksi: 70 üstü aşırı alım, 30 altı aşırı satım">RSI</th>
+          <th data-k="stop" title="Model bu fiyatın altında pozisyonu kapatır (son oynaklığın 2,5 katı)">Zarar-kes</th>
+          <th data-k="target" title="Bilgi amaçlı: son oynaklığın 4 katı yukarısı">Hedef</th>
+        </tr></thead>
+        <tbody><tr><td colspan="8" class="muted">Yükleniyor…</td></tr></tbody>
+      </table>
+    </div>
+    <p class="muted small">Fiyatlar günlük kapanıştır. "Modelde olanlar", geriye dönük test kurallarına göre şu an elde tutulan hisselerdir.</p>
+  </section>
 
-  <div class="tbl" style="margin-top:12px"><table class="mt" id="pf"></table></div>
-  <p class="muted small">Nakit = sermayenin tamamı TCMB politika faizinde beklese elde edilecek getiri. Sharpe, faizin üzerindeki fazla getiriye göre hesaplanır.</p>
-  <h2>Yıl yıl getiri</h2>
-  <div class="tbl"><table class="mt yr" id="yearly"></table></div>
-  <p class="muted small">● her yılın en yüksek getirisi. Eksik yıllar (backtest başlangıcı ve içinde bulunulan yıl) tarih aralığıyla gösterilir.</p>
-  <div class="tbl" style="margin-top:12px"><table class="mt" id="trades"></table></div>
+  <!-- ===== PERFORMANS ===== -->
+  <section id="performans">
+    <h2>Model geçmişte ne yapardı?</h2>
+    <p class="lead" id="btlead">Aynı kurallar geçmiş fiyatlara uygulanarak 100.000 ₺'lik bir portföy simüle edildi: 30 hisseye eşit pay, sinyal yokken para faizde. Komisyon ve kayma maliyeti düşüldü. Gerçek işlem değildir.</p>
 
-  <h2>Hisse bazında performans</h2>
-  <div class="tbl"><table id="stocks"></table></div>
-  <p class="muted small">OOS = örneklem dışı dönem (son %30). Parametreler optimize edilmediği için tüm dönem ve OOS arasındaki fark stratejinin tutarlılığı hakkında fikir verir.</p>
+    <div class="card">
+      <div class="chart-head">
+        <h3>Portföy eğrisi</h3>
+        <div class="legend"><span><i style="background:var(--strat)"></i>Model portföy</span><span><i style="background:var(--bench)"></i>BIST30 endeksi</span><span><i style="background:var(--cash)"></i>Faiz (politika faizi)</span></div>
+      </div>
+      <div class="chartbox" id="chart"></div>
+      <div class="muted small" id="btmeta" style="margin-top:6px"></div>
+    </div>
 
-  <h2>Yöntem</h2>
-  <div class="card small">
-    <details open><summary>Skor nasıl hesaplanıyor? (−100 … +100)</summary>
-      <ul>
-        <li><b>Trend (40):</b> Fiyat EMA200 üstü/altı ±15 · EMA20/EMA50 ±15 · ADX gücü ve DI yönü ±10</li>
-        <li><b>Momentum (30):</b> RSI 55–78 +15, 45–55 0, 25–45 −15, &gt;78 −5 (aşırı alım), &lt;25 +5 (aşırı satım) · MACD histogramı yön ±10 ve eğim ±5</li>
-        <li><b>Hacim (10):</b> Hacim 20 günlük ortalamanın 1.5 katı üstünde ise günün yönünde ±10</li>
-        <li><b>Kırılım (10):</b> 20 günlük zirve üstü kapanış +10, dip altı −10</li>
-        <li><b>Göreli güç (10):</b> 3 aylık getirinin XU030'dan farkı (±%15'te tavan)</li>
-      </ul>
-      <p>Skor ≥ +40 → <span class="badge AL">AL</span> &nbsp; Skor ≤ −40 → <span class="badge SAT">SAT</span> &nbsp; arası → <span class="badge TUT">TUT</span></p>
+    <div class="toolbar" style="margin:22px 0 0">
+      <div class="seg" id="perseg"><button data-p="full" class="on">Tüm dönem</button><button data-p="oos">Son dönem (test)</button></div>
+      <span class="muted small" id="perdesc"></span>
+    </div>
+    <div class="stats" id="stats"></div>
+
+    <h3 class="sm">Yıl yıl getiri</h3>
+    <div class="tbl"><table class="yr" id="yearly"></table></div>
+    <p class="muted small">● o yılın en yüksek getirisi. İlk ve son yıl tam değildir; tarih aralığı yazılıdır.</p>
+
+    <details class="more">
+      <summary>Hisse bazında sonuçlar ve son işlemler</summary>
+      <div>
+        <div class="tbl"><table id="stocks"></table></div>
+        <p class="muted small">"Test" sütunu son dönemi gösterir. Kazanma = kârla kapanan işlemlerin oranı. Kâr faktörü = toplam kâr / toplam zarar (1'in üstü iyi).</p>
+        <h3 class="sm">Son kapanan işlemler</h3>
+        <div class="tbl"><table id="trades"></table></div>
+      </div>
     </details>
-    <details><summary>Backtest kuralları</summary>
-      <ul>
-        <li>Sadece alış yönlü (açığa satış yok). Sinyal günün kapanışında oluşur, işlem <b>ertesi gün açılışında</b> yapılır.</li>
-        <li>Çıkış: skor 0'ın altına inerse ertesi açılışta, ya da 2.5×ATR iz süren stop gün içinde tetiklenirse.</li>
-        <li>Tek yön %0.10 komisyon + %0.05 kayma maliyeti düşülür.</li>
-        <li>Portföy: her hisseye sermayenin 1/30'u ayrılır; sinyal yokken o pay nakitte bekler ve TCMB politika faizi kadar günlük bileşik faiz kazanır.</li>
-        <li>Endeks bileşimi bugünkü listedir; geçmişte endeksten çıkmış hisseler dahil değildir (hayatta kalma yanlılığı).</li>
-      </ul>
-    </details>
-  </div>
+  </section>
 
-  <footer id="disc"></footer>
-</div>
+  <!-- ===== NASIL ÇALIŞIR ===== -->
+  <section id="nasil">
+    <h2>Nasıl çalışır?</h2>
+    <p class="lead">Her iş günü borsa kapandıktan sonra (18:40) otomatik çalışır; kimse elle müdahale etmez.</p>
+    <div class="steps">
+      <div class="step"><div class="n">1</div><h4>Veri</h4><p>BIST 30'daki 30 hissenin ve endeksin günlük fiyatları indirilir. Faiz ve enflasyon TCMB'den alınır.</p></div>
+      <div class="step"><div class="n">2</div><h4>Puan</h4><p>Trend, momentum, hacim ve endekse göre güç gibi 8 gösterge birleştirilip her hisseye −100…+100 puan verilir.</p></div>
+      <div class="step"><div class="n">3</div><h4>Sinyal</h4><p>Puan +40 üstü AL, −40 altı SAT, arası TUT. Model girdiği hissede zarar-kes seviyesi takip eder.</p></div>
+      <div class="step"><div class="n">4</div><h4>Test</h4><p>Aynı kurallar son 5 yıla uygulanır; sonuç endeks ve faizle dürüstçe kıyaslanır.</p></div>
+    </div>
+
+    <details class="more tech">
+      <summary>Teknik ayrıntılar</summary>
+      <div class="card small">
+        <b>Puanın bileşenleri (toplam ±100)</b>
+        <ul>
+          <li><b>Trend (40):</b> Fiyat 200 günlük ortalamanın üstü/altı ±15 · 20 günlük ortalama 50 günlüğün üstü/altı ±15 · ADX trend gücü ve yönü ±10</li>
+          <li><b>Momentum (30):</b> RSI 55–78 +15, 45–55 0, 25–45 −15, 78 üstü −5 (aşırı alım), 25 altı +5 (aşırı satım) · MACD histogramı yön ±10, eğim ±5</li>
+          <li><b>Hacim (10):</b> Hacim 20 günlük ortalamanın 1,5 katını aşarsa günün yönünde ±10</li>
+          <li><b>Kırılım (10):</b> 20 günlük zirve üstünde kapanış +10, dip altında −10</li>
+          <li><b>Göreli güç (10):</b> Son 3 aylık getirinin BIST30 endeksinden farkı (±%15'te tavan)</li>
+        </ul>
+        <b>Test kuralları</b>
+        <ul>
+          <li>Sadece alış yapılır, açığa satış yok. Sinyal kapanışta oluşur, işlem ertesi gün açılışta yapılır (geleceği bilmeden).</li>
+          <li>Giriş: puan ≥ +40. Çıkış: puan 0'ın altına inerse ertesi açılışta, ya da 2,5×ATR iz süren zarar-kes gün içinde tetiklenirse.</li>
+          <li>Her işlemde %0,10 komisyon + %0,05 kayma düşülür. Her hisseye sermayenin 1/30'u ayrılır; boştaki para TCMB politika faizi kazanır.</li>
+          <li>Son %30'luk dönem "test" olarak ayrı raporlanır. Ayarlar bu döneme bakılarak seçilmedi.</li>
+          <li>Bilinen sınırlama: test bugünkü BIST 30 listesiyle yapılır; geçmişte endeksten çıkmış hisseler dahil değildir.</li>
+        </ul>
+      </div>
+    </details>
+  </section>
+
+  <!-- ===== SSS ===== -->
+  <section id="sss" class="faq">
+    <h2>Sık sorulan sorular</h2>
+    <p class="lead"></p>
+    <details><summary>Bu bir yatırım tavsiyesi mi?</summary><div><p>Hayır. Sayfa bir hobi/araştırma projesidir; kimsenin kişisel durumunu, risk tercihini ya da vergisini bilmez. Yatırım danışmanlığı yalnızca SPK lisanslı kuruluşlarca kişiye özel verilir.</p></div></details>
+    <details><summary>AL sinyali gelen hisse kesin yükselir mi?</summary><div><p>Hayır. AL, sadece fiyat hareketinin teknik olarak güçlü göründüğü anlamına gelir. Testte işlemlerin yarısından azı kârla kapandı; model kazancını, kârlı işlemlerin zararlılardan daha büyük olmasından elde ediyor.</p></div></details>
+    <details><summary>Model endeksi geçiyor mu?</summary><div id="faq-perf"><p>Yükleniyor…</p></div></details>
+    <details><summary>"Faiz ortamı" kutusu ne anlatıyor?</summary><div><p>Reel faiz = politika faizi − yıllık enflasyon. Pozitifse paranızı faizde tutmak enflasyonun üstünde getiri sağlar; bu dönemlerde hisseler cazibesini yitirebilir. Son 5 yılda reel faiz negatifken hisseler, pozitifken faiz daha çok kazandırdı. Bu bilgi sinyalleri değiştirmez, sadece bağlam verir.</p></div></details>
+    <details><summary>Ne sıklıkla güncelleniyor?</summary><div><p>Her iş günü 18:40'ta, borsa kapandıktan sonra otomatik olarak. Sayfanın üstündeki tarih son verinin günüdür.</p></div></details>
+    <details><summary>Veriler nereden geliyor?</summary><div><p>Hisse ve endeks fiyatları Yahoo Finance'ten, politika faizi ve enflasyon TCMB'nin sitesinden alınır. Veri kaynaklarında zaman zaman eksik gün veya hata olabilir.</p></div></details>
+  </section>
+
+  <footer>
+    <p id="disc"></p>
+    <p id="meta"></p>
+  </footer>
+</main>
 
 <script>
 const $ = s => document.querySelector(s);
 const fmt = (x, d = 2) => x == null ? "–" : Number(x).toLocaleString("tr-TR", {minimumFractionDigits: d, maximumFractionDigits: d});
 const pct = (x, d = 1) => x == null ? "–" : `<span class="${x > 0 ? "pos" : x < 0 ? "neg" : ""}">${x > 0 ? "+" : ""}${fmt(x, d)}%</span>`;
-const COMP = {ema200: "EMA200", ema_cross: "EMA20/50", adx: "ADX/DI", rsi: "RSI", macd: "MACD", volume: "Hacim", breakout: "Kırılım", relative: "Göreli güç"};
-const STATE = {"POZİSYONDA": "pozisyonda", "GİRİŞ": "yeni sinyal · yarın giriş", "ÇIKIŞ": "çıkış sinyali", "BEKLE": ""};
-let S = null, filter = "ALL", sortK = null, sortDir = 1, openRow = null;
+const tl = v => fmt(v, 0) + " ₺";
+const COMP = {ema200: "200 günlük ort.", ema_cross: "20/50 günlük ort.", adx: "Trend gücü", rsi: "RSI", macd: "MACD", volume: "Hacim", breakout: "Kırılım", relative: "Endekse göre"};
+const STATE = {"POZİSYONDA": "modelde", "GİRİŞ": "yarın alınacak", "ÇIKIŞ": "yarın satılacak", "BEKLE": ""};
+const MONTHS = ["Ocak","Şubat","Mart","Nisan","Mayıs","Haziran","Temmuz","Ağustos","Eylül","Ekim","Kasım","Aralık"];
+const monthName = ym => { const [y, m] = ym.split("-"); return `${MONTHS[+m - 1]} ${y}`; };
+const trDate = iso => new Date(iso + "T00:00:00").toLocaleDateString("tr-TR", {day: "numeric", month: "long", year: "numeric"});
+const START = 100000;
+let S = null, B = null, filter = "ALL", sortK = null, sortDir = 1, openRow = null, period = "full";
 
 async function load() {
   try {
@@ -173,52 +354,56 @@ async function load() {
       fetch("signals.json?v=" + Date.now()).then(r => r.json()),
       fetch("backtest.json?v=" + Date.now()).then(r => r.json()),
     ]);
-    S = s; renderHeader(s); renderSignals(); renderBacktest(b);
+    S = s; B = b;
+    renderHero(); renderToday(); renderSignals(); renderBacktest();
   } catch (e) {
-    $("#meta").textContent = "Veri yüklenemedi. Sayfayı bir web sunucusu üzerinden açın (örn. python3 -m http.server).";
+    $("#h-sub").textContent = "Veri yüklenemedi. Sayfayı bir web sunucusu üzerinden açın (örn. python3 -m http.server).";
   }
 }
 
-function renderHeader(s) {
-  const d = new Date(s.generated_at);
-  $("#meta").textContent = `Veri tarihi ${s.data_date} · güncellendi ${d.toLocaleString("tr-TR", {dateStyle: "medium", timeStyle: "short"})} · ${s.universe}`;
-  if (s.demo) $("#banner").innerHTML = `<div class="banner"><b>DEMO verisi:</b> Bu sayfa şu an sentetik (gerçek olmayan) fiyatlarla üretilmiş örnek çıktıyı gösteriyor. <code>python bot.py</code> çalıştırıldığında gerçek verilerle güncellenir.</div>`;
-  const avg = s.signals.reduce((a, x) => a + x.score, 0) / s.signals.length;
-  const inPos = s.signals.filter(x => x.position).length;
-  $("#cards").innerHTML = [
-    ["AL", s.counts.AL, "var(--al)"], ["TUT", s.counts.TUT, "var(--tut)"], ["SAT", s.counts.SAT, "var(--sat)"],
-    ["Ortalama skor", fmt(avg, 1), "var(--ink)"], ["Açık pozisyon", inPos, "var(--ink)"],
-  ].map(([k, v, c]) => `<div class="card"><div class="k">${k}</div><div class="v" style="color:${c}">${v}</div></div>`).join("");
-  renderMacro(s.regime);
-  $("#disc").innerHTML = `<b>Yasal uyarı:</b> ${s.disclaimer} Geçmiş performans gelecekteki sonuçların göstergesi değildir.`;
+// ---------------- Bugün ----------------
+function renderHero() {
+  const c = B.equity_curve, last = c[c.length - 1];
+  const val = START * last.strategy, gain = val - START, ret = (last.strategy - 1) * 100;
+  const yrs = (new Date(B.period.end) - new Date(B.period.start)) / 3.156e10;
+  $("#h-big").textContent = fmt(val, 0) + " ₺";
+  $("#h-delta").innerHTML = `<span class="${gain >= 0 ? "pos" : "neg"}">${gain >= 0 ? "↗ +" : "↘ "}%${fmt(ret, 0)} (${gain >= 0 ? "+" : ""}${tl(gain)})</span>`;
+  $("#h-sub").innerHTML = `${trDate(B.period.start)} tarihinde 100.000 ₺ ile başlansaydı · yaklaşık ${fmt(yrs, 1)} yıl, yıllık %${fmt(B.portfolio.full.cagr_pct, 0)}<br>Aynı parayla BIST30 endeksi alınsaydı veya faize yatırılsaydı:`;
+  $("#h-chips").innerHTML =
+    `<span class="chip"><i style="background:var(--bench)"></i>BIST30 al-bekle <b>${tl(START * last.benchmark)}</b></span>` +
+    `<span class="chip"><i style="background:var(--cash)"></i>Faiz <b>${tl(START * last.cash)}</b></span>` +
+    `<span class="chip">En büyük düşüş: model <b>${pct(B.portfolio.full.max_drawdown_pct, 0)}</b></span>` +
+    `<span class="chip">endeks <b>${pct(B.portfolio.benchmark_full?.max_drawdown_pct, 0)}</b></span>`;
+  if (S.demo) $("#demo").innerHTML = `<div class="warn demo"><div><b>DEMO verisi:</b> Bu sayfa şu an gerçek olmayan, rastgele üretilmiş fiyatlarla çalışıyor.</div></div>`;
+  $("#disc").innerHTML = `<b>Yasal uyarı:</b> ${S.disclaimer} Geçmiş performans gelecekteki sonuçların göstergesi değildir.`;
+  $("#meta").textContent = `Son veri: ${trDate(S.data_date)} kapanışı · sayfa güncellendi ${new Date(S.generated_at).toLocaleString("tr-TR", {dateStyle: "medium", timeStyle: "short"})} · ${S.universe} · Fiyat: Yahoo Finance · Faiz ve enflasyon: TCMB`;
+  // SSS: dürüst performans özeti
+  const y = (B.yearly || []).filter(r => !r.partial), beatIdx = y.filter(r => r.strategy > r.benchmark).length;
+  $("#faq-perf").innerHTML = `<p>Tüm dönemde hayır: model ${pct(B.portfolio.full.total_return_pct, 0)}, BIST30 ${pct(B.portfolio.benchmark_full?.total_return_pct, 0)} getirdi. Fark çoğunlukla 2022–2023'teki güçlü yükselişten geliyor; model zamanının yaklaşık yarısında piyasa dışında kalıyor.</p>
+    <p>Tam yılların ${y.length}'ünün ${beatIdx}'ünde endeksi geçti ve düşüşleri belirgin şekilde daha küçük. Ama faizin yüksek olduğu son yıllarda hem model hem endeks faizin gerisinde kaldı. Ayrıntılar <a href="#performans">Performans</a> bölümünde.</p>`;
 }
 
-const MONTHS = ["Ocak","Şubat","Mart","Nisan","Mayıs","Haziran","Temmuz","Ağustos","Eylül","Ekim","Kasım","Aralık"];
-const monthName = ym => { const [y, m] = ym.split("-"); return `${MONTHS[+m - 1]} ${y}`; };
-const trDate = iso => new Date(iso + "T00:00:00").toLocaleDateString("tr-TR", {day: "numeric", month: "long", year: "numeric"});
-
-function renderMacro(r) {
-  if (!r || r.real_rate == null) return;
-  const pos = r.real_rate > 0;
-  const col = pos ? "var(--tut)" : "var(--al)";
-  const text = pos
-    ? `Reel faiz <b>pozitif</b>: politika faizi enflasyonun üzerinde. Geçmiş 5 yılda böyle dönemlerde (Aralık 2024'ten beri) parayı faizde tutmak hem BIST30'u hem bu stratejiyi geride bıraktı.`
-    : `Reel faiz <b>negatif</b>: politika faizi enflasyonun altında. Geçmiş 5 yılda böyle dönemlerde (2021–2024) hisseler faizden çok daha fazla kazandırdı.`;
-  const filt = r.filter_max == null
-    ? `Reel faiz filtresi kapalı — AL/SAT sinyalleri faiz ortamını hesaba katmaz.`
-    : r.blocking ? `<b>Filtre açık:</b> reel faiz %${fmt(r.filter_max, 0)} eşiğinin üstünde olduğu için yeni AL sinyalleri işleme alınmıyor.`
-                 : `Filtre açık (eşik %${fmt(r.filter_max, 0)}); şu an alımlara engel yok.`;
-  const el = $("#macro");
-  el.hidden = false; el.style.marginTop = "12px";
-  el.innerHTML = `<div class="k">Faiz ortamı<span class="pill" style="background:${pos ? "var(--tut-bg)" : "var(--al-bg)"};color:${col}">${pos ? "faiz cazip" : "hisse lehine"}</span></div>
-    <div class="macro">
-      <div class="big" style="color:${col}">${r.real_rate > 0 ? "+" : ""}${fmt(r.real_rate, 1)}</div>
-      <p>${text} <span class="muted">${filt}</span></p>
-      <div class="eq">reel faiz (puan) = %${fmt(r.policy_rate, 2)} politika − %${fmt(r.cpi_yoy, 2)} TÜFE</div>
-    </div>
-    <div class="muted small" style="margin-top:8px">Politika faizi ${trDate(r.policy_date)} itibarıyla · TÜFE ${monthName(r.cpi_month)} (yıllık) · kaynak: ${r.source || "TCMB"}</div>`;
+function renderToday() {
+  const inPos = S.signals.filter(x => x.position).length;
+  const tiles = [["AL", "var(--al)", "güçlü görünüm"], ["TUT", "var(--tut)", "belirgin yön yok"], ["SAT", "var(--sat)", "zayıf görünüm"]]
+    .map(([k, c, d]) => `<div class="tile" data-go="${k}"><div class="k">${k}</div><div class="v" style="color:${c}">${S.counts[k]}</div><div class="d">hisse · ${d}</div><div class="go">Listeyi gör →</div></div>`).join("");
+  $("#today").innerHTML = tiles + macroTile(S.regime) ;
+  document.querySelectorAll("#today .tile[data-go]").forEach(t => t.onclick = () => { setFilter(t.dataset.go); location.hash = "#sinyaller"; });
+  $("#today").insertAdjacentHTML("afterend", `<p class="muted small" style="text-align:center;margin:12px 0 0">${trDate(S.data_date)} kapanışına göre · modelin şu an elinde <b>${inPos}</b> hisse var</p>`);
 }
 
+function macroTile(r) {
+  if (!r || r.real_rate == null) return "";
+  const pos = r.real_rate > 0, col = pos ? "var(--tut)" : "var(--al)";
+  return `<div class="tile macro">
+    <div class="row1"><span class="k">Faiz ortamı</span><span class="pill" style="background:${pos ? "var(--tut-bg)" : "var(--al-bg)"};color:${col}">${pos ? "FAİZ CAZİP" : "HİSSE LEHİNE"}</span></div>
+    <div class="row1"><span class="v" style="color:${col}">${r.real_rate > 0 ? "+" : ""}${fmt(r.real_rate, 1)}</span><span class="d muted small">reel faiz = %${fmt(r.policy_rate, 0)} faiz − %${fmt(r.cpi_yoy, 1)} enflasyon</span></div>
+    <p>${pos ? "Faiz enflasyonun üzerinde. Son yıllarda böyle dönemlerde faiz, hisselerden daha çok kazandırdı." : "Faiz enflasyonun altında. Son yıllarda böyle dönemlerde hisseler faizden daha çok kazandırdı."}
+    <span title="Politika faizi ${trDate(r.policy_date)} · TÜFE ${monthName(r.cpi_month)} · kaynak ${r.source}">(TCMB, ${monthName(r.cpi_month)})</span></p>
+  </div>`;
+}
+
+// ---------------- Sinyal tablosu ----------------
 function scoreBar(v) {
   const w = Math.min(Math.abs(v), 100) / 2;
   const col = v >= S.thresholds.buy ? "var(--al)" : v <= S.thresholds.sell ? "var(--sat)" : "var(--tut)";
@@ -226,38 +411,46 @@ function scoreBar(v) {
   return `<b>${v > 0 ? "+" : ""}${fmt(v, 0)}</b><span class="bar"><i style="${pos};background:${col}"></i></span>`;
 }
 
+function setFilter(f) {
+  filter = f;
+  document.querySelectorAll("#tabs button").forEach(b => b.classList.toggle("on", b.dataset.f === f));
+  renderSignals();
+}
+
 function renderSignals() {
   const q = $("#q").value.trim().toLocaleUpperCase("tr-TR");
-  let rows = S.signals.filter(x => (filter === "ALL" || x.signal === filter) &&
+  let rows = S.signals.filter(x => (filter === "ALL" || x.signal === filter || (filter === "POS" && x.position)) &&
     (!q || x.ticker.includes(q) || x.name.toLocaleUpperCase("tr-TR").includes(q)));
   if (sortK) rows = [...rows].sort((a, b) => (a[sortK] > b[sortK] ? 1 : a[sortK] < b[sortK] ? -1 : 0) * sortDir);
   $("#sig tbody").innerHTML = rows.map(x => {
     const stop = x.position ? x.position.stop : x.stop;
     const trend = x.score - x.score_5d_ago;
-    const main = `<tr class="row" data-t="${x.ticker}">
-      <td><span class="tk">${x.ticker}</span><span class="nm">${x.name}</span></td>
+    const open = openRow === x.ticker;
+    const main = `<tr class="row${open ? " open" : ""}" data-t="${x.ticker}">
+      <td><span class="tk"><span class="chev">▶</span>${x.ticker}</span><span class="nm">${x.name}</span></td>
       <td>${fmt(x.close)}</td><td>${pct(x.change_pct, 2)}</td>
       <td><span class="badge ${x.signal}">${x.signal}</span><div class="state">${STATE[x.state] || ""}</div></td>
-      <td>${scoreBar(x.score)}<div class="state">5 gün: ${trend >= 0 ? "▲" : "▼"} ${fmt(Math.abs(trend), 0)}</div></td>
+      <td>${scoreBar(x.score)}<div class="state">5 günde ${trend >= 0 ? "▲" : "▼"} ${fmt(Math.abs(trend), 0)}</div></td>
       <td>${fmt(x.rsi, 0)}</td><td>${fmt(stop)}</td><td>${fmt(x.target)}</td></tr>`;
-    if (openRow !== x.ticker) return main;
+    if (!open) return main;
     const p = x.position;
     return main + `<tr class="detail"><td colspan="8"><div class="dw">
       <div class="sc" id="sc-${x.ticker}"><div class="muted small">Grafik yükleniyor…</div></div>
-      <b>Gerekçeler</b><ul>${x.reasons.map(r => `<li>${r}</li>`).join("")}</ul>
-      ${p ? `<div class="small">Model pozisyonu: ${p.entry_date} tarihinde ${fmt(p.entry_price)} ile girildi · ${p.days} gün · ${pct(p.pnl_pct, 2)} · iz süren stop ${fmt(p.stop)}</div>` : ""}
+      ${p ? `<div class="posbox">Model bu hisseyi <b>${trDate(p.entry_date)}</b> tarihinde <b>${fmt(p.entry_price)}</b> fiyatından aldı · ${p.days} gündür elde · şu an ${pct(p.pnl_pct, 2)} · zarar-kes ${fmt(p.stop)}</div>` : ""}
+      <h4>Neden ${x.signal}?</h4><ul>${x.reasons.map(r => `<li>${r}</li>`).join("")}</ul>
+      <h4>Puanın dağılımı <span class="muted small" style="font-weight:400">(toplam ${x.score > 0 ? "+" : ""}${fmt(x.score, 0)})</span></h4>
       <div class="comp">${Object.entries(x.components).map(([k, v]) => `<span>${COMP[k]} <b class="${v > 0 ? "pos" : v < 0 ? "neg" : ""}">${v > 0 ? "+" : ""}${fmt(v, 1)}</b></span>`).join("")}</div>
-      <div class="small muted" style="margin-top:6px">ADX ${fmt(x.adx, 0)} · ATR %${fmt(x.atr_pct, 1)}</div>
+      <div class="small muted" style="margin-top:8px">RSI ${fmt(x.rsi, 0)} · ADX ${fmt(x.adx, 0)} · günlük oynaklık (ATR) %${fmt(x.atr_pct, 1)}${x.target ? ` · hedef ${fmt(x.target)}` : ""}</div>
     </div></td></tr>`;
   }).join("") || `<tr><td colspan="8" class="muted">Sonuç yok</td></tr>`;
   fitDetail();
   if (openRow) loadStock(openRow);
 }
 
-// Telefonda tablo yana kayar; detay alanını görünen genişliğe sabitle
+// Telefonda tablo yana kayabilir; detay alanını görünen genişliğe sabitle
 function fitDetail() {
   const dw = document.querySelector("#sig .dw");
-  if (dw) dw.style.width = ($("#sig").parentElement.clientWidth - 24) + "px";
+  if (dw) dw.style.width = ($("#sig").parentElement.clientWidth - 28) + "px";
 }
 
 // ---------------- Hisse detay grafiği ----------------
@@ -276,7 +469,7 @@ async function loadStock(t) {
 function drawStock(box, D) {
   const n = D.dates.length, from = Math.max(0, n - chartRange), idx = [];
   for (let i = from; i < n; i++) idx.push(i);
-  const W = Math.max(300, box.clientWidth), PH = W < 560 ? 200 : 260, SH = 70, GAP = 18, L = 8, R = 52, T = 8, B = 18;
+  const W = Math.max(280, box.clientWidth), PH = W < 560 ? 190 : 260, SH = 64, GAP = 20, L = 4, R = 50, T = 8, B = 18;
   const H = T + PH + GAP + SH + B;
   const x = k => L + k / (idx.length - 1) * (W - L - R);
   const series = ["close", "ema20", "ema50", "ema200"];
@@ -287,35 +480,31 @@ function drawStock(box, D) {
   const pos = {}; idx.forEach((i, k) => pos[D.dates[i]] = k);
   const kOf = date => pos[date] ?? (date < D.dates[from] ? 0 : null);
   const path = key => idx.map((i, k) => D[key][i] == null ? "" : `${k && D[key][idx[k - 1]] != null ? "L" : "M"}${x(k).toFixed(1)},${y(D[key][i]).toFixed(1)}`).join("");
-  // pozisyonda olunan dönemler
   const spans = [...D.trades.map(t => [t.entry_date, t.exit_date, t]), ...(D.open ? [[D.open.entry_date, D.dates[n - 1], null]] : [])]
     .filter(([a, b]) => b >= D.dates[from]);
   let shade = "", marks = "";
   for (const [a, b, t] of spans) {
     const ka = kOf(a), kb = pos[b] ?? idx.length - 1;
-    shade += `<rect x="${x(ka)}" y="${T}" width="${Math.max(1, x(kb) - x(ka))}" height="${PH}" fill="var(--al)" opacity=".08"/>`;
-    if (pos[a] != null) marks += `<path d="M${x(ka)},${y(D.close[idx[ka]]) + 16}l-5,8h10z" fill="var(--al)"><title>Alış ${a}</title></path>`;
-    if (t && pos[b] != null) marks += `<path d="M${x(kb)},${y(D.close[idx[kb]]) - 16}l-5,-8h10z" fill="var(--sat)"><title>Satış ${b} (${t.exit_reason}) ${t.ret_pct > 0 ? "+" : ""}${fmt(t.ret_pct, 1)}%</title></path>`;
+    shade += `<rect x="${x(ka)}" y="${T}" width="${Math.max(1, x(kb) - x(ka))}" height="${PH}" fill="var(--al)" opacity=".09"/>`;
+    if (pos[a] != null) marks += `<path d="M${x(ka)},${y(D.close[idx[ka]]) + 14}l-5,8h10z" fill="var(--al)"><title>Alış ${a}</title></path>`;
+    if (t && pos[b] != null) marks += `<path d="M${x(kb)},${y(D.close[idx[kb]]) - 14}l-5,-8h10z" fill="var(--sat)"><title>Satış ${b} (${t.exit_reason}) ${t.ret_pct > 0 ? "+" : ""}${fmt(t.ret_pct, 1)}%</title></path>`;
   }
-  // fiyat ekseni
   let grid = "";
   const step = niceStep((hi - lo) / 4);
   for (let v = Math.ceil(lo / step) * step; v <= hi; v += step)
     grid += `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/><text x="${W - R + 6}" y="${y(v) + 4}">${fmt(v, v < 10 ? 2 : 0)}</text>`;
-  // tarih etiketleri
   let dates = ""; const every = Math.ceil(idx.length / (W < 560 ? 3 : 6));
   for (let k = every; k < idx.length - every / 3; k += every) {
     const d = new Date(D.dates[idx[k]] + "T00:00:00");
     dates += `<text x="${x(k)}" y="${H - 4}" text-anchor="middle">${d.toLocaleDateString("tr-TR", {month: "short", year: "2-digit"})}</text>`;
   }
-  // skor şeridi
   const sPath = idx.map((i, k) => `${k ? "L" : "M"}${x(k).toFixed(1)},${sy(D.score[i]).toFixed(1)}`).join("");
   const thr = [S.thresholds.buy, 0, S.thresholds.sell].map(v =>
-    `<line x1="${L}" x2="${W - R}" y1="${sy(v)}" y2="${sy(v)}" stroke="${v ? (v > 0 ? "var(--al)" : "var(--sat)") : "var(--line)"}" stroke-dasharray="${v ? "3 3" : ""}" opacity="${v ? .7 : 1}"/><text x="${W - R + 6}" y="${sy(v) + 4}">${v > 0 ? "+" : ""}${v}</text>`).join("");
-  const lg = [["close", "Fiyat", "var(--ink)"], ["ema20", "EMA20", "var(--e20)"], ["ema50", "EMA50", "var(--e50)"], ["ema200", "EMA200", "var(--e200)"]]
-    .map(([, n, c]) => `<span><i style="background:${c}"></i>${n}</span>`).join("");
+    `<line x1="${L}" x2="${W - R}" y1="${sy(v)}" y2="${sy(v)}" stroke="${v ? (v > 0 ? "var(--al)" : "var(--sat)") : "var(--line2)"}" stroke-dasharray="${v ? "3 3" : ""}" opacity="${v ? .7 : 1}"/><text x="${W - R + 6}" y="${sy(v) + 4}">${v > 0 ? "+" : ""}${v}</text>`).join("");
+  const lg = [["Fiyat", "var(--ink)"], ["20g ort.", "var(--e20)"], ["50g ort.", "var(--e50)"], ["200g ort.", "var(--e200)"]]
+    .map(([nm, c]) => `<span><i class="ln" style="background:${c}"></i>${nm}</span>`).join("");
   box.innerHTML = `<div class="rng">${RANGES.map(([l, v]) => `<button data-r="${v}" class="${v === chartRange ? "on" : ""}">${l}</button>`).join("")}
-      <div class="lg legend" style="margin:0">${lg}<span><i style="background:var(--al);opacity:.35;height:8px"></i>pozisyonda</span></div></div>
+      <div class="legend">${lg}<span><i style="background:var(--al);opacity:.4;border-radius:2px"></i>modelde</span></div></div>
     <svg width="${W}" height="${H}" style="display:block;max-width:100%">
       ${shade}${grid}
       <path d="${path("ema200")}" fill="none" stroke="var(--e200)" stroke-width="1.3"/>
@@ -323,27 +512,35 @@ function drawStock(box, D) {
       <path d="${path("ema20")}" fill="none" stroke="var(--e20)" stroke-width="1.3"/>
       <path d="${path("close")}" fill="none" stroke="var(--ink)" stroke-width="1.8"/>
       ${marks}
-      <text x="${L}" y="${T + PH + GAP - 4}">Skor</text>${thr}
+      <text x="${L}" y="${T + PH + GAP - 5}">Puan</text>${thr}
       <path d="${sPath}" fill="none" stroke="var(--accent)" stroke-width="1.4"/>
       ${dates}
       <line class="cur" x1="0" x2="0" y1="${T}" y2="${T + PH + GAP + SH}" stroke="var(--muted)" stroke-dasharray="2 3" visibility="hidden"/>
       <rect class="hit" x="${L}" y="${T}" width="${W - L - R}" height="${PH + GAP + SH}" fill="transparent"/>
     </svg><div class="tip"></div>`;
   box.querySelectorAll(".rng button").forEach(b => b.onclick = e => { e.stopPropagation(); chartRange = +b.dataset.r; drawStock(box, D); });
+  hover(box, x, idx.length, (k, tip) => {
+    const i = idx[k];
+    tip.innerHTML = `<b>${trDate(D.dates[i])}</b><br>Fiyat <b>${fmt(D.close[i])}</b><br><i style="background:var(--e20)"></i>20g ${fmt(D.ema20[i])} · <i style="background:var(--e50)"></i>50g ${fmt(D.ema50[i])}<br><i style="background:var(--e200)"></i>200g ${fmt(D.ema200[i])}<br>Puan <b>${D.score[i] > 0 ? "+" : ""}${fmt(D.score[i], 0)}</b>`;
+  }, W);
+  box.onclick = e => e.stopPropagation();
+}
+
+// Grafiklerde fare / parmakla gezinme
+function hover(box, x, n, fill, W) {
   const tip = box.querySelector(".tip"), cur = box.querySelector(".cur"), hit = box.querySelector(".hit");
   const move = ev => {
     const r = hit.getBoundingClientRect(), px = (ev.touches ? ev.touches[0].clientX : ev.clientX) - r.left;
-    const k = Math.max(0, Math.min(idx.length - 1, Math.round(px / r.width * (idx.length - 1)))), i = idx[k];
+    const k = Math.max(0, Math.min(n - 1, Math.round(px / r.width * (n - 1))));
     cur.setAttribute("x1", x(k)); cur.setAttribute("x2", x(k)); cur.setAttribute("visibility", "visible");
-    tip.style.display = "block";
-    tip.innerHTML = `<b>${trDate(D.dates[i])}</b><br>Fiyat ${fmt(D.close[i])}<br>EMA20 ${fmt(D.ema20[i])} · EMA50 ${fmt(D.ema50[i])}<br>EMA200 ${fmt(D.ema200[i])}<br>Skor <b>${D.score[i] > 0 ? "+" : ""}${fmt(D.score[i], 0)}</b>`;
-    const tx = x(k) + 14 + tip.offsetWidth > W ? x(k) - tip.offsetWidth - 14 : x(k) + 14;
-    tip.style.left = tx + "px"; tip.style.top = "40px";
+    tip.style.display = "block"; fill(k, tip);
+    const sx = box.querySelector("svg").getBoundingClientRect().width / W;
+    const left = x(k) * sx, tx = left + 14 + tip.offsetWidth > box.clientWidth ? left - tip.offsetWidth - 14 : left + 14;
+    tip.style.left = Math.max(0, tx) + "px"; tip.style.top = "36px";
   };
   const leave = () => { tip.style.display = "none"; cur.setAttribute("visibility", "hidden"); };
-  hit.addEventListener("mousemove", move); hit.addEventListener("touchmove", move, {passive: true});
+  hit.addEventListener("mousemove", move); hit.addEventListener("touchmove", move, {passive: true}); hit.addEventListener("touchstart", move, {passive: true});
   hit.addEventListener("mouseleave", leave); hit.addEventListener("touchend", leave);
-  box.onclick = e => e.stopPropagation();
 }
 
 function niceStep(raw) {
@@ -351,28 +548,39 @@ function niceStep(raw) {
   return (f < 1.5 ? 1 : f < 3.5 ? 2 : f < 7.5 ? 5 : 10) * p;
 }
 
-function renderBacktest(b) {
-  $("#btmeta").textContent = `${b.period.start} – ${b.period.end} · örneklem dışı dönem ${b.period.oos_start} sonrası`;
-  drawChart(b.equity_curve, b.period.oos_start);
-  const P = b.portfolio, rows = [
-    ["Toplam getiri", "total_return_pct", v => pct(v)], ["Yıllık (CAGR)", "cagr_pct", v => pct(v)],
-    ["Maks. düşüş", "max_drawdown_pct", v => pct(v)], ["Sharpe", "sharpe", v => fmt(v)],
-  ];
-  $("#pf").innerHTML = `<thead><tr><th>Portföy</th><th>Strateji</th><th>XU030</th><th>Nakit</th><th>Strateji OOS</th><th>XU030 OOS</th><th>Nakit OOS</th></tr></thead><tbody>` +
-    rows.map(([n, k, f]) => `<tr><td>${n}</td><td>${f(P.full[k])}</td><td>${f(P.benchmark_full?.[k])}</td><td>${f(P.cash_full?.[k])}</td><td>${f(P.oos[k])}</td><td>${f(P.benchmark_oos?.[k])}</td><td>${f(P.cash_oos?.[k])}</td></tr>`).join("") + "</tbody>";
-  renderYearly(b.yearly || []);
-  $("#trades").innerHTML = `<thead><tr><th>Son işlemler</th><th>Giriş</th><th>Çıkış</th><th>Getiri</th><th>Neden</th></tr></thead><tbody>` +
-    b.recent_trades.slice(0, 8).map(t => `<tr><td class="tk">${t.ticker}</td><td>${t.entry_date.slice(5)}</td><td>${t.exit_date.slice(5)}</td><td>${pct(t.ret_pct)}</td><td>${t.exit_reason}</td></tr>`).join("") + "</tbody>";
-  $("#stocks").innerHTML = `<thead><tr><th>Hisse</th><th>Strateji</th><th>Al-tut</th><th>OOS</th><th>İşlem</th><th>Kazanma</th><th>Kâr faktörü</th><th>Maks. düşüş</th><th>Sharpe</th></tr></thead><tbody>` +
-    b.stocks.map(s => `<tr><td><span class="tk">${s.ticker}</span><span class="nm">${s.name}</span></td>
+// ---------------- Performans ----------------
+function renderBacktest() {
+  $("#btmeta").textContent = `${trDate(B.period.start)} – ${trDate(B.period.end)} · gölgeli alan: ${trDate(B.period.oos_start)} sonrası test dönemi (ayarlar bu döneme bakılmadan seçildi)`;
+  drawChart(B.equity_curve, B.period.oos_start);
+  renderStats();
+  renderYearly(B.yearly || []);
+  $("#stocks").innerHTML = `<thead><tr><th>Hisse</th><th>Model</th><th>Al-bekle</th><th>Test</th><th>İşlem</th><th>Kazanma</th><th>Kâr faktörü</th><th>En büyük düşüş</th></tr></thead><tbody>` +
+    B.stocks.map(s => `<tr><td><span class="tk">${s.ticker}</span><span class="nm">${s.name}</span></td>
       <td>${pct(s.strategy.total_return_pct, 0)}</td><td>${pct(s.buy_hold_pct, 0)}</td><td>${pct(s.oos.total_return_pct, 0)}</td>
       <td>${s.strategy.trades}</td><td>${fmt(s.strategy.win_rate_pct, 0)}%</td><td>${fmt(s.strategy.profit_factor)}</td>
-      <td>${pct(s.strategy.max_drawdown_pct, 0)}</td><td>${fmt(s.strategy.sharpe)}</td></tr>`).join("") + "</tbody>";
+      <td>${pct(s.strategy.max_drawdown_pct, 0)}</td></tr>`).join("") + "</tbody>";
+  const short = iso => new Date(iso + "T00:00:00").toLocaleDateString("tr-TR", {day: "numeric", month: "short", year: "2-digit"});
+  $("#trades").innerHTML = `<thead><tr><th>Hisse</th><th>Alış</th><th>Satış</th><th>Getiri</th><th>Neden</th></tr></thead><tbody>` +
+    B.recent_trades.slice(0, 12).map(t => `<tr><td class="tk">${t.ticker}</td><td>${short(t.entry_date)}</td><td>${short(t.exit_date)}</td><td>${pct(t.ret_pct)}</td><td>${t.exit_reason === "stop" ? "zarar-kes" : "puan düştü"}</td></tr>`).join("") + "</tbody>";
+}
+
+function renderStats() {
+  const P = B.portfolio, oos = period === "oos";
+  const sets = [["Model portföy", "var(--strat)", oos ? P.oos : P.full], ["BIST30 al-bekle", "var(--bench)", oos ? P.benchmark_oos : P.benchmark_full], ["Faiz", "var(--cash)", oos ? P.cash_oos : P.cash_full]];
+  $("#perdesc").textContent = oos ? `${trDate(B.period.oos_start)} – ${trDate(B.period.end)}` : `${trDate(B.period.start)} – ${trDate(B.period.end)}`;
+  $("#stats").innerHTML = sets.map(([n, c, m]) => !m ? "" : `<div class="stat">
+    <div class="k"><i style="background:${c}"></i>${n}</div>
+    <div class="v">${pct(m.total_return_pct, 0)}</div>
+    <dl><dt>100.000 ₺ →</dt><dd>${tl(START * (1 + m.total_return_pct / 100))}</dd>
+      <dt>Yıllık ortalama</dt><dd>${pct(m.cagr_pct, 1)}</dd>
+      <dt title="Zirveden en derin düşüş">En büyük düşüş</dt><dd>${pct(m.max_drawdown_pct, 1)}</dd>
+      ${m.sharpe != null ? `<dt title="Faizin üzerinde, alınan risk başına getiri. 0'ın altı: faizden kötü">Risk/getiri (Sharpe)</dt><dd>${fmt(m.sharpe)}</dd>` : ""}</dl>
+  </div>`).join("");
 }
 
 function renderYearly(rows) {
   const short = iso => new Date(iso + "T00:00:00").toLocaleDateString("tr-TR", {day: "numeric", month: "short"});
-  const cols = [["strategy", "Strateji"], ["benchmark", "XU030 al-tut"], ["cash", "Nakit (faiz)"]];
+  const cols = [["strategy", "Model"], ["benchmark", "BIST30"], ["cash", "Faiz"]];
   const wins = Object.fromEntries(cols.map(([k]) => [k, 0]));
   const body = rows.map(r => {
     const best = cols.map(([k]) => r[k]).filter(v => v != null).reduce((a, b) => Math.max(a, b), -Infinity);
@@ -381,43 +589,46 @@ function renderYearly(rows) {
       cols.map(([k]) => `<td class="${r[k] === best ? "best" : ""}">${pct(r[k])}</td>`).join("") +
       `<td>${r.strategy != null && r.benchmark != null ? pct(r.strategy - r.benchmark) : "–"}</td></tr>`;
   }).join("");
-  $("#yearly").innerHTML = `<thead><tr><th>Yıl</th>${cols.map(([, n]) => `<th>${n}</th>`).join("")}<th>Strateji − XU030</th></tr></thead><tbody>${body}</tbody>` +
-    `<tfoot><tr><td class="muted small" colspan="5" style="text-align:left">Tam yıllarda birinci olma sayısı: ` +
+  $("#yearly").innerHTML = `<thead><tr><th>Yıl</th>${cols.map(([, n]) => `<th>${n}</th>`).join("")}<th title="Modelin endekse göre farkı (puan)">Model − BIST30</th></tr></thead><tbody>${body}</tbody>` +
+    `<tfoot><tr><td class="muted small" colspan="5" style="text-align:left;white-space:normal">Tam yıllarda birinci: ` +
     cols.map(([k, n]) => `${n} <b>${wins[k]}</b>`).join(" · ") + `</td></tr></tfoot>`;
 }
 
 function drawChart(c, oos) {
-  const W = 1000, H = 280, L = 44, R = 10, T = 10, B = 24;
+  const box = $("#chart");
+  const W = Math.max(300, box.clientWidth), H = W < 560 ? 240 : 320, L = 62, R = 10, T = 12, Bm = 26;
   const vals = c.flatMap(p => [p.strategy, p.benchmark, p.cash]).filter(v => v != null);
   const lo = Math.log(Math.min(...vals) * .95), hi = Math.log(Math.max(...vals) * 1.05);
-  const x = i => L + i / (c.length - 1) * (W - L - R), y = v => T + (1 - (Math.log(v) - lo) / (hi - lo)) * (H - T - B);
+  const x = i => L + i / (c.length - 1) * (W - L - R), y = v => T + (1 - (Math.log(v) - lo) / (hi - lo)) * (H - T - Bm);
   const path = k => c.map((p, i) => p[k] == null ? "" : `${i ? "L" : "M"}${x(i).toFixed(1)},${y(p[k]).toFixed(1)}`).join("");
   const oi = c.findIndex(p => p.date >= oos);
+  const money = v => { const t = v * START; return t >= 1e6 ? `${fmt(t / 1e6, t >= 1e7 ? 0 : 1)} mn ₺` : `${fmt(t / 1e3, 0)} bin ₺`; };
   let ticks = "";
-  for (const v of [0.5, 0.75, 1, 1.5, 2, 3, 4, 6, 8, 12]) {
+  for (const v of [0.75, 1, 1.5, 2, 3, 4, 6, 8, 10, 12, 15]) {
     if (Math.log(v) < lo || Math.log(v) > hi) continue;
-    ticks += `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/><text x="${L - 6}" y="${y(v) + 4}" text-anchor="end">${v}x</text>`;
+    ticks += `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)" stroke-dasharray="3 4"/><text x="${L - 8}" y="${y(v) + 4}" text-anchor="end">${money(v)}</text>`;
   }
   const years = [...new Set(c.map(p => p.date.slice(0, 4)))].map(yr => {
     const i = c.findIndex(p => p.date.startsWith(yr));
-    if (i < c.length * 0.04) return "";
-    return `<text x="${x(i)}" y="${H - 6}" text-anchor="middle">${yr}</text>`;
+    return i < c.length * 0.04 ? "" : `<text x="${x(i)}" y="${H - 6}" text-anchor="middle">${yr}</text>`;
   }).join("");
-  $("#chart").innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Sermaye eğrisi">
+  box.innerHTML = `<svg width="${W}" height="${H}" style="display:block" role="img" aria-label="Portföy eğrisi">
     ${ticks}${years}
-    ${oi > 0 ? `<rect x="${x(oi)}" y="${T}" width="${W - R - x(oi)}" height="${H - T - B}" fill="var(--accent)" opacity=".06"/><text x="${x(oi) + 6}" y="${T + 14}">örneklem dışı</text>` : ""}
-    <path d="${path("cash")}" fill="none" stroke="var(--cash)" stroke-width="1.4" stroke-dasharray="5 4"/>
-    <path d="${path("benchmark")}" fill="none" stroke="var(--bench)" stroke-width="1.6"/>
-    <path d="${path("strategy")}" fill="none" stroke="var(--accent)" stroke-width="2.2"/>
-  </svg>`;
+    ${oi > 0 ? `<rect x="${x(oi)}" y="${T}" width="${W - R - x(oi)}" height="${H - T - Bm}" fill="var(--accent)" opacity=".06"/><text x="${x(oi) + 8}" y="${T + 14}">test dönemi</text>` : ""}
+    <path d="${path("cash")}" fill="none" stroke="var(--cash)" stroke-width="2" stroke-dasharray="6 4"/>
+    <path d="${path("benchmark")}" fill="none" stroke="var(--bench)" stroke-width="2"/>
+    <path d="${path("strategy")}" fill="none" stroke="var(--strat)" stroke-width="2.6"/>
+    <line class="cur" x1="0" x2="0" y1="${T}" y2="${H - Bm}" stroke="var(--muted)" stroke-dasharray="2 3" visibility="hidden"/>
+    <rect class="hit" x="${L}" y="${T}" width="${W - L - R}" height="${H - T - Bm}" fill="transparent"/>
+  </svg><div class="tip"></div>`;
+  hover(box, x, c.length, (k, tip) => {
+    const p = c[k];
+    tip.innerHTML = `<b>${trDate(p.date)}</b><br><i style="background:var(--strat)"></i>Model <b>${tl(p.strategy * START)}</b><br><i style="background:var(--bench)"></i>BIST30 <b>${p.benchmark ? tl(p.benchmark * START) : "–"}</b><br><i style="background:var(--cash)"></i>Faiz <b>${tl(p.cash * START)}</b>`;
+  }, W);
 }
 
-$("#tabs").addEventListener("click", e => {
-  if (!e.target.dataset.f) return;
-  filter = e.target.dataset.f;
-  document.querySelectorAll("#tabs button").forEach(b => b.classList.toggle("on", b === e.target));
-  renderSignals();
-});
+// ---------------- Olaylar ----------------
+$("#tabs").addEventListener("click", e => { if (e.target.dataset.f) setFilter(e.target.dataset.f); });
 $("#q").addEventListener("input", renderSignals);
 $("#sig thead").addEventListener("click", e => {
   const k = e.target.dataset.k; if (!k) return;
@@ -427,8 +638,24 @@ $("#sig tbody").addEventListener("click", e => {
   const tr = e.target.closest("tr.row"); if (!tr) return;
   openRow = openRow === tr.dataset.t ? null : tr.dataset.t; renderSignals();
 });
+$("#perseg").addEventListener("click", e => {
+  if (!e.target.dataset.p) return;
+  period = e.target.dataset.p;
+  document.querySelectorAll("#perseg button").forEach(b => b.classList.toggle("on", b === e.target));
+  renderStats();
+});
+// Menüde bulunulan bölümü işaretle
+const secs = [...document.querySelectorAll("main section")];
+const io = new IntersectionObserver(es => es.forEach(en => {
+  if (!en.isIntersecting) return;
+  document.querySelectorAll("nav a[href^='#']").forEach(a => a.classList.toggle("on", a.getAttribute("href") === "#" + en.target.id));
+}), {rootMargin: "-45% 0px -50% 0px"});
+secs.forEach(s => io.observe(s));
 let rsz;
-addEventListener("resize", () => { clearTimeout(rsz); rsz = setTimeout(() => { fitDetail(); if (openRow && STOCK[openRow]) drawStock(document.getElementById("sc-" + openRow), STOCK[openRow]); }, 150); });
+addEventListener("resize", () => { clearTimeout(rsz); rsz = setTimeout(() => {
+  if (!B) return; drawChart(B.equity_curve, B.period.oos_start); fitDetail();
+  if (openRow && STOCK[openRow]) drawStock(document.getElementById("sc-" + openRow), STOCK[openRow]);
+}, 150); });
 load();
 </script>
 </body>
