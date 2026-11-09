@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BIST30 Sinyal Botu</title>
+<style>
+:root{
+  --bg:#f6f7f9;--card:#fff;--ink:#14181f;--muted:#5f6b7a;--line:#e3e7ec;
+  --al:#0f8a5f;--al-bg:#e3f5ec;--sat:#c23b3b;--sat-bg:#fbe7e7;--tut:#8a6d0f;--tut-bg:#f7f0da;
+  --accent:#2d5bd7;--bench:#9aa4b2;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#0e1116;--card:#161b22;--ink:#e6e9ee;--muted:#8d97a5;--line:#262d37;
+  --al:#3ccf91;--al-bg:#11291f;--sat:#ff7272;--sat-bg:#2e1616;--tut:#e0bd4f;--tut-bg:#2a2412;
+  --accent:#6f95ff;--bench:#5d6775;
+}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,sans-serif}
+.wrap{max-width:1180px;margin:0 auto;padding:24px 16px 60px}
+header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px;margin-bottom:18px}
+h1{font-size:26px;margin:0;letter-spacing:-.02em}
+h2{font-size:18px;margin:34px 0 12px}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+.banner{background:var(--tut-bg);color:var(--tut);border-radius:10px;padding:10px 14px;margin-bottom:16px;font-size:14px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.card .k{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.card .v{font-size:26px;font-weight:650;font-variant-numeric:tabular-nums}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:20px 0 10px}
+.tabs button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:6px 12px;border-radius:999px;cursor:pointer;font:inherit;font-size:14px}
+.tabs button.on{background:var(--ink);color:var(--card);border-color:var(--ink)}
+input[type=search]{flex:1;min-width:160px;max-width:260px;margin-left:auto;padding:7px 12px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit}
+.tbl{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+th,td{padding:10px 12px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--line)}
+th{font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.03em;cursor:pointer;user-select:none}
+th:first-child,td:first-child{text-align:left}
+tbody tr.row{cursor:pointer}
+tbody tr.row:hover{background:color-mix(in srgb,var(--accent) 6%,transparent)}
+tr:last-child td{border-bottom:0}
+.tk{font-weight:650}
+.nm{display:block;font-size:12px;color:var(--muted);font-weight:400}
+.badge{display:inline-block;min-width:44px;text-align:center;padding:2px 8px;border-radius:6px;font-weight:700;font-size:13px}
+.AL{background:var(--al-bg);color:var(--al)}.SAT{background:var(--sat-bg);color:var(--sat)}.TUT{background:var(--tut-bg);color:var(--tut)}
+.pos{color:var(--al)}.neg{color:var(--sat)}
+.bar{position:relative;width:110px;height:8px;background:var(--line);border-radius:4px;display:inline-block;vertical-align:middle;margin-left:8px}
+.bar i{position:absolute;top:0;bottom:0;border-radius:4px}
+.bar::after{content:"";position:absolute;left:50%;top:-3px;bottom:-3px;width:1px;background:var(--muted)}
+.state{font-size:12px;color:var(--muted)}
+.detail td{background:color-mix(in srgb,var(--bg) 60%,var(--card));text-align:left;white-space:normal}
+.detail ul{margin:6px 0;padding-left:18px}
+.comp{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:6px 16px;margin-top:8px;font-size:13px}
+.comp span b{float:right;font-variant-numeric:tabular-nums}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:760px){.grid2{grid-template-columns:1fr}.bar{width:60px}}
+svg text{fill:var(--muted);font-size:11px}
+.legend{display:flex;gap:16px;font-size:13px;color:var(--muted);margin:4px 0 8px}
+.legend i{display:inline-block;width:14px;height:3px;border-radius:2px;vertical-align:middle;margin-right:6px}
+.mt td,.mt th{padding:8px 10px}
+footer{margin-top:40px;font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:16px}
+details summary{cursor:pointer;font-weight:600;color:var(--ink)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>BIST30 Teknik Sinyal Botu</h1>
+      <div class="muted small" id="meta">Yükleniyor…</div>
+    </div>
+    <div class="muted small">Günlük veri · çoklu indikatör skoru</div>
+  </header>
+
+  <div id="banner"></div>
+
+  <div class="cards" id="cards"></div>
+
+  <div class="toolbar">
+    <div class="tabs" id="tabs">
+      <button data-f="ALL" class="on">Tümü</button>
+      <button data-f="AL">AL</button>
+      <button data-f="TUT">TUT</button>
+      <button data-f="SAT">SAT</button>
+    </div>
+    <input type="search" id="q" placeholder="Hisse ara…">
+  </div>
+
+  <div class="tbl">
+    <table id="sig">
+      <thead><tr>
+        <th data-k="ticker">Hisse</th><th data-k="close">Fiyat</th><th data-k="change_pct">Gün %</th>
+        <th data-k="signal">Sinyal</th><th data-k="score">Skor</th><th data-k="rsi">RSI</th>
+        <th data-k="stop">Stop</th><th data-k="target">Hedef</th>
+      </tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+  <p class="muted small">Satıra tıklayarak sinyalin gerekçelerini ve skor bileşenlerini görebilirsiniz. Stop = fiyat − 2.5×ATR, Hedef = fiyat + 4×ATR. Pozisyondaki hisselerde iz süren stop gösterilir.</p>
+
+  <h2>Geriye dönük test (backtest)</h2>
+  <div class="muted small" id="btmeta"></div>
+  <div class="card" style="margin-top:10px">
+    <div class="legend"><span><i style="background:var(--accent)"></i>Strateji (30 hisse, eşit ağırlık)</span><span><i style="background:var(--bench)"></i>XU030 al-tut</span></div>
+    <div id="chart"></div>
+  </div>
+
+  <div class="grid2" style="margin-top:12px">
+    <div class="tbl"><table class="mt" id="pf"></table></div>
+    <div class="tbl"><table class="mt" id="trades"></table></div>
+  </div>
+
+  <h2>Hisse bazında performans</h2>
+  <div class="tbl"><table id="stocks"></table></div>
+  <p class="muted small">OOS = örneklem dışı dönem (son %30). Parametreler optimize edilmediği için tüm dönem ve OOS arasındaki fark stratejinin tutarlılığı hakkında fikir verir.</p>
+
+  <h2>Yöntem</h2>
+  <div class="card small">
+    <details open><summary>Skor nasıl hesaplanıyor? (−100 … +100)</summary>
+      <ul>
+        <li><b>Trend (40):</b> Fiyat EMA200 üstü/altı ±15 · EMA20/EMA50 ±15 · ADX gücü ve DI yönü ±10</li>
+        <li><b>Momentum (30):</b> RSI 55–78 +15, 45–55 0, 25–45 −15, &gt;78 −5 (aşırı alım), &lt;25 +5 (aşırı satım) · MACD histogramı yön ±10 ve eğim ±5</li>
+        <li><b>Hacim (10):</b> Hacim 20 günlük ortalamanın 1.5 katı üstünde ise günün yönünde ±10</li>
+        <li><b>Kırılım (10):</b> 20 günlük zirve üstü kapanış +10, dip altı −10</li>
+        <li><b>Göreli güç (10):</b> 3 aylık getirinin XU030'dan farkı (±%15'te tavan)</li>
+      </ul>
+      <p>Skor ≥ +40 → <span class="badge AL">AL</span> &nbsp; Skor ≤ −40 → <span class="badge SAT">SAT</span> &nbsp; arası → <span class="badge TUT">TUT</span></p>
+    </details>
+    <details><summary>Backtest kuralları</summary>
+      <ul>
+        <li>Sadece alış yönlü (açığa satış yok). Sinyal günün kapanışında oluşur, işlem <b>ertesi gün açılışında</b> yapılır.</li>
+        <li>Çıkış: skor 0'ın altına inerse ertesi açılışta, ya da 2.5×ATR iz süren stop gün içinde tetiklenirse.</li>
+        <li>Tek yön %0.10 komisyon + %0.05 kayma maliyeti düşülür.</li>
+        <li>Portföy: her hisseye sermayenin 1/30'u ayrılır; sinyal yokken o pay nakitte bekler (faiz getirisi hesaba katılmaz).</li>
+        <li>Endeks bileşimi bugünkü listedir; geçmişte endeksten çıkmış hisseler dahil değildir (hayatta kalma yanlılığı).</li>
+      </ul>
+    </details>
+  </div>
+
+  <footer id="disc"></footer>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const fmt = (x, d = 2) => x == null ? "–" : Number(x).toLocaleString("tr-TR", {minimumFractionDigits: d, maximumFractionDigits: d});
+const pct = (x, d = 1) => x == null ? "–" : `<span class="${x > 0 ? "pos" : x < 0 ? "neg" : ""}">${x > 0 ? "+" : ""}${fmt(x, d)}%</span>`;
+const COMP = {ema200: "EMA200", ema_cross: "EMA20/50", adx: "ADX/DI", rsi: "RSI", macd: "MACD", volume: "Hacim", breakout: "Kırılım", relative: "Göreli güç"};
+const STATE = {"POZİSYONDA": "pozisyonda", "GİRİŞ": "yeni sinyal · yarın giriş", "ÇIKIŞ": "çıkış sinyali", "BEKLE": ""};
+let S = null, filter = "ALL", sortK = null, sortDir = 1, openRow = null;
+
+async function load() {
+  try {
+    const [s, b] = await Promise.all([
+      fetch("signals.json?v=" + Date.now()).then(r => r.json()),
+      fetch("backtest.json?v=" + Date.now()).then(r => r.json()),
+    ]);
+    S = s; renderHeader(s); renderSignals(); renderBacktest(b);
+  } catch (e) {
+    $("#meta").textContent = "Veri yüklenemedi. Sayfayı bir web sunucusu üzerinden açın (örn. python3 -m http.server).";
+  }
+}
+
+function renderHeader(s) {
+  const d = new Date(s.generated_at);
+  $("#meta").textContent = `Veri tarihi ${s.data_date} · güncellendi ${d.toLocaleString("tr-TR", {dateStyle: "medium", timeStyle: "short"})} · ${s.universe}`;
+  if (s.demo) $("#banner").innerHTML = `<div class="banner"><b>DEMO verisi:</b> Bu sayfa şu an sentetik (gerçek olmayan) fiyatlarla üretilmiş örnek çıktıyı gösteriyor. <code>python bot.py</code> çalıştırıldığında gerçek verilerle güncellenir.</div>`;
+  const avg = s.signals.reduce((a, x) => a + x.score, 0) / s.signals.length;
+  const inPos = s.signals.filter(x => x.position).length;
+  $("#cards").innerHTML = [
+    ["AL", s.counts.AL, "var(--al)"], ["TUT", s.counts.TUT, "var(--tut)"], ["SAT", s.counts.SAT, "var(--sat)"],
+    ["Ortalama skor", fmt(avg, 1), "var(--ink)"], ["Açık pozisyon", inPos, "var(--ink)"],
+  ].map(([k, v, c]) => `<div class="card"><div class="k">${k}</div><div class="v" style="color:${c}">${v}</div></div>`).join("");
+  $("#disc").innerHTML = `<b>Yasal uyarı:</b> ${s.disclaimer} Geçmiş performans gelecekteki sonuçların göstergesi değildir.`;
+}
+
+function scoreBar(v) {
+  const w = Math.min(Math.abs(v), 100) / 2;
+  const col = v >= S.thresholds.buy ? "var(--al)" : v <= S.thresholds.sell ? "var(--sat)" : "var(--tut)";
+  const pos = v >= 0 ? `left:50%;width:${w}%` : `left:${50 - w}%;width:${w}%`;
+  return `<b>${v > 0 ? "+" : ""}${fmt(v, 0)}</b><span class="bar"><i style="${pos};background:${col}"></i></span>`;
+}
+
+function renderSignals() {
+  const q = $("#q").value.trim().toLocaleUpperCase("tr-TR");
+  let rows = S.signals.filter(x => (filter === "ALL" || x.signal === filter) &&
+    (!q || x.ticker.includes(q) || x.name.toLocaleUpperCase("tr-TR").includes(q)));
+  if (sortK) rows = [...rows].sort((a, b) => (a[sortK] > b[sortK] ? 1 : a[sortK] < b[sortK] ? -1 : 0) * sortDir);
+  $("#sig tbody").innerHTML = rows.map(x => {
+    const stop = x.position ? x.position.stop : x.stop;
+    const trend = x.score - x.score_5d_ago;
+    const main = `<tr class="row" data-t="${x.ticker}">
+      <td><span class="tk">${x.ticker}</span><span class="nm">${x.name}</span></td>
+      <td>${fmt(x.close)}</td><td>${pct(x.change_pct, 2)}</td>
+      <td><span class="badge ${x.signal}">${x.signal}</span><div class="state">${STATE[x.state] || ""}</div></td>
+      <td>${scoreBar(x.score)}<div class="state">5 gün: ${trend >= 0 ? "▲" : "▼"} ${fmt(Math.abs(trend), 0)}</div></td>
+      <td>${fmt(x.rsi, 0)}</td><td>${fmt(stop)}</td><td>${fmt(x.target)}</td></tr>`;
+    if (openRow !== x.ticker) return main;
+    const p = x.position;
+    return main + `<tr class="detail"><td colspan="8">
+      <b>Gerekçeler</b><ul>${x.reasons.map(r => `<li>${r}</li>`).join("")}</ul>
+      ${p ? `<div class="small">Model pozisyonu: ${p.entry_date} tarihinde ${fmt(p.entry_price)} ile girildi · ${p.days} gün · ${pct(p.pnl_pct, 2)} · iz süren stop ${fmt(p.stop)}</div>` : ""}
+      <div class="comp">${Object.entries(x.components).map(([k, v]) => `<span>${COMP[k]} <b class="${v > 0 ? "pos" : v < 0 ? "neg" : ""}">${v > 0 ? "+" : ""}${fmt(v, 1)}</b></span>`).join("")}</div>
+      <div class="small muted" style="margin-top:6px">ADX ${fmt(x.adx, 0)} · ATR %${fmt(x.atr_pct, 1)}</div>
+    </td></tr>`;
+  }).join("") || `<tr><td colspan="8" class="muted">Sonuç yok</td></tr>`;
+}
+
+function renderBacktest(b) {
+  $("#btmeta").textContent = `${b.period.start} – ${b.period.end} · örneklem dışı dönem ${b.period.oos_start} sonrası`;
+  drawChart(b.equity_curve, b.period.oos_start);
+  const P = b.portfolio, rows = [
+    ["Toplam getiri", "total_return_pct", v => pct(v)], ["Yıllık (CAGR)", "cagr_pct", v => pct(v)],
+    ["Maks. düşüş", "max_drawdown_pct", v => pct(v)], ["Sharpe", "sharpe", v => fmt(v)],
+  ];
+  $("#pf").innerHTML = `<thead><tr><th>Portföy</th><th>Strateji</th><th>XU030</th><th>Strateji OOS</th><th>XU030 OOS</th></tr></thead><tbody>` +
+    rows.map(([n, k, f]) => `<tr><td>${n}</td><td>${f(P.full[k])}</td><td>${f(P.benchmark_full?.[k])}</td><td>${f(P.oos[k])}</td><td>${f(P.benchmark_oos?.[k])}</td></tr>`).join("") + "</tbody>";
+  $("#trades").innerHTML = `<thead><tr><th>Son işlemler</th><th>Giriş</th><th>Çıkış</th><th>Getiri</th><th>Neden</th></tr></thead><tbody>` +
+    b.recent_trades.slice(0, 8).map(t => `<tr><td class="tk">${t.ticker}</td><td>${t.entry_date.slice(5)}</td><td>${t.exit_date.slice(5)}</td><td>${pct(t.ret_pct)}</td><td>${t.exit_reason}</td></tr>`).join("") + "</tbody>";
+  $("#stocks").innerHTML = `<thead><tr><th>Hisse</th><th>Strateji</th><th>Al-tut</th><th>OOS</th><th>İşlem</th><th>Kazanma</th><th>Kâr faktörü</th><th>Maks. düşüş</th><th>Sharpe</th></tr></thead><tbody>` +
+    b.stocks.map(s => `<tr><td><span class="tk">${s.ticker}</span><span class="nm">${s.name}</span></td>
+      <td>${pct(s.strategy.total_return_pct, 0)}</td><td>${pct(s.buy_hold_pct, 0)}</td><td>${pct(s.oos.total_return_pct, 0)}</td>
+      <td>${s.strategy.trades}</td><td>${fmt(s.strategy.win_rate_pct, 0)}%</td><td>${fmt(s.strategy.profit_factor)}</td>
+      <td>${pct(s.strategy.max_drawdown_pct, 0)}</td><td>${fmt(s.strategy.sharpe)}</td></tr>`).join("") + "</tbody>";
+}
+
+function drawChart(c, oos) {
+  const W = 1000, H = 280, L = 44, R = 10, T = 10, B = 24;
+  const vals = c.flatMap(p => [p.strategy, p.benchmark]).filter(v => v != null);
+  const lo = Math.log(Math.min(...vals) * .95), hi = Math.log(Math.max(...vals) * 1.05);
+  const x = i => L + i / (c.length - 1) * (W - L - R), y = v => T + (1 - (Math.log(v) - lo) / (hi - lo)) * (H - T - B);
+  const path = k => c.map((p, i) => p[k] == null ? "" : `${i ? "L" : "M"}${x(i).toFixed(1)},${y(p[k]).toFixed(1)}`).join("");
+  const oi = c.findIndex(p => p.date >= oos);
+  let ticks = "";
+  for (const v of [0.5, 0.75, 1, 1.5, 2, 3, 4, 6, 8, 12]) {
+    if (Math.log(v) < lo || Math.log(v) > hi) continue;
+    ticks += `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/><text x="${L - 6}" y="${y(v) + 4}" text-anchor="end">${v}x</text>`;
+  }
+  const years = [...new Set(c.map(p => p.date.slice(0, 4)))].map(yr => {
+    const i = c.findIndex(p => p.date.startsWith(yr));
+    if (i < c.length * 0.04) return "";
+    return `<text x="${x(i)}" y="${H - 6}" text-anchor="middle">${yr}</text>`;
+  }).join("");
+  $("#chart").innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Sermaye eğrisi">
+    ${ticks}${years}
+    ${oi > 0 ? `<rect x="${x(oi)}" y="${T}" width="${W - R - x(oi)}" height="${H - T - B}" fill="var(--accent)" opacity=".06"/><text x="${x(oi) + 6}" y="${T + 14}">örneklem dışı</text>` : ""}
+    <path d="${path("benchmark")}" fill="none" stroke="var(--bench)" stroke-width="1.6"/>
+    <path d="${path("strategy")}" fill="none" stroke="var(--accent)" stroke-width="2.2"/>
+  </svg>`;
+}
+
+$("#tabs").addEventListener("click", e => {
+  if (!e.target.dataset.f) return;
+  filter = e.target.dataset.f;
+  document.querySelectorAll("#tabs button").forEach(b => b.classList.toggle("on", b === e.target));
+  renderSignals();
+});
+$("#q").addEventListener("input", renderSignals);
+$("#sig thead").addEventListener("click", e => {
+  const k = e.target.dataset.k; if (!k) return;
+  sortDir = sortK === k ? -sortDir : (k === "ticker" ? 1 : -1); sortK = k; renderSignals();
+});
+$("#sig tbody").addEventListener("click", e => {
+  const tr = e.target.closest("tr.row"); if (!tr) return;
+  openRow = openRow === tr.dataset.t ? null : tr.dataset.t; renderSignals();
+});
+load();
+</script>
+</body>
+</html>
