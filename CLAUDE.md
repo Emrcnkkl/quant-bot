@@ -31,6 +31,7 @@ YENİ PROJE/
 ├── README.md          # kullanıcıya yönelik kurulum/çalıştırma
 ├── bot.py             # tüm mantık: veri, indikatörler, skor, backtest, JSON yazımı (tek dosya)
 ├── index.html         # tek dosyalık statik sayfa (inline CSS/JS, kütüphane yok); JSON'ları fetch eder
+├── fonts/             # Inter değişken yazı tipi (woff2, latin + latin-ext; OFL lisansı OFL-Inter.txt)
 ├── requirements.txt   # yfinance, pandas, numpy
 ├── .github/workflows/bot.yml  # GitHub Actions workflow
 ├── signals.json       # güncel sinyaller (bot üretir)
@@ -114,7 +115,10 @@ real_rate_max (None = kapalı; reel faiz bunun üstündeyse yeni alım yok — `
 ## Kod kuralları
 - `bot.py` tek dosya kalsın, ta ki belirgin şekilde büyüyene kadar; Python 3.10 uyumlu olmalı (kullanıcının makinesi 3.10).
 - JSON `allow_nan=False` ile yazılır → NaN değerleri `r2()` ile `None`'a çevir.
-- `index.html` dışa bağımlılık içermez; koyu tema `:root`'ta, açık tema `@media (prefers-color-scheme: light)` içinde.
+- `index.html` dışa bağımlılık içermez (yazı tipi `fonts/` altında, depodan yüklenir); koyu tema `:root`'ta, açık tema `@media (prefers-color-scheme: light)` içinde.
+- "Premium" tema: arka planda ışık + ızgara, yarı saydam kart yüzeyleri (`--surface`), gradyan kenarlı hero, sayaç animasyonu,
+  hisse simgeleri (`who()` / `.av`, renk `hue(ticker)`), kaydırınca belirme (`.rv`), `prefers-reduced-motion` destekli.
+- Mobilde (≤520px) sinyal tablosunda simge ve puan çubuğu gizlenir, şirket adı kısaltılır — tablo 360px'e sığmalı.
 - Sayfa metinleri teknik bilgisi olmayan okura göre yazılır; jargon gerekiyorsa `title` ipucu ya da SSS ile açıklanır.
 - Sayılar `tr-TR` formatında gösterilir.
 
