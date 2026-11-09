@@ -73,7 +73,13 @@ CFG = {
     "min_bars": 260,
     "cash_rate_factor": 1.0,    # nakit getirisi = politika faizi × bu katsayı (0 -> faiz yok)
     "real_rate_max": None,
-    "changes_days": 30,         # sinyal geçmişi listesi: son kaç işlem günündeki değişiklikler      # reel faiz (politika − yıllık TÜFE) bunun üstündeyse yeni alım yok; None = filtre kapalı
+    "changes_days": 30,
+    # Çıkış kuralı: "score" = skor < exit_score | "ema50" = kapanış < EMA50 |
+    #               "cross" = EMA20 < EMA50 | "ema200" = kapanış < EMA200 |
+    #               "regime" = endeks EMA200 üstündeyken "cross", altındayken "score"
+    "exit_rule": "score",
+    # Giriş kuralı: "score" = skor >= buy_threshold | "ema200" = kapanış > EMA200 (klasik 200 gün kuralı, kıyas için)
+    "entry_rule": "score",         # sinyal geçmişi listesi: son kaç işlem günündeki değişiklikler      # reel faiz (politika − yıllık TÜFE) bunun üstündeyse yeni alım yok; None = filtre kapalı
 }
 
 # TCMB politika faizi (bir hafta vadeli repo, borç verme), yıllık %. (yürürlük tarihi, oran)
@@ -255,8 +261,10 @@ def add_indicators(df: pd.DataFrame, bench_close: pd.Series | None) -> pd.DataFr
     if bench_close is not None:
         b = bench_close.reindex(d.index).ffill()
         d["rel63"] = d["ret63"] - b.pct_change(63)
+        d["bench_up"] = b > ema(b, 200)          # endeks uzun vadeli yükseliş trendinde mi
     else:
         d["rel63"] = 0.0
+        d["bench_up"] = False
     return d
 
 
@@ -390,6 +398,26 @@ def backtest(d: pd.DataFrame, sc: pd.Series, cash: pd.Series | None = None) -> d
     score = sc.to_numpy()
     cash_r = cash.reindex(d.index).fillna(0).to_numpy() if cash is not None else np.zeros(len(d))
     allow = entry_allowed(d.index).to_numpy()
+    rule = CFG["exit_rule"]
+    if rule == "score":
+        exit_sig = score < CFG["exit_score"]
+    elif rule == "ema50":
+        exit_sig = (d["Close"] < d["ema50"]).to_numpy()
+    elif rule == "cross":
+        exit_sig = (d["ema20"] < d["ema50"]).to_numpy()
+    elif rule == "ema200":
+        exit_sig = (d["Close"] < d["ema200"]).to_numpy()
+    elif rule == "regime":
+        # Endeks EMA200 üstündeyken (boğa) trend çıkışı, altındayken skor çıkışı
+        up = d["bench_up"].fillna(False).to_numpy(dtype=bool)
+        exit_sig = np.where(up, (d["ema20"] < d["ema50"]).to_numpy(), score < CFG["exit_score"])
+    else:
+        raise ValueError(f"bilinmeyen exit_rule: {rule}")
+    if CFG["entry_rule"] == "ema200":
+        entry_sig = (d["Close"] > d["ema200"]).to_numpy()
+    else:
+        entry_sig = score >= CFG["buy_threshold"]
+    use_stop = CFG["stop_atr"] is not None
     n = len(d)
     cost = CFG["commission"] + CFG["slippage"]
     start = CFG["warmup_days"]
@@ -405,7 +433,7 @@ def backtest(d: pd.DataFrame, sc: pd.Series, cash: pd.Series | None = None) -> d
         # 1) Bir önceki kapanışta verilen emri açılışta uygula
         if pending == "buy" and not in_pos:
             entry_px = o[i] * (1 + cost)
-            stop = o[i] - CFG["stop_atr"] * atr[i - 1]
+            stop = o[i] - CFG["stop_atr"] * atr[i - 1] if use_stop else -np.inf
             in_pos, entry_i = True, i
             day_ret = c[i] / entry_px - 1
             pending = None
@@ -438,10 +466,11 @@ def backtest(d: pd.DataFrame, sc: pd.Series, cash: pd.Series | None = None) -> d
 
         # 3) Kapanışta: stopu yukarı taşı ve yarın için emir üret
         if in_pos:
-            stop = max(stop, c[i] - CFG["stop_atr"] * atr[i])
-            if score[i] < CFG["exit_score"]:
+            if use_stop:
+                stop = max(stop, c[i] - CFG["stop_atr"] * atr[i])
+            if exit_sig[i]:
                 pending = "sell"
-        elif score[i] >= CFG["buy_threshold"] and allow[i]:
+        elif entry_sig[i] and allow[i]:
             pending = "buy"
 
     open_trade = None
@@ -450,7 +479,7 @@ def backtest(d: pd.DataFrame, sc: pd.Series, cash: pd.Series | None = None) -> d
             "entry_date": str(d.index[entry_i].date()),
             "entry_price": round(float(entry_px), 2),
             "last_price": round(float(c[-1]), 2),
-            "stop": round(float(stop), 2),
+            "stop": round(float(stop), 2) if use_stop else None,
             "pnl_pct": round((c[-1] / entry_px - 1) * 100, 2),
             "days": int(n - 1 - entry_i),
         }

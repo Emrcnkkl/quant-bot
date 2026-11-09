@@ -23,6 +23,8 @@ ve sonuçları statik bir web sayfasında gösteren bir bot. Şu an **Aşama 1**
   geçmiş fiyatlardan yeniden hesaplanır (`signal_changes()`); history.json'a bağlı değil.
 - Bulgular: strateji test döneminde endeksle başa baş, düşüşü ~1/3; ama 2024 sonrası faizin gerisinde
   (`docs/duyarlilik-analizi.md`, `docs/reel-faiz-filtresi.md`).
+- Al-bekle'yi geçen hisse: tüm dönemde 6/30 ama test döneminde 18/30; 9 kural denendi, hiçbiri iki dönemi birden iyileştirmedi
+  → mevcut kural korunuyor (`docs/kural-deneyleri.md`).
 
 ## Dosya yapısı
 ```
@@ -39,6 +41,7 @@ YENİ PROJE/
 ├── stocks/TICKER.json # hisse detay grafiği verisi, son 500 gün (bot üretir)
 ├── sensitivity.py     # parametre duyarlılık analizi (bot.py fonksiyonlarını kullanır, veriyi .cache/ altına kaydeder)
 ├── sensitivity.json   # analiz çıktısı
+├── experiments.py     # giriş/çıkış kuralı deneyleri (al-bekle'yi geçen hisse sayısı), çıktı experiments.json
 └── history.json       # günlük sinyal geçmişi (yalnızca gerçek veriyle çalışınca oluşur/eklenir, son 500 gün)
 ```
 
@@ -94,7 +97,8 @@ Bilgi amaçlı stop = kapanış − 2.5×ATR, hedef = kapanış + 4×ATR. Pozisy
 ### Tüm ayarlar
 `bot.py` başındaki `CFG` sözlüğü: history_period, warmup_days, buy/sell_threshold, exit_score,
 stop_atr, target_atr, commission, slippage, oos_fraction, min_bars, cash_rate_factor (0 = faiz yok), changes_days (30),
-real_rate_max (None = kapalı; reel faiz bunun üstündeyse yeni alım yok — `entry_allowed()`, `macro_frame()`).
+real_rate_max (None = kapalı; reel faiz bunun üstündeyse yeni alım yok — `entry_allowed()`, `macro_frame()`),
+exit_rule ("score" varsayılan | ema50 | cross | ema200 | regime), entry_rule ("score" | ema200), stop_atr=None → stop yok.
 
 `POLICY_RATES` (TCMB 1 hafta repo, yürürlük tarihi) ve `CPI_YOY` (yıllık TÜFE) yerleşik tablolar; gerçek çalıştırmada
 `fetch_macro()` ikisini de tcmb.gov.tr'den canlı çekip günceller (urllib + regex, ek bağımlılık yok). Başarısızsa yerleşik tablo kalır,
