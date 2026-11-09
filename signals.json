@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-09T20:35+03:00",
+ "generated_at": "2026-11-09T20:38+03:00",
  "data_date": "2026-11-09",
  "demo": false,
  "universe": "BIST 30 (Ekim-Aralık 2026)",
@@ -737,7 +737,7 @@
    "components": {
     "ema200": -15.0,
     "ema_cross": -15.0,
-    "adx": -7.7,
+    "adx": -7.6,
     "rsi": 0.0,
     "macd": 15.0,
     "volume": 0.0,
@@ -745,8 +745,8 @@
     "relative": -8.8
    },
    "rsi": 47.53,
-   "adx": 26.48,
-   "atr_pct": 3.73,
+   "adx": 26.44,
+   "atr_pct": 3.74,
    "stop": 15.36,
    "target": 19.47,
    "position": null,
