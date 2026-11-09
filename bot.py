@@ -291,6 +291,46 @@ def _clean(df: pd.DataFrame) -> pd.DataFrame:
     return df[~df.index.duplicated(keep="last")].sort_index()
 
 
+def signal_accuracy(prep: dict, mem: pd.DataFrame, start: str, horizons=(5, 21, 63)) -> dict:
+    """
+    Sinyallerin geçmiş isabeti. Her AL'a / SAT'a geçişte (o gün evrende olan hissede) ertesi gün açılıştan
+    alınmış sayılır; h işlem günü sonraki kapanışa kadar getiri ölçülür. Kıyas: aynı dönemde evrendeki
+    herhangi bir hisse-gün ("TUM"). Getiriler TL cinsinden ve maliyetsizdir.
+    """
+    buckets = {k: {h: [] for h in horizons} for k in ("AL", "SAT", "TUM")}
+    recent = {k: {h: [] for h in horizons} for k in ("AL", "SAT", "TUM")}
+    by_t = {}
+    cut = pd.Timestamp(start)
+    rcut = mem.index[-1] - pd.DateOffset(years=3)
+    for t, (d, sc) in prep.items():
+        m = mem[t].reindex(d.index).fillna(False).to_numpy(dtype=bool) if t in mem else np.zeros(len(d), bool)
+        lab = np.where(sc >= CFG["buy_threshold"], "AL", np.where(sc <= CFG["sell_threshold"], "SAT", "TUT"))
+        prev = np.concatenate([["TUT"], lab[:-1]])
+        ok = m & (d.index >= cut)
+        dates = d.index
+        for h in horizons:
+            fwd = (d["Close"].shift(-h) / d["Open"].shift(-1) - 1).to_numpy()
+            valid = ok & ~np.isnan(fwd)
+            for k, mask in (("AL", (lab == "AL") & (prev != "AL")), ("SAT", (lab == "SAT") & (prev != "SAT")),
+                            ("TUM", np.ones(len(d), bool))):
+                sel = valid & mask
+                buckets[k][h].extend(fwd[sel])
+                recent[k][h].extend(fwd[sel & (dates >= rcut)])
+            if h == 21:
+                sel = valid & (lab == "AL") & (prev != "AL")
+                if sel.any():
+                    by_t[t] = {"n": int(sel.sum()), "avg21": r2(np.mean(fwd[sel]) * 100),
+                               "pos21": r2(np.mean(fwd[sel] > 0) * 100)}
+
+    def summ(b):
+        return {k: {str(h): {"n": len(v), "avg": r2(np.mean(v) * 100) if v else None,
+                             "median": r2(np.median(v) * 100) if v else None,
+                             "pos": r2(np.mean(np.array(v) > 0) * 100) if v else None}
+                    for h, v in hs.items()} for k, hs in b.items()}
+    return {"since": start[:4], "recent_since": str(rcut.date()), "horizons": list(horizons),
+            "all": summ(buckets), "recent": summ(recent), "by_ticker": by_t}
+
+
 def data_quality(data: dict, tickers: list[str], bench: pd.DataFrame, usdtry, demo: bool) -> dict:
     """Veri kalite kontrolü. Ciddi eksiklikte (evrenin %25'inden fazlası son gün verisiz) hiçbir dosyayı
     değiştirmeden durur; küçük sorunları signals.json'a ve yöneticiye Telegram uyarısı olarak yazar."""
@@ -860,6 +900,15 @@ def run(demo: bool, telegram_test: bool = False) -> None:
             print(f"  ✓ USD/TRY: {usdtry.iloc[-1]:.2f} ({usdtry.index[-1].date()})")
         except Exception as e:  # noqa: BLE001
             print(f"  ! USD/TRY alınamadı, dolar bazlı getiri atlanacak: {e}", file=sys.stderr)
+    gold = None   # gram altın (TL) = ons altın (USD, Yahoo GC=F vadeli) × USD/TRY ÷ 31,1035
+    if usdtry is not None:
+        try:
+            gc = _clean(yf.download("GC=F", start=CFG["history_start"], interval="1d", auto_adjust=True,
+                                    progress=False, threads=False))["Close"]
+            gold = (gc.reindex(usdtry.index).ffill() * usdtry / 31.1035).dropna()
+            print(f"  ✓ Gram altın: {gold.iloc[-1]:,.0f} TL ({gold.index[-1].date()})")
+        except Exception as e:  # noqa: BLE001
+            print(f"  ! Altın fiyatı alınamadı, altın kıyası atlanacak: {e}", file=sys.stderr)
     bench = data.pop(BENCHMARK, None)
     bench_close = bench["Close"] if bench is not None else None
     if bench is None:
@@ -990,19 +1039,27 @@ def run(demo: bool, telegram_test: bool = False) -> None:
     usd_l = usdtry.reindex(port.index).ffill().bfill() if usdtry is not None else None
     cpi_eq = cpi_l / cpi_l.iloc[0]
     usd_eq = usd_l / usd_l.iloc[0] if usd_l is not None else None
+    gold_l = gold.reindex(port.index).ffill().bfill() if gold is not None else None
+    gold_eq = gold_l / gold_l.iloc[0] if gold_l is not None else None
     uni_eq = (1 + uni).cumprod()
     weekly = port_eq.resample("W-FRI").last().dropna()   # tamamen tatil olan haftaları atla
     curve = [{"date": str(i.date()), "strategy": round(float(v), 4),
               "benchmark": round(float(bench_eq.asof(i)), 4) if bench_eq is not None else None,
               "cash": round(float(cash_eq.asof(i)), 4), "universe": round(float(uni_eq.asof(i)), 4),
               "cpi": round(float(cpi_eq.asof(i)), 4),
-              "usd": round(float(usd_eq.asof(i)), 4) if usd_eq is not None else None}
+              "usd": round(float(usd_eq.asof(i)), 4) if usd_eq is not None else None,
+              "gold": round(float(gold_eq.asof(i)), 4) if gold_eq is not None else None}
              for i, v in weekly.items()]
 
     live = update_live(port, weights, bench_close, demo)
+    accuracy = signal_accuracy(prep, mem_full, str(cal[0].date()))
     unit_src = {"strategy": port, "cash": cash, "universe": uni}
     if bench_eq is not None:
         unit_src["benchmark"] = bench_eq.pct_change().fillna(0)
+    if gold_eq is not None:
+        unit_src["gold"] = gold_eq.pct_change().fillna(0)
+    if usd_eq is not None:
+        unit_src["dollar"] = usd_eq.pct_change().fillna(0)
     now = datetime.now(TR_TZ)
     order = {"AL": 0, "TUT": 1, "SAT": 2}
     signals.sort(key=lambda x: (order[x["signal"]], -x["score"]))
@@ -1046,6 +1103,7 @@ def run(demo: bool, telegram_test: bool = False) -> None:
                 ns["last_warn"] = meta["data_date"]
                 write("notify.json", ns)
     write("signals.json", {**meta, "regime": regime, "counts": counts, "signals": signals, "quality": quality,
+                           "accuracy": accuracy,
                            "changes_days": CFG["changes_days"],
                            "changes_dates": sorted(change_dates)[-(CFG["changes_days"] + 1):], "changes": changes})
 
@@ -1070,10 +1128,15 @@ def run(demo: bool, telegram_test: bool = False) -> None:
             "cash_oos": {**metrics(cash.iloc[split:]), "sharpe": None},
             "universe_full": metrics(uni, rf=cash),
             "universe_oos": metrics(uni.iloc[split:], rf=cash),
+            # Gram altın ve dolar tutmak (TL getirisi)
+            **({"gold_full": metrics(unit_src["gold"], rf=cash),
+                "gold_oos": metrics(unit_src["gold"].iloc[split:], rf=cash)} if "gold" in unit_src else {}),
+            **({"dollar_full": metrics(unit_src["dollar"], rf=cash),
+                "dollar_oos": metrics(unit_src["dollar"].iloc[split:], rf=cash)} if "dollar" in unit_src else {}),
         },
         "equity_curve": curve,
         "yearly": yearly_table(port, bench_eq.pct_change().fillna(0) if bench_eq is not None else None, cash, uni,
-                               cpi_l, usd_l),
+                               cpi_l, usd_l, gold_l),
         "fx_start": r2(usd_l.iloc[0]) if usd_l is not None else None,
         "units": {
             "real": unit_metrics(unit_src, cpi_l, split),
@@ -1313,7 +1376,8 @@ def unit_metrics(series: dict[str, pd.Series], deflator: pd.Series, split: int) 
 
 
 def yearly_table(port: pd.Series, bench: pd.Series | None, cash: pd.Series, uni: pd.Series | None = None,
-                 cpi: pd.Series | None = None, usd: pd.Series | None = None) -> list[dict]:
+                 cpi: pd.Series | None = None, usd: pd.Series | None = None,
+                 gold: pd.Series | None = None) -> list[dict]:
     """Takvim yılı bazında strateji / XU030 / nakit getirisi (%). Eksik yıllar `partial` işaretli."""
     out = []
     for year, p in port.groupby(port.index.year):
@@ -1326,6 +1390,7 @@ def yearly_table(port: pd.Series, bench: pd.Series | None, cash: pd.Series, uni:
             # o yıl TÜFE ve USD/TRY değişimi (%): sayfa reel / dolar bazlı yıllık getiriyi bundan hesaplar
             "cpi_pct": None if cpi is None else r2(((1 + cpi.pct_change().loc[p.index].fillna(0)).prod() - 1) * 100),
             "usd_pct": None if usd is None else r2(((1 + usd.pct_change().loc[p.index].fillna(0)).prod() - 1) * 100),
+            "gold_pct": None if gold is None else r2(((1 + gold.pct_change().loc[p.index].fillna(0)).prod() - 1) * 100),
         })
     return out
 

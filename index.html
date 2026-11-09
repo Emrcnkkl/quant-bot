@@ -5,6 +5,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>BIST50 Sinyal</title>
 <meta name="description" content="Borsa İstanbul'un en büyük 50 hissesi için her iş günü güncellenen teknik analiz sinyalleri ve geriye dönük test sonuçları. Yatırım tavsiyesi değildir.">
+<!-- Paylaşım önizlemesi (WhatsApp, Telegram, X...) -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="BIST50 Sinyal">
+<meta property="og:title" content="BIST50 Sinyal — en büyük 50 hisse için günlük sinyaller">
+<meta property="og:description" content="Teknik puan, 20 yıllık dürüst test, canlı model portföy ve endeks · altın · faiz kıyası. Yatırım tavsiyesi değildir.">
+<meta property="og:url" content="https://emrcnkkl.github.io/quant-bot/">
+<meta property="og:image" content="https://emrcnkkl.github.io/quant-bot/img/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="tr_TR">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#06080b">
+<link rel="icon" type="image/png" sizes="512x512" href="img/icon-512.png">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
 <link rel="preload" href="fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
 <style>
 /* ---- Yazı tipi: Inter (OFL lisanslı, depoda barındırılıyor) ---- */
@@ -20,7 +34,7 @@
   --line:rgba(255,255,255,.07);--line2:rgba(255,255,255,.12);--hi:rgba(255,255,255,.06);
   --accent:#4f8cff;--accent2:#19c79a;--grad:linear-gradient(110deg,#4f8cff 0%,#38b2ff 45%,#19c79a 100%);
   --al:#2fd47f;--al-bg:rgba(47,212,127,.11);--sat:#ff5c6c;--sat-bg:rgba(255,92,108,.11);--tut:#f7b84b;--tut-bg:rgba(247,184,75,.11);
-  --strat:#2fd47f;--bench:#4f8cff;--cash:#f7b84b;--uni:#b79cff;--e20:#6aa7ff;--e50:#ff9a52;--e200:#c18cff;
+  --strat:#2fd47f;--bench:#4f8cff;--cash:#94a8c6;--uni:#b79cff;--gold:#f5b83d;--usdc:#f472b6;--e20:#6aa7ff;--e50:#ff9a52;--e200:#c18cff;
   --warn-bg:rgba(247,184,75,.06);--warn-line:rgba(247,184,75,.32);
   --shadow:0 1px 0 var(--hi) inset,0 24px 60px -24px rgba(0,0,0,.75);
   --glow1:rgba(79,140,255,.16);--glow2:rgba(25,199,154,.11);--grid:rgba(255,255,255,.025);
@@ -32,7 +46,7 @@
   --line:rgba(13,19,28,.08);--line2:rgba(13,19,28,.14);--hi:rgba(255,255,255,.9);
   --accent:#2563eb;--accent2:#059669;--grad:linear-gradient(110deg,#2563eb 0%,#0ea5e9 45%,#059669 100%);
   --al:#0d9a58;--al-bg:#e4f6ed;--sat:#d8334a;--sat-bg:#fdebee;--tut:#b2730f;--tut-bg:#fcf2dd;
-  --strat:#0d9a58;--bench:#2563eb;--cash:#d97706;--uni:#7c3aed;--e20:#2563eb;--e50:#ea580c;--e200:#9333ea;
+  --strat:#0d9a58;--bench:#2563eb;--cash:#64748b;--uni:#7c3aed;--gold:#b7791f;--usdc:#db2777;--e20:#2563eb;--e50:#ea580c;--e200:#9333ea;
   --warn-bg:#fffaf0;--warn-line:#f2cf8a;
   --shadow:0 1px 0 var(--hi) inset,0 20px 50px -24px rgba(20,35,70,.18);
   --glow1:rgba(37,99,235,.10);--glow2:rgba(5,150,105,.07);--grid:rgba(13,19,28,.035);
@@ -216,8 +230,8 @@ svg text{fill:var(--muted);font-size:11px;font-family:inherit}
 .sc .rng .seg button{padding:4px 11px;font-size:12px}
 .sc .legend{font-size:12px;margin-left:auto;gap:6px 12px}
 
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:14px}
-@media(max-width:1000px){.stats{grid-template-columns:1fr 1fr}}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:14px}
+@media(max-width:900px){.stats{grid-template-columns:1fr 1fr}}
 .stat{position:relative;border-radius:18px;padding:18px 20px;overflow:hidden}
 .stat::before{content:"";position:absolute;inset:0 0 auto;height:2px;background:var(--c)}
 .stat .k{display:flex;align-items:center;gap:8px;font-weight:600;color:var(--ink2);font-size:14px}
@@ -249,6 +263,11 @@ details.more>div{padding-top:14px}
 .filt{display:flex;gap:10px;align-items:flex-start;border:1px solid color-mix(in srgb,var(--tut) 35%,transparent);background:var(--tut-bg);color:var(--ink2);border-radius:12px;padding:11px 14px;font-size:13.5px;margin:0 0 16px}
 .filt b{color:var(--tut)}
 .units{margin-left:auto}
+.legend.tog span{cursor:pointer;user-select:none;transition:opacity .15s}
+.legend.tog span.off{opacity:.35}
+.acc td:first-child{white-space:normal}
+.acc .ex{font-size:11px;color:var(--muted);display:block}
+@media(max-width:520px){.acc th:nth-child(2),.acc th:nth-child(3),.acc td:nth-child(2),.acc td:nth-child(3){display:none}.acc th,.acc td{padding:10px 8px}}
 
 /* ---- Sinyal geçmişi ---- */
 .hist .day{padding:10px 18px;font-size:12px;font-weight:650;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:var(--surface);border-bottom:1px solid var(--line);display:flex;justify-content:space-between}
@@ -366,6 +385,13 @@ footer p{margin:0 0 8px;max-width:860px}
       <div class="seg" id="hrange" style="margin-left:auto"><button data-n="5">1 hafta</button><button data-n="10" class="on">2 hafta</button><button data-n="30">1 ay</button></div>
     </div>
     <div class="tbl hist" id="hist"></div>
+    <div id="accblock">
+    <h3 class="sm" id="isabet" style="margin-top:40px">Sinyaller ne kadar isabetli?</h3>
+    <p class="lead" style="margin-bottom:12px">Geçmişte bir hisse AL'a ya da SAT'a geçtikten sonra fiyatı ortalama ne yaptı? Kıyas için: aynı dönemde büyük 50 hisseden herhangi birini herhangi bir gün almak.</p>
+    <div class="toolbar"><div class="seg" id="accseg"><button data-a="all" class="on">2006'dan beri</button><button data-a="recent">Son 3 yıl</button></div></div>
+    <div class="tbl"><table class="acc" id="acc"></table></div>
+    <p class="muted small" id="accnote"></p>
+    </div>
     <p class="muted small">Geçmiş günlerin sinyalleri, o güne kadarki fiyatlarla yeniden hesaplanmıştır (puan geleceği kullanmaz). Bir satıra dokunarak hisseyi tabloda açabilirsiniz.</p>
   </section>
 
@@ -379,7 +405,7 @@ footer p{margin:0 0 8px;max-width:860px}
       <div class="chart-head">
         <h3>Portföy eğrisi</h3>
         <div class="seg units" id="unitseg"><button data-u="tl" class="on">TL</button><button data-u="real" title="Enflasyondan arındırılmış: 2006 fiyatlarıyla alım gücü">Enflasyondan arındırılmış</button><button data-u="usd">Dolar</button></div>
-        <div class="legend"><span><i style="background:var(--strat);color:var(--strat)"></i>Model portföy</span><span><i style="background:var(--bench);color:var(--bench)"></i>BIST30 endeksi</span><span><i style="background:var(--cash);color:var(--cash)"></i>Faiz (politika faizi)</span><span title="Her dönemin en büyük 50 hissesini eşit ağırlıkla tutmak"><i style="background:var(--uni);color:var(--uni)"></i>Büyük 50 hisse al-bekle</span></div>
+        <div class="legend tog" id="chartleg" title="Göstermek / gizlemek için dokunun"></div>
       </div>
       <div class="chartbox" id="chart"></div>
       <div class="muted small" id="btmeta" style="margin-top:6px"></div>
@@ -456,6 +482,7 @@ footer p{margin:0 0 8px;max-width:860px}
     </div></details>
     <details><summary>"Faiz ortamı" kutusu ne anlatıyor?</summary><div><p>Reel faiz = politika faizi − yıllık enflasyon. Pozitifse paranızı faizde tutmak enflasyonun üstünde getiri sağlar; bu dönemlerde hisseler cazibesini yitirebilir.</p>
       <p><b>Model bunu kullanıyor:</b> reel faiz %5'in üzerindeyken model portföy yeni hisse almaz, parayı faizde tutar (elindeki hisseleri normal kurallarla satar). 2006'dan beri yapılan testte bu kural hem 2006–2020'de hem 2021–2026'da sonucu iyileştirdi. AL / TUT / SAT etiketleri yine gösterilir; bunlar teknik görünümü anlatır.</p></div></details>
+    <details><summary>Altın neden bu kadar iyi görünüyor?</summary><div id="faq-gold"><p>Yükleniyor…</p></div></details>
     <details><summary>Enflasyona göre gerçekte kazandırıyor mu?</summary><div id="faq-real"><p>Yükleniyor…</p></div></details>
     <details><summary>"Canlı model portföy" nedir?</summary><div><p>Sayfadaki diğer performans rakamları geriye dönük testtir: kurallar geçmişe uygulanarak hesaplanır. Canlı portföy ise 9 Kasım 2026'da 100.000 ₺ ile başlatıldı ve her gün yalnızca o günün sonucu eklenir; geçmiş kayıtlar sonradan değiştirilmez. Zamanla modelin gerçek performansının en güvenilir göstergesi olacak. Gerçek para değildir, işlem yapılmaz.</p></div></details>
     <details><summary>Ne sıklıkla güncelleniyor?</summary><div><p>Her iş günü 18:40'ta, borsa kapandıktan sonra otomatik olarak. Sayfanın üstündeki tarih son verinin günüdür.</p></div></details>
@@ -502,6 +529,11 @@ function countUp(el, to, fmtFn, ms = 1100) {
 }
 let S = null, B = null, filter = "ALL", sortK = null, sortDir = 1, openRow = null, period = "full";
 let hFilter = "inAL", hDays = 10, unit = "tl", LIVE = null;
+// Grafikteki seriler: [anahtar, ad, renk, kesik çizgi, kalınlık]; gizlenenler lejanttan açılır
+const SER = [["strategy", "Model portföy", "var(--strat)", "", 2.6], ["benchmark", "BIST30 endeksi", "var(--bench)", "", 2],
+  ["gold", "Gram altın", "var(--gold)", "", 1.8], ["usd", "Dolar", "var(--usdc)", "4 3", 1.5],
+  ["cash", "Faiz", "var(--cash)", "6 4", 1.8], ["universe", "Büyük 50 al-bekle", "var(--uni)", "2 3", 1.5]];
+const hidden = new Set(["universe", "usd"]);
 // Birimler: TL (nominal), enflasyondan arındırılmış (2006 TL'si) ve dolar
 const UNIT = {tl: "", real: " (enflasyondan arındırılmış)", usd: " (dolar bazında)"};
 const cv = (p, k) => p[k] == null ? null : unit === "real" ? p[k] / p.cpi : unit === "usd" ? (p.usd ? p[k] / p.usd : null) : p[k];
@@ -515,7 +547,7 @@ async function load() {
     ]);
     S = s; B = b;
     LIVE = await fetch("live.json?v=" + Date.now()).then(r => r.ok ? r.json() : null).catch(() => null);
-    renderHero(); renderToday(); renderLive(); renderFilter(); renderSignals(); renderHistory(); renderBacktest();
+    renderHero(); renderToday(); renderLive(); renderFilter(); renderSignals(); renderHistory(); renderAccuracy(); renderBacktest();
   } catch (e) {
     $("#h-sub").textContent = "Veri yüklenemedi. Sayfayı bir web sunucusu üzerinden açın (örn. python3 -m http.server).";
   }
@@ -535,6 +567,8 @@ function renderHero() {
   $("#h-chips").innerHTML =
     (last.universe ? `<span class="chip" title="Her dönemin en büyük 50 hissesini eşit ağırlıkla alıp tutmak"><i style="background:var(--uni);color:var(--uni)"></i>Büyük 50 hisse al-bekle <b>${tl(START * last.universe)}</b></span>` : "") +
     `<span class="chip"><i style="background:var(--bench);color:var(--bench)"></i>BIST30 al-bekle <b>${tl(START * last.benchmark)}</b></span>` +
+    (last.gold ? `<span class="chip"><i style="background:var(--gold);color:var(--gold)"></i>Gram altın <b>${tl(START * last.gold)}</b></span>` : "") +
+    (last.usd ? `<span class="chip"><i style="background:var(--usdc);color:var(--usdc)"></i>Dolar <b>${tl(START * last.usd)}</b></span>` : "") +
     `<span class="chip"><i style="background:var(--cash);color:var(--cash)"></i>Faiz <b>${tl(START * last.cash)}</b></span>` +
     `<span class="chip">En büyük düşüş: model <b>${pct(B.portfolio.full.max_drawdown_pct, 0)}</b></span>` +
     `<span class="chip">endeks <b>${pct(B.portfolio.benchmark_full?.max_drawdown_pct, 0)}</b></span>`;
@@ -547,6 +581,8 @@ function renderHero() {
   // SSS: dürüst performans özeti
   const y = (B.yearly || []).filter(r => !r.partial), beatIdx = y.filter(r => r.strategy > r.benchmark).length;
   const P0 = B.portfolio, up = P0.full.cagr_pct > (P0.benchmark_full?.cagr_pct ?? 0);
+  if (P0.gold_full) $("#faq-gold").innerHTML = `<p>Çünkü öyleydi: 2006'dan bu yana gram altın TL bazında yılda ortalama ${pct(P0.gold_full.cagr_pct, 1)} kazandırdı; model ${pct(P0.full.cagr_pct, 1)}, BIST30 endeksi ${pct(P0.benchmark_full?.cagr_pct, 1)}. Bu dönemde TL'nin dolara karşı sert değer kaybı ve altının dünya fiyatındaki yükseliş birleşti.</p>
+    <p>Altının da bedeli var: en büyük düşüşü ${pct(P0.gold_full.max_drawdown_pct, 0)}, modelinki ${pct(P0.full.max_drawdown_pct, 0)}. Geçmişte en çok kazandıranın gelecekte de öyle olacağının garantisi yok; bu karşılaştırma modelin neyi iyi yaptığını (riski azaltmak) ve neyi yapamadığını dürüstçe göstermek için var.</p>`;
   if (U.real) $("#faq-real").innerHTML = `<p>Az. Türkiye'de fiyatlar 2006'dan bu yana ~${fmt(B.equity_curve.at(-1).cpi, 0)} katına çıktı. Enflasyondan arındırınca modelin yıllık getirisi ${pct(U.real.strategy.full.cagr_pct, 1)}, BIST30 endeksinin ${pct(U.real.benchmark?.full.cagr_pct, 1)}, büyük 50 hisseyi al-bekle ${pct(U.real.universe.full.cagr_pct, 1)}, faizin ${pct(U.real.cash.full.cagr_pct, 1)}.${U.usd ? ` Dolar bazında model ${pct(U.usd.strategy.full.cagr_pct, 1)}, endeks ${pct(U.usd.benchmark?.full.cagr_pct, 1)}.` : ""}</p>
     <p>Yani model 20 yılda alım gücünü koruyup biraz artırdı; endeks ve faiz ise alım gücü kaybettirdi. TL cinsinden büyük görünen rakamların çoğu enflasyondan geliyor. Performans bölümündeki "Enflasyondan arındırılmış" ve "Dolar" düğmeleriyle tüm grafik ve tabloları bu ölçülerle görebilirsiniz.</p>`;
   $("#faq-perf").innerHTML = `<p>${trDate(B.period.start).split(" ").pop()}'dan bu yana ${up ? "evet, az farkla" : "hayır"}: model yılda ortalama %${fmt(P0.full.cagr_pct, 1)}, BIST30 endeksi %${fmt(P0.benchmark_full?.cagr_pct, 1)}, büyük 50 hisseyi al-bekle %${fmt(P0.universe_full?.cagr_pct, 1)} getirdi. Asıl fark riskte: en büyük düşüş modelde ${pct(P0.full.max_drawdown_pct, 0)}, endekste ${pct(P0.benchmark_full?.max_drawdown_pct, 0)} (2008).</p>
@@ -652,11 +688,29 @@ function renderSignals() {
       <h4>Neden ${x.signal}?</h4><ul>${x.reasons.map(r => `<li>${r}</li>`).join("")}</ul>
       <h4>Puanın dağılımı <span class="muted small" style="font-weight:400">(toplam ${x.score > 0 ? "+" : ""}${fmt(x.score, 0)})</span></h4>
       <div class="comp">${Object.entries(x.components).map(([k, v]) => `<span>${COMP[k]} <b class="${v > 0 ? "pos" : v < 0 ? "neg" : ""}">${v > 0 ? "+" : ""}${fmt(v, 1)}</b></span>`).join("")}</div>
+      ${S.accuracy?.by_ticker?.[x.ticker] ? (a => `<div class="small" style="margin-top:8px;color:var(--ink2)">Bu hissede 2006'dan beri <b>${a.n}</b> AL sinyali: 1 ay sonra ortalama ${pct(a.avg21, 1)}, %${fmt(a.pos21, 0)}'inde fiyat yükseldi.</div>`)(S.accuracy.by_ticker[x.ticker]) : ""}
       <div class="small muted" style="margin-top:8px">RSI ${fmt(x.rsi, 0)} · ADX ${fmt(x.adx, 0)} · günlük oynaklık (ATR) %${fmt(x.atr_pct, 1)}${x.target ? ` · hedef ${fmt(x.target)}` : ""}</div>
     </div></td></tr>`;
   }).join("") || `<tr><td colspan="8" class="muted">Sonuç yok</td></tr>`;
   fitDetail();
   if (openRow) loadStock(openRow);
+}
+
+// ---------------- Sinyal isabeti ----------------
+let accMode = "all";
+function renderAccuracy() {
+  const A = S.accuracy; if (!A) { $("#accblock").hidden = true; return; }
+  const D = A[accMode], H = [["5", "1 hafta"], ["21", "1 ay"], ["63", "3 ay"]];
+  const row = (k, lab, ex) => `<tr><td><b>${lab}</b><span class="ex">${ex}</span></td>` + H.map(([h]) => {
+    const v = D[k][h], base = D.TUM[h];
+    const diff = k !== "TUM" && v.avg != null ? v.avg - base.avg : null;
+    return `<td>${pct(v.avg, 1)}${diff != null ? `<span class="ex">${diff >= 0 ? "+" : ""}${fmt(diff, 1)} puan</span>` : ""}</td><td>%${fmt(v.pos, 0)}</td>`;
+  }).join("") + `</tr>`;
+  $("#acc").innerHTML = `<thead><tr><th>Ne zaman alınsaydı?</th>${H.map(([, n]) => `<th title="Ortalama fiyat değişimi">${n} sonra</th><th title="Fiyatı yükselenlerin oranı">yükselen</th>`).join("")}</tr></thead><tbody>` +
+    row("AL", "AL sinyalinden sonra", `${fmt(D.AL["21"].n, 0)} sinyal`) + row("SAT", "SAT sinyalinden sonra", `${fmt(D.SAT["21"].n, 0)} sinyal`) +
+    row("TUM", "Herhangi bir gün (kıyas)", "büyük 50 hissenin tamamı") + `</tbody>`;
+  const d21 = D.AL["21"].avg - D.TUM["21"].avg, s21 = D.SAT["21"].avg - D.TUM["21"].avg;
+  $("#accnote").innerHTML = `Okuma: AL sinyalinden sonraki bir ayda hisseler ortalamadan ${fmt(Math.abs(d21), 1)} puan ${d21 >= 0 ? "daha iyi" : "daha kötü"}, SAT'tan sonra ${fmt(Math.abs(s21), 1)} puan ${s21 <= 0 ? "daha kötü" : "daha iyi"} gitti. Fark küçük: sinyaller tek tek güçlü bir tahmin aracı değil; modelin asıl faydası düşüşlerde riski azaltmak. Rakamlar TL cinsinden, işlem maliyeti hariç, ertesi gün açılış fiyatından hesaplanmıştır.`;
 }
 
 // ---------------- Sinyal geçmişi ----------------
@@ -805,7 +859,7 @@ function renderBacktest() {
 function renderStats() {
   const P = B.portfolio, oos = period === "oos", Ux = unit === "tl" ? null : B.units?.[unit];
   const pick = (k, nom) => Ux ? (Ux[k] ? Ux[k][oos ? "oos" : "full"] : null) : nom;
-  const sets = [["Model portföy", "var(--strat)", pick("strategy", oos ? P.oos : P.full)], ["BIST30 al-bekle", "var(--bench)", pick("benchmark", oos ? P.benchmark_oos : P.benchmark_full)], ["Büyük 50 hisse al-bekle", "var(--uni)", pick("universe", oos ? P.universe_oos : P.universe_full)], ["Faiz", "var(--cash)", pick("cash", oos ? P.cash_oos : P.cash_full)]];
+  const sets = [["Model portföy", "var(--strat)", pick("strategy", oos ? P.oos : P.full)], ["BIST30 al-bekle", "var(--bench)", pick("benchmark", oos ? P.benchmark_oos : P.benchmark_full)], ["Büyük 50 hisse al-bekle", "var(--uni)", pick("universe", oos ? P.universe_oos : P.universe_full)], ["Gram altın", "var(--gold)", pick("gold", oos ? P.gold_oos : P.gold_full)], ["Dolar", "var(--usdc)", pick("dollar", oos ? P.dollar_oos : P.dollar_full)], ["Faiz", "var(--cash)", pick("cash", oos ? P.cash_oos : P.cash_full)]];
   $("#perdesc").textContent = (oos ? `${trDate(B.period.oos_start)} – ${trDate(B.period.end)}` : `${trDate(B.period.start)} – ${trDate(B.period.end)}`) + UNIT[unit];
   $("#stats").innerHTML = sets.map(([n, c, m]) => !m ? "" : `<div class="stat" style="--c:${c}">
     <div class="k"><i style="background:${c};color:${c}"></i>${n}</div>
@@ -819,15 +873,16 @@ function renderStats() {
 
 function renderYearly(rows0) {
   // Seçili birime göre: (1 + nominal) / (1 + TÜFE ya da kur değişimi) − 1
-  const rows = rows0.map(r => {
+  const rows = rows0.map(r0 => {
+    const r = {...r0, gold: r0.gold_pct, dollar: r0.usd_pct};
     if (unit === "tl") return r;
     const d = unit === "real" ? r.cpi_pct : r.usd_pct, o = {...r};
-    for (const k of ["strategy", "benchmark", "universe", "cash"])
+    for (const k of ["strategy", "benchmark", "universe", "cash", "gold", "dollar"])
       o[k] = r[k] == null || d == null ? null : Math.round(((1 + r[k] / 100) / (1 + d / 100) - 1) * 1000) / 10;
     return o;
   });
   const short = iso => new Date(iso + "T00:00:00").toLocaleDateString("tr-TR", {day: "numeric", month: "short"});
-  const cols = [["strategy", "Model"], ["benchmark", "BIST30 endeksi"], ["universe", "Büyük 50 al-bekle"], ["cash", "Faiz"]].filter(([k]) => rows.some(r => r[k] != null));
+  const cols = [["strategy", "Model"], ["benchmark", "BIST30 endeksi"], ["universe", "Büyük 50 al-bekle"], ["gold", "Altın"], ["dollar", "Dolar"], ["cash", "Faiz"]].filter(([k]) => rows.some(r => r[k] != null));
   const wins = Object.fromEntries(cols.map(([k]) => [k, 0]));
   const body = rows.map(r => {
     const best = cols.map(([k]) => r[k]).filter(v => v != null).reduce((a, b) => Math.max(a, b), -Infinity);
@@ -844,7 +899,10 @@ function renderYearly(rows0) {
 function drawChart(c, oos) {
   const box = $("#chart");
   const W = Math.max(300, box.clientWidth), H = W < 560 ? 240 : 320, L = 62, R = 10, T = 12, Bm = 26;
-  const vals = c.flatMap(p => ["strategy", "benchmark", "cash", "universe"].map(k => cv(p, k))).filter(v => v != null && v > 0);
+  const shown = SER.filter(([k]) => !hidden.has(k) && c.some(p => p[k] != null));
+  $("#chartleg").innerHTML = SER.filter(([k]) => c.some(p => p[k] != null)).map(([k, n, col]) =>
+    `<span data-k="${k}" class="${hidden.has(k) ? "off" : ""}"><i style="background:${col};color:${col}"></i>${n}</span>`).join("");
+  const vals = c.flatMap(p => shown.map(([k]) => cv(p, k))).filter(v => v != null && v > 0);
   const lo = Math.log(Math.min(...vals) * .95), hi = Math.log(Math.max(...vals) * 1.05);
   const x = i => L + i / (c.length - 1) * (W - L - R), y = v => T + (1 - (Math.log(v) - lo) / (hi - lo)) * (H - T - Bm);
   const path = k => c.map((p, i) => cv(p, k) == null ? "" : `${i ? "L" : "M"}${x(i).toFixed(1)},${y(cv(p, k)).toFixed(1)}`).join("");
@@ -862,7 +920,7 @@ function drawChart(c, oos) {
     const i = c.findIndex(p => p.date.startsWith(yr));
     return i < c.length * 0.04 ? "" : `<text x="${x(i)}" y="${H - 6}" text-anchor="middle">${yr}</text>`;
   }).join("");
-  const area = path("strategy") + `L${x(c.length - 1).toFixed(1)},${H - Bm}L${x(0).toFixed(1)},${H - Bm}Z`;
+  const area = hidden.has("strategy") ? "" : path("strategy") + `L${x(c.length - 1).toFixed(1)},${H - Bm}L${x(0).toFixed(1)},${H - Bm}Z`;
   const base = unit === "tl" ? "" : `<line x1="${L}" x2="${W - R}" y1="${y(1)}" y2="${y(1)}" stroke="var(--muted)" stroke-width="1"/><text x="${W - R - 4}" y="${y(1) - 6}" text-anchor="end">başlangıç alım gücü</text>`;
   box.innerHTML = `<svg width="${W}" height="${H}" style="display:block" role="img" aria-label="Portföy eğrisi">
     <defs>
@@ -872,17 +930,15 @@ function drawChart(c, oos) {
     ${ticks}${years}${Math.log(1) >= lo && Math.log(1) <= hi ? base : ""}
     <path d="${area}" fill="url(#ga)"/>
     ${oi > 0 ? `<rect x="${x(oi)}" y="${T}" width="${W - R - x(oi)}" height="${H - T - Bm}" fill="var(--accent)" opacity=".06"/><text x="${x(oi) + 8}" y="${T + 14}">test dönemi</text>` : ""}
-    <path d="${path("cash")}" fill="none" stroke="var(--cash)" stroke-width="2" stroke-dasharray="6 4"/>
-    <path d="${path("universe")}" fill="none" stroke="var(--uni)" stroke-width="1.6" stroke-dasharray="2 3"/>
-    <path d="${path("benchmark")}" fill="none" stroke="var(--bench)" stroke-width="2"/>
-    <path d="${path("strategy")}" fill="none" stroke="var(--strat)" stroke-width="2.6" filter="url(#gl)"/>
+    ${shown.slice().reverse().map(([k, , col, dash, w]) => `<path d="${path(k)}" fill="none" stroke="${col}" stroke-width="${w}"${dash ? ` stroke-dasharray="${dash}"` : ""}${k === "strategy" ? ' filter="url(#gl)"' : ""}/>`).join("")}
     <line class="cur" x1="0" x2="0" y1="${T}" y2="${H - Bm}" stroke="var(--muted)" stroke-dasharray="2 3" visibility="hidden"/>
     <rect class="hit" x="${L}" y="${T}" width="${W - L - R}" height="${H - T - Bm}" fill="transparent"/>
   </svg><div class="tip"></div>`;
   hover(box, x, c.length, (k, tip) => {
     const p = c[k];
     const m = k => cv(p, k) == null ? "–" : money0(cv(p, k));
-    tip.innerHTML = `<b>${trDate(p.date)}</b>${UNIT[unit] ? `<br><span class="muted">${UNIT[unit].trim()}</span>` : ""}<br><i style="background:var(--strat)"></i>Model <b>${m("strategy")}</b><br><i style="background:var(--bench)"></i>BIST30 <b>${m("benchmark")}</b><br><i style="background:var(--cash)"></i>Faiz <b>${m("cash")}</b>${p.universe ? `<br><i style="background:var(--uni)"></i>Büyük 50 al-bekle <b>${m("universe")}</b>` : ""}`;
+    tip.innerHTML = `<b>${trDate(p.date)}</b>${UNIT[unit] ? `<br><span class="muted">${UNIT[unit].trim()}</span>` : ""}` +
+      shown.map(([k, n, col]) => `<br><i style="background:${col}"></i>${n} <b>${m(k)}</b>`).join("");
   }, W);
 }
 
@@ -906,6 +962,17 @@ $("#hist").addEventListener("click", e => {
   const r = e.target.closest(".ch[data-t]"); if (!r) return;
   $("#q").value = ""; openRow = r.dataset.t; setFilter("ALL");
   document.querySelector(`#sig tr.row[data-t="${openRow}"]`)?.scrollIntoView({behavior: "smooth", block: "start"});
+});
+$("#accseg").addEventListener("click", e => {
+  if (!e.target.dataset.a) return; accMode = e.target.dataset.a;
+  document.querySelectorAll("#accseg button").forEach(b => b.classList.toggle("on", b === e.target)); renderAccuracy();
+});
+$("#chartleg").addEventListener("click", e => {
+  const sp = e.target.closest("span[data-k]"); if (!sp) return;
+  const k = sp.dataset.k;
+  hidden.has(k) ? hidden.delete(k) : hidden.add(k);
+  if (hidden.size >= SER.length) hidden.delete(k);
+  drawChart(B.equity_curve, B.period.oos_start);
 });
 $("#unitseg").addEventListener("click", e => {
   if (!e.target.dataset.u) return;

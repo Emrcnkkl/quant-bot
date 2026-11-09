@@ -19,6 +19,14 @@ ve sonuçları statik bir web sayfasında gösteren bir bot. Şu an **Aşama 1**
   Sonuç (6 bileşenli puanla, 10 Kasım 2026): model %23.6/yıl, düşüş −%16.7, Sharpe 0.71 · XU030 %17.7, −%64 · büyük 50 al-bekle
   %20.3, −%67 · faiz %15.5. **Enflasyondan arındırılmış**: model +%3.9/yıl, büyük 50 al-bekle +%1.0, XU030 −%1.2, faiz −%3.0.
 - Veri koruması: Yahoo'dan gelen en yeni veri yayındakinden eskiyse bot hiçbir dosyayı değiştirmeden hata koduyla durur.
+  `data_quality()`: eksik son gün, fiyat sınırını aşan hareket, geride kalan endeks, TCMB/kur alınamaması → signals.json `quality`,
+  uyarı Telegram'a (`TELEGRAM_ADMIN_CHAT_ID` varsa oraya, yoksa kanala); evrenin %25'inden fazlası eksikse durur.
+  Workflow: önce `tests/` (unittest), son deneme (21:10) ya da elle çalıştırma başarısızsa Telegram'a arıza uyarısı.
+- Kıyaslar: XU030, büyük 50 al-bekle, faiz, **gram altın** (GC=F × USD/TRY ÷ 31,1035) ve **dolar**. 2006'dan altın TL'de %31.6/yıl
+  ile modeli (%23.6) geçiyor (düşüşü −%34); sitede ve SSS'de açıkça gösteriliyor.
+- **Sinyal isabeti** (`signal_accuracy`, signals.json `accuracy`): AL'dan 1 ay sonra ort. +%2.3 vs herhangi bir gün +%1.8;
+  SAT +%0.9. Son 3 yılda fark ~0. Sinyallerin tek tek tahmin gücü zayıf; modelin değeri risk kontrolü.
+- Paylaşım: og:image `img/og.png` (1200×630), ikonlar `img/`.
 - Modelin değeri getiri değil **düşüş koruması** (2008: endeks −%50, model +%7). Teknik göstergelerle al-bekle'yi getiride
   belirgin geçmek gerçekçi testte mümkün olmadı; aşağıdaki "Araştırma bulguları"na bakmadan yeni kural ekleme.
 - **Canlı model portföy** (`live.json`): 9 Kasım 2026'da 100.000 ₺ ile başladı; her çalıştırmada yalnızca yeni günler eklenir,
@@ -62,6 +70,8 @@ YENİ PROJE/
 ├── live.json          # canlı model portföy kaydı (yalnızca eklenir, geçmişi değişmez)
 ├── notify.json        # son Telegram bildirimi tarihi
 ├── names.json         # Yahoo'dan alınmış şirket adı önbelleği (NAMES'te olmayanlar için)
+├── tests/test_bot.py  # birim testler (python3 -m unittest discover -s tests); workflow her çalıştırmada koşar
+├── img/               # og.png paylaşım görseli, ikonlar
 ├── sensitivity.py     # parametre duyarlılık analizi (bot.py fonksiyonlarını kullanır, veriyi .cache/ altına kaydeder)
 ├── sensitivity.json   # analiz çıktısı
 ├── experiments.py     # giriş/çıkış kuralı deneyleri (al-bekle'yi geçen hisse sayısı), çıktı experiments.json
@@ -131,11 +141,11 @@ exit_rule ("score" varsayılan | ema50 | cross | ema200 | regime), entry_rule ("
 `regime.source` bunu gösterir. Yerleşik tabloları ara ara canlı veriyle eşitle.
 
 ## JSON şemaları (index.html bunlara bağımlı — alan adı değiştirirken sayfayı da güncelle)
-**signals.json**: `generated_at, data_date, demo, universe, thresholds{buy,sell}, disclaimer, regime{policy_rate,cpi_yoy,real_rate,policy_date,cpi_month,source,filter_max,blocking}, counts{AL,TUT,SAT}, signals[], changes_days, changes_dates[], changes[]`
+**signals.json**: `generated_at, data_date, demo, universe, thresholds{buy,sell}, disclaimer, quality{ok,warnings[],checked}, accuracy{since,recent_since,horizons,all|recent{AL,SAT,TUM}{5,21,63}{n,avg,median,pos},by_ticker{T:{n,avg21,pos21}}}, regime{policy_rate,cpi_yoy,real_rate,policy_date,cpi_month,source,filter_max,blocking}, counts{AL,TUT,SAT}, signals[], changes_days, changes_dates[], changes[]`
 - `changes[]`: `date, ticker, name, from, to, score, close, since_pct` (yeniden eskiye)
 - `signals[]`: `ticker, name, date, close, change_pct, score, signal, state, score_5d_ago, components{ema200,...}, rsi, adx, atr_pct, stop, target, position{entry_date,entry_price,last_price,stop,pnl_pct,days}|null, reasons[]`
 
-**backtest.json**: meta alanları + `backtest_universe, avg_exposure_pct, fx_start, units{real,usd}{strategy,benchmark,universe,cash}{full,oos}, settings, period{start,end,oos_start}, portfolio{full,oos,benchmark_full,benchmark_oos,cash_full,cash_oos}, portfolio{...,universe_full,universe_oos}, equity_curve[{date,strategy,benchmark,cash,universe,cpi,usd}] (haftalık), yearly[{year,from,to,partial,strategy,benchmark,cash,universe,cpi_pct,usd_pct}], stocks[{ticker,name,strategy,oos,buy_hold_pct}], recent_trades[]`
+**backtest.json**: meta alanları + `backtest_universe, avg_exposure_pct, fx_start, units{real,usd}{strategy,benchmark,universe,cash}{full,oos}, settings, period{start,end,oos_start}, portfolio{full,oos,benchmark_full,benchmark_oos,cash_full,cash_oos}, portfolio{...,universe_full,universe_oos,gold_full,gold_oos,dollar_full,dollar_oos}, equity_curve[{date,strategy,benchmark,cash,universe,cpi,usd,gold}] (haftalık), yearly[{year,from,to,partial,strategy,benchmark,cash,universe,cpi_pct,usd_pct,gold_pct}], stocks[{ticker,name,strategy,oos,buy_hold_pct}], recent_trades[]`
 - metrik alanları (`metrics()`): `total_return_pct, cagr_pct, sharpe, max_drawdown_pct, exposure_pct` (+ işlem listesi verilirse `trades, win_rate_pct, avg_trade_pct, profit_factor, avg_days`)
 
 **live.json**: `start_date, start_value, start_bench, points[{date,value,bench,stock_pct}], events[{date,ticker,name,type}], holdings[{ticker,name,weight_pct}], notes[{date,text}], updated`
