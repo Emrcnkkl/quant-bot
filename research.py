@@ -403,14 +403,122 @@ def main_pit() -> None:
     print("\nKayan pencere seçimleri:", picks)
 
 
+# --------------------------------------------------------------------------- #
+#  Bileşen ve ağırlık deneyleri (botun güncel ayarlarıyla: en büyük 50, 12 ay hacim, oynaklık, faiz filtresi)
+# --------------------------------------------------------------------------- #
+def bot_setup():
+    """Botun kullandığı evren ve ayarlarla hazırlık (önbellekteki veriden)."""
+    bot.fetch_macro()
+    with open(WIDE, "rb") as f:
+        data = bot.dedupe(fix(pickle.load(f), quiet=True))
+    with open(CACHE, "rb") as f:
+        bench = fix(pickle.load(f), quiet=True)[bot.BENCHMARK]
+    full = bench.index
+    cal = full[full >= pd.Timestamp(bot.CFG["backtest_start"])]
+    cash = bot.cash_returns(cal)
+    mem = bot.pit_membership(data, full, bot.CFG["universe_size"]).reindex(cal).fillna(False)
+    comps = {}
+    for t, df in data.items():
+        if len(df) < bot.CFG["min_bars"] or not mem[t].any():
+            continue
+        d = bot.add_indicators(df, bench["Close"])
+        comps[t] = (d, bot.score_frame(d))
+    return cal, cash, mem[list(comps)], comps
+
+
+def period_stats(r, cash, cal):
+    out = {}
+    for lab, m in (("egitim", cal.year <= 2020), ("test", cal.year >= 2021), ("tum", cal.year > 0)):
+        x = bot.metrics(r[m], rf=cash[m])
+        out[lab] = (x["cagr_pct"], x["max_drawdown_pct"], x["sharpe"])
+    return out
+
+
+def main_bilesen() -> None:
+    """Her seferinde bir puan bileşenini çıkar; eşikleri kalan en yüksek puana göre orantılı küçült."""
+    cal, cash, mem, comps = bot_setup()
+    maxabs = {"ema200": 15, "ema_cross": 15, "adx": 10, "rsi": 15, "macd": 15, "volume": 10, "breakout": 10, "relative": 10}
+    base = dict(bot.CFG)
+    rows = []
+    for drop in [None] + list(maxabs):
+        keep = [k for k in maxabs if k != drop]
+        scale = sum(maxabs[k] for k in keep) / 100
+        bot.CFG.update(buy_threshold=base["buy_threshold"] * scale, sell_threshold=base["sell_threshold"] * scale)
+        prep = {t: (d, sc[keep].sum(axis=1)) for t, (d, sc) in comps.items()}
+        r, e, _ = bot.sized_portfolio(prep, cal, cash, mem, 1.0, bot.CFG["vol_sizing"], bot.CFG["vol_cap"])
+        st = period_stats(r, cash, cal)
+        rows.append({"cikarilan": drop or "(hiçbiri)", **{f"{p}_{k}": v for p, t3 in st.items() for k, v in zip(("yil", "dd", "sh"), t3)},
+                     "hisse_payi": round(float(e.mean()) * 100)})
+        bot.CFG.clear(); bot.CFG.update(base)
+    df = pd.DataFrame(rows)
+    ref = df.iloc[0]
+    df["gereksiz_mi"] = (df["egitim_sh"] >= ref["egitim_sh"]) & (df["test_sh"] >= ref["test_sh"])
+    bot.write("research_bilesen.json", {"rows": df.to_dict("records")})
+    pd.set_option("display.width", 250)
+    print(df.to_string(index=False))
+
+
+def main_agirlik() -> None:
+    """Hisse başına ağırlık yöntemleri (botun güncel modeliyle)."""
+    cal, cash, mem, comps = bot_setup()
+    n = bot.CFG["universe_size"]
+    rets, held, atrp, score = {}, {}, {}, {}
+    for t, (d, sc) in comps.items():
+        bt = bot.backtest(d, sc["score"], cash.reindex(d.index).fillna(0), entry_mask=mem[t])
+        rets[t], held[t] = bt["daily"], bt["held"]
+        atrp[t] = (d["atr"] / d["Close"]).shift(1)
+        score[t] = sc["score"].shift(1)
+    M = mem.reindex(index=cal, columns=list(comps)).fillna(False)
+    Rr = pd.DataFrame(rets).reindex(cal).fillna(0)
+    H = pd.DataFrame(held).reindex(cal).fillna(False).astype(bool) & M
+    A = pd.DataFrame(atrp).reindex(cal)
+    SC = pd.DataFrame(score).reindex(cal)
+    volf = lambda lo, hi: A.pow(-1).mul(A.where(M).median(axis=1), axis=0).clip(lo, hi).fillna(1)  # noqa: E731
+
+    def port(Wt, max_w=None):
+        if max_w is not None:
+            Wt = Wt.clip(upper=max_w)
+        Wt = Wt.div(Wt.sum(axis=1).clip(lower=1), axis=0)
+        e = Wt.sum(axis=1)
+        return (Wt * Rr).sum(axis=1) + (1 - e) * cash, e
+
+    base = H.astype(float) / n
+    variants = {
+        "esit": port(base),
+        "oynaklik (mevcut)": port(base * volf(1 / 3, 2)),
+        "oynaklik + puan egimi": port(base * volf(1 / 3, 2) * (SC / 40).clip(0.75, 1.5).fillna(1)),
+        "oynaklik sinir 3x": port(base * volf(1 / 4, 3)),
+        "oynaklik temel 1/40": port(base * n / 40 * volf(1 / 3, 2)),
+        "oynaklik temel 1/30": port(base * n / 30 * volf(1 / 3, 2)),
+        "oynaklik + tek hisse max %3": port(base * volf(1 / 3, 2), 0.03),
+    }
+    rows = []
+    for k, (r, e) in variants.items():
+        st = period_stats(r, cash, cal)
+        rows.append({"yontem": k, **{f"{p}_{x}": v for p, t3 in st.items() for x, v in zip(("yil", "dd", "sh"), t3)},
+                     "hisse_payi": round(float(e.mean()) * 100), "en_buyuk_tek_pay": round(float((r * 0).max()), 1)})
+    df = pd.DataFrame(rows).drop(columns="en_buyuk_tek_pay")
+    ref = df[df.yontem == "oynaklik (mevcut)"].iloc[0]
+    df["kurali_gecti"] = (df.egitim_sh > ref.egitim_sh) & (df.test_sh > ref.test_sh) & (df.tum_dd >= ref.tum_dd - 2)
+    bot.write("research_agirlik.json", {"rows": df.to_dict("records")})
+    pd.set_option("display.width", 250)
+    print(df.to_string(index=False))
+
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--refresh", action="store_true")
     ap.add_argument("--pit", action="store_true", help="noktasal (o dönemin en likit 30 hissesi) evrenle test")
     ap.add_argument("--sizing", action="store_true", help="pozisyon büyüklüğü deneyleri (noktasal evren)")
     ap.add_argument("--faiz", action="store_true", help="reel faiz filtresi, 2006–bugün")
+    ap.add_argument("--bilesen", action="store_true", help="puan bileşenlerini tek tek çıkararak test")
+    ap.add_argument("--agirlik", action="store_true", help="hisse başına ağırlık yöntemleri")
     a = ap.parse_args()
-    if a.faiz:
+    if a.bilesen:
+        main_bilesen()
+    elif a.agirlik:
+        main_agirlik()
+    elif a.faiz:
         main_faiz()
     else:
         main_sizing() if a.sizing else main_pit() if a.pit else main(a.refresh)

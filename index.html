@@ -332,7 +332,7 @@ footer p{margin:0 0 8px;max-width:860px}
   <section id="sinyaller">
     <div class="kicker"><span class="gtext">01 · Sinyaller</span></div>
     <h2>Bugünün sinyalleri</h2>
-    <p class="lead">Borsa İstanbul'un işlem hacmine göre en büyük 50 hissesi (her çeyrek güncellenir). Her hisseye 8 teknik göstergeye bakılarak −100 ile +100 arasında bir puan verilir. Puan yükseldikçe fiyat hareketi o kadar güçlü görünür. <b>Ayrıntı ve grafik için bir hisseye dokunun.</b></p>
+    <p class="lead">Borsa İstanbul'un işlem hacmine göre en büyük 50 hissesi (her çeyrek güncellenir). Her hisseye 6 teknik göstergeye bakılarak −100 ile +100 arasında bir puan verilir. Puan yükseldikçe fiyat hareketi o kadar güçlü görünür. <b>Ayrıntı ve grafik için bir hisseye dokunun.</b></p>
     <div id="filt"></div>
     <div class="legend-sig">
       <span><span class="badge AL">AL</span>&nbsp; puan +40 ve üstü: teknik görünüm güçlü</span>
@@ -413,7 +413,7 @@ footer p{margin:0 0 8px;max-width:860px}
     <p class="lead">Her iş günü borsa kapandıktan sonra (18:40) otomatik çalışır; kimse elle müdahale etmez.</p>
     <div class="steps">
       <div class="step"><div class="n">1</div><h4>Veri</h4><p>~150 büyük hissenin 2004'ten beri günlük fiyatları indirilir; işlem hacmine göre en büyük 50'si seçilir. Faiz ve enflasyon TCMB'den alınır.</p></div>
-      <div class="step"><div class="n">2</div><h4>Puan</h4><p>Trend, momentum, hacim ve endekse göre güç gibi 8 gösterge birleştirilip her hisseye −100…+100 puan verilir.</p></div>
+      <div class="step"><div class="n">2</div><h4>Puan</h4><p>Trend, momentum, hacim ve kırılım gibi 6 gösterge birleştirilip her hisseye −100…+100 puan verilir.</p></div>
       <div class="step"><div class="n">3</div><h4>Sinyal</h4><p>Puan +40 üstü AL, −40 altı SAT, arası TUT. Model girdiği hissede zarar-kes seviyesi takip eder.</p></div>
       <div class="step"><div class="n">4</div><h4>Test</h4><p>Aynı kurallar 2006'dan bu yana, her dönemin o zamanki büyük hisselerine uygulanır; sonuç endeks ve faizle kıyaslanır.</p></div>
     </div>
@@ -423,11 +423,11 @@ footer p{margin:0 0 8px;max-width:860px}
       <div class="card small">
         <b>Puanın bileşenleri (toplam ±100)</b>
         <ul>
-          <li><b>Trend (40):</b> Fiyat 200 günlük ortalamanın üstü/altı ±15 · 20 günlük ortalama 50 günlüğün üstü/altı ±15 · ADX trend gücü ve yönü ±10</li>
-          <li><b>Momentum (30):</b> RSI 55–78 +15, 45–55 0, 25–45 −15, 78 üstü −5 (aşırı alım), 25 altı +5 (aşırı satım) · MACD histogramı yön ±10, eğim ±5</li>
-          <li><b>Hacim (10):</b> Hacim 20 günlük ortalamanın 1,5 katını aşarsa günün yönünde ±10</li>
-          <li><b>Kırılım (10):</b> 20 günlük zirve üstünde kapanış +10, dip altında −10</li>
-          <li><b>Göreli güç (10):</b> Son 3 aylık getirinin BIST30 endeksinden farkı (±%15'te tavan)</li>
+          <li><b>Trend (33):</b> Fiyat 200 günlük ortalamanın üstü/altı ±20 · ADX trend gücü ve yönü ±13</li>
+          <li><b>Momentum (40):</b> RSI 55–78 +20, 45–55 0, 25–45 −20, 78 üstü −7 (aşırı alım), 25 altı +7 (aşırı satım) · MACD histogramı yön ±13, eğim ±7</li>
+          <li><b>Hacim (13):</b> Hacim 20 günlük ortalamanın 1,5 katını aşarsa günün yönünde ±13</li>
+          <li><b>Kırılım (13):</b> 20 günlük zirve üstünde kapanış +13, dip altında −13</li>
+          <li class="muted">Kasım 2026'da her gösterge tek tek test edildi; 20/50 günlük ortalama kesişimi ve endekse göre güç katkı vermediği için çıkarıldı.</li>
         </ul>
         <b>Test kuralları</b>
         <ul>

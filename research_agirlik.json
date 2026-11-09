@@ -1,0 +1,102 @@
+{
+ "rows": [
+  {
+   "yontem": "esit",
+   "egitim_yil": 14.91,
+   "egitim_dd": -14.5,
+   "egitim_sh": 0.48,
+   "test_yil": 45.75,
+   "test_dd": -16.91,
+   "test_sh": 0.92,
+   "tum_yil": 22.76,
+   "tum_dd": -16.91,
+   "tum_sh": 0.63,
+   "hisse_payi": 38,
+   "kurali_gecti": false
+  },
+  {
+   "yontem": "oynaklik (mevcut)",
+   "egitim_yil": 15.25,
+   "egitim_dd": -14.44,
+   "egitim_sh": 0.53,
+   "test_yil": 47.64,
+   "test_dd": -16.73,
+   "test_sh": 1.0,
+   "tum_yil": 23.46,
+   "tum_dd": -16.73,
+   "tum_sh": 0.69,
+   "hisse_payi": 38,
+   "kurali_gecti": false
+  },
+  {
+   "yontem": "oynaklik + puan egimi",
+   "egitim_yil": 16.41,
+   "egitim_dd": -15.92,
+   "egitim_sh": 0.58,
+   "test_yil": 53.12,
+   "test_dd": -18.91,
+   "test_sh": 1.13,
+   "tum_yil": 25.62,
+   "tum_dd": -18.91,
+   "tum_sh": 0.77,
+   "hisse_payi": 43,
+   "kurali_gecti": false
+  },
+  {
+   "yontem": "oynaklik sinir 3x",
+   "egitim_yil": 15.28,
+   "egitim_dd": -14.44,
+   "egitim_sh": 0.53,
+   "test_yil": 47.68,
+   "test_dd": -16.73,
+   "test_sh": 1.01,
+   "tum_yil": 23.49,
+   "tum_dd": -16.73,
+   "tum_sh": 0.7,
+   "hisse_payi": 38,
+   "kurali_gecti": false
+  },
+  {
+   "yontem": "oynaklik temel 1/40",
+   "egitim_yil": 15.76,
+   "egitim_dd": -18.59,
+   "egitim_sh": 0.5,
+   "test_yil": 48.86,
+   "test_dd": -20.7,
+   "test_sh": 0.94,
+   "tum_yil": 24.14,
+   "tum_dd": -20.7,
+   "tum_sh": 0.65,
+   "hisse_payi": 46,
+   "kurali_gecti": false
+  },
+  {
+   "yontem": "oynaklik temel 1/30",
+   "egitim_yil": 15.0,
+   "egitim_dd": -23.73,
+   "egitim_sh": 0.39,
+   "test_yil": 45.08,
+   "test_dd": -25.25,
+   "test_sh": 0.72,
+   "tum_yil": 22.67,
+   "tum_dd": -25.25,
+   "tum_sh": 0.5,
+   "hisse_payi": 54,
+   "kurali_gecti": false
+  },
+  {
+   "yontem": "oynaklik + tek hisse max %3",
+   "egitim_yil": 15.2,
+   "egitim_dd": -14.39,
+   "egitim_sh": 0.53,
+   "test_yil": 47.63,
+   "test_dd": -16.71,
+   "test_sh": 1.0,
+   "tum_yil": 23.42,
+   "tum_dd": -16.71,
+   "tum_sh": 0.69,
+   "hisse_payi": 38,
+   "kurali_gecti": false
+  }
+ ]
+}

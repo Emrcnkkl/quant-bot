@@ -531,6 +531,10 @@ def add_indicators(df: pd.DataFrame, bench_close: pd.Series | None) -> pd.DataFr
 # Bileşen ağırlıkları (maksimum mutlak puan). Toplam = 100.
 W = {"ema200": 15, "ema_cross": 15, "adx": 10, "rsi": 15,
      "macd": 15, "volume": 10, "breakout": 10, "relative": 10}
+# Puana giren bileşenler. 10 Kasım 2026 bileşen testinde (research.py --bilesen) "ema_cross" ve "relative"
+# hem 2006–2020 hem 2021–2026'da katkı vermedi → puandan çıkarıldı (yalnızca gerekçe metninde bilgi olarak kalır).
+# Kalanlar toplamı 100 olacak şekilde ölçeklenir: puan yine −100…+100, eşikler yine ±40.
+ACTIVE = ["ema200", "adx", "rsi", "macd", "volume", "breakout"]
 
 
 def score_frame(d: pd.DataFrame) -> pd.DataFrame:
@@ -566,7 +570,10 @@ def score_frame(d: pd.DataFrame) -> pd.DataFrame:
 
     s["relative"] = (d["rel63"].fillna(0) / 0.15).clip(-1, 1) * W["relative"]
 
-    s["score"] = s[list(W)].sum(axis=1).round(1)
+    scale = 100 / sum(W[k] for k in ACTIVE)
+    for k in ACTIVE:
+        s[k] = s[k] * scale
+    s["score"] = s[ACTIVE].sum(axis=1).round(1)
     return s
 
 
@@ -831,6 +838,20 @@ def run(demo: bool, telegram_test: bool = False) -> None:
     if bench is None:
         sys.exit("XU030 verisi alınamadı; evren seçimi ve portföy testi yapılamıyor.")
 
+    # --- Koruma: Yahoo bazen son günü geç ya da eksik verir. Yeni veri mevcut yayındakinden eskiyse
+    # hiçbir dosyayı değiştirme (site geriye gitmesin) ve hata koduyla dur.
+    if not demo:
+        newest = max(df.index[-1] for df in data.values()).date()
+        try:
+            with open(os.path.join(OUT_DIR, "signals.json"), encoding="utf-8") as f:
+                prev = json.load(f)
+            prev_date = None if prev.get("demo") else prev.get("data_date")
+        except (FileNotFoundError, json.JSONDecodeError):
+            prev_date = None
+        if prev_date and str(newest) < prev_date:
+            sys.exit(f"  ! Yahoo'dan gelen en yeni veri ({newest}) yayındaki veriden ({prev_date}) eski; "
+                     "dosyalar değiştirilmedi. Daha sonra tekrar çalıştırın.")
+
     # --- Evren: her çeyrek işlem hacmine göre en büyük N hisse. Sinyaller bugünkü üyeler için üretilir.
     cand = dedupe(data)
     full_cal = bench.index
@@ -877,7 +898,7 @@ def run(demo: bool, telegram_test: bool = False) -> None:
             "signal": sig,
             "state": state,
             "score_5d_ago": round(float(sc["score"].iloc[-6]), 1),
-            "components": {k: round(float(comp[k]), 1) for k in W},
+            "components": {k: round(float(comp[k]), 1) for k in ACTIVE},
             "rsi": r2(last["rsi"]), "adx": r2(last["adx"]),
             "atr_pct": r2(atr / close * 100),
             "stop": r2(close - CFG["stop_atr"] * atr) if sig != "SAT" else None,

@@ -16,8 +16,9 @@ ve sonuçları statik bir web sayfasında gösteren bir bot. Şu an **Aşama 1**
   (`universe_size=50`, `universe_window=252`); sinyaller bugünkü üyeler için, liste otomatik — elle BIST listesi tutulmuyor.
   Kıyas endeksi XU030 kalır (Yahoo'da XU050 geçmişi yok). Şirket adları `NAMES`, yoksa Yahoo → `names.json`.
 - **Portföy testi (sitedeki rakamlar)**: 2006'dan, noktasal evren, oynaklık ayarlı pozisyon, reel faiz filtresi (+5).
-  Sonuç: model %22.9/yıl, düşüş −%19.7, Sharpe 0.66 · XU030 %17.7, −%64 · büyük 50 al-bekle %20.3, −%67 · faiz %15.5.
-  **Enflasyondan arındırılmış**: model +%3.3/yıl, büyük 50 al-bekle +%1.0, XU030 −%1.2, faiz −%3.0.
+  Sonuç (6 bileşenli puanla, 10 Kasım 2026): model %23.6/yıl, düşüş −%16.7, Sharpe 0.71 · XU030 %17.7, −%64 · büyük 50 al-bekle
+  %20.3, −%67 · faiz %15.5. **Enflasyondan arındırılmış**: model +%3.9/yıl, büyük 50 al-bekle +%1.0, XU030 −%1.2, faiz −%3.0.
+- Veri koruması: Yahoo'dan gelen en yeni veri yayındakinden eskiyse bot hiçbir dosyayı değiştirmeden hata koduyla durur.
 - Modelin değeri getiri değil **düşüş koruması** (2008: endeks −%50, model +%7). Teknik göstergelerle al-bekle'yi getiride
   belirgin geçmek gerçekçi testte mümkün olmadı; aşağıdaki "Araştırma bulguları"na bakmadan yeni kural ekleme.
 - **Canlı model portföy** (`live.json`): 9 Kasım 2026'da 100.000 ₺ ile başladı; her çalıştırmada yalnızca yeni günler eklenir,
@@ -42,6 +43,8 @@ ve sonuçları statik bir web sayfasında gösteren bir bot. Şu an **Aşama 1**
 | Reel faiz filtresi 20 yıl (`research.py --faiz`) | +2.5…+7.5 arası eşikler iyileştiriyor; +5 iki dönemde de | **eklendi** (`real_rate_max=5`) |
 | 30 → 50 hisse | Sharpe 0.34→0.54 (2006–20), 0.73→0.90 (2021–26); 31–50. sıradakilerde de çalışıyor | **eklendi** |
 | Hacim penceresi 3 ay → 12 ay | aynı performans, liste çeyrekte 6.7 yerine 2.9 hisse değişiyor | **12 ay** |
+| Bileşen testi (`research.py --bilesen`) | ema_cross ve relative çıkınca iki dönemde de iyileşiyor; macd, rsi, adx, breakout, volume gerekli; ema200 sınırda | **ema_cross + relative çıkarıldı** (`ACTIVE`) |
+| Ağırlık yöntemleri (`research.py --agirlik`) | puana göre eğim: Sharpe 0.53→0.58 / 1.00→1.13 ama düşüş −16.7→−18.9 (2 puan sınırını az aştı); diğerleri fark yok/kötü | eklenmedi, kullanıcıya soruldu |
 
 ## Dosya yapısı
 ```
@@ -91,17 +94,17 @@ AEFES AKBNK ASELS ASTOR BIMAS EKGYO ENKAI EREGL FROTO GARAN GUBRF ISCTR KCHOL KR
 PETKM PGSUS SAHOL SASA SISE TAVHL TCELL THYAO TOASO TRALT TRMET TTKOM TUPRS VAKBN YKBNK
 Evren `pit_membership` ile otomatik belirlenir; `CANDIDATES` (156 aday) ara ara yeni büyük hisselerle genişletilmeli.
 
-### Skor (−100…+100) — `score_frame()`, ağırlıklar `W` sözlüğünde
+### Skor (−100…+100) — `score_frame()`, ağırlıklar `W`, puana girenler `ACTIVE` (kalanlar ×100/75 ölçeklenir)
 | Bileşen | Puan | Kural |
 |---|---|---|
 | ema200 | ±15 | Kapanış EMA200 üstü/altı |
-| ema_cross | ±15 | EMA20 > / < EMA50 |
+| ema_cross | (±15) | EMA20 > / < EMA50 — **puanda değil** (yalnızca gerekçe metni) |
 | adx | ±10 | DI+/DI− yönü × ADX gücü (ADX 15→0, 30+→tam) |
 | rsi | +15/0/−15/−5/+5 | 55–78 / 45–55 / 25–45 / >78 aşırı alım / <25 aşırı satım |
 | macd | ±15 | Histogram işareti ±10, eğimi ±5 |
 | volume | ±10 | Hacim > 1.5× 20g ort. ise günün yönünde |
 | breakout | ±10 | Dünkü 20g zirve üstü / dip altı kapanış |
-| relative | ±10 | 63g getiri − XU030 63g getirisi, ±%15'te tavan |
+| relative | (±10) | 63g getiri − XU030 63g getirisi — **puanda değil** |
 
 Sinyal: skor ≥ +40 → AL, ≤ −40 → SAT, arası TUT (`CFG["buy_threshold"]`, `CFG["sell_threshold"]`).
 Bilgi amaçlı stop = kapanış − 2.5×ATR, hedef = kapanış + 4×ATR. Pozisyondaysa iz süren stop gösterilir.
@@ -111,7 +114,7 @@ Bilgi amaçlı stop = kapanış − 2.5×ATR, hedef = kapanış + 4×ATR. Pozisy
 - Giriş: skor ≥ 40. Çıkış: skor < 0 (ertesi açılış) **veya** 2.5×ATR iz süren stop gün içinde (fiyat = min(açılış, stop)).
 - Maliyet tek yön %0.10 komisyon + %0.05 kayma.
 - İlk 210 gün ısınma (EMA200). Son %30 örneklem dışı (OOS) ayrı raporlanır.
-- Portföy (`sized_portfolio`): 2006'dan, noktasal evren (her çeyrek önceki 3 ayın TL hacmine göre ilk 30, `pit_membership`); temel pay 1/30,
+- Portföy (`sized_portfolio`): 2006'dan, noktasal evren (her çeyrek son 12 ayın TL hacmine göre ilk 50, `pit_membership`); temel pay 1/50,
   oynaklık ayarlı (× medyan ATR% / hisse ATR%, 1/3–2), toplam ≤ %100; hisseye yalnızca evrendeyken girilir. Sinyal yokken pay nakitte ve **TCMB politika faizi** kazanır (`POLICY_RATES` tablosu, `cash_returns()`, takvim günü bazında bileşik). Verisi kısa olan hissenin payı da o günlerde nakitte. XU030 al-tut ve saf nakit ile kıyaslanır.
 - Sharpe, nakit getirisinin üzerindeki fazla getiriyle hesaplanır (`metrics(..., rf=cash)`); nakdin kendi Sharpe'ı `None`.
 - `state` alanı backtest durum makinesinden gelir: `POZİSYONDA`, `GİRİŞ` (yarın al), `ÇIKIŞ` (yarın sat), `BEKLE`.
@@ -119,7 +122,7 @@ Bilgi amaçlı stop = kapanış − 2.5×ATR, hedef = kapanış + 4×ATR. Pozisy
 ### Tüm ayarlar
 `bot.py` başındaki `CFG` sözlüğü: warmup_days, buy/sell_threshold, exit_score,
 stop_atr, target_atr, commission, slippage, oos_fraction, min_bars, cash_rate_factor (0 = faiz yok), changes_days (30),
-history_start, backtest_start (2006), universe_size (30), vol_sizing (True), vol_cap (2), jump_limit (0.25),
+history_start, backtest_start (2006), universe_size (50), universe_window (252), vol_sizing (True), vol_cap (2), jump_limit (0.25),
 real_rate_max (5.0; None = kapalı; reel faiz bunun üstündeyse yeni alım yok — `entry_allowed()`, `macro_frame()`),
 exit_rule ("score" varsayılan | ema50 | cross | ema200 | regime), entry_rule ("score" | ema200), stop_atr=None → stop yok.
 
@@ -153,7 +156,7 @@ exit_rule ("score" varsayılan | ema50 | cross | ema200 | regime), entry_rule ("
 
 ## Bilinen sınırlamalar
 - Hayatta kalma yanlılığı büyük ölçüde giderildi (noktasal evren); borsadan çıkmış hisselerin Yahoo verisi yok → hafif iyimserlik kalabilir.
-- Hisse bazında tablo (`stocks[]`) ve son işlemler hâlâ bugünkü 30 hisse için (2005'ten).
+- Hisse bazında tablo (`stocks[]`) ve son işlemler bugünkü 50 hisse için (2005'ten, noktasal değil).
 - Nakit getirisi politika faizi kabul ediliyor; gerçekte para piyasası fonu getirisi vergi/masraf nedeniyle biraz düşük olabilir (`cash_rate_factor` ile ayarlanır).
 - Portföy `exposure_pct` metriği anlamlı değil (günlük ortalama getiri ≠ 0 olduğu sürece ~%100 çıkar); sayfada gösterilmiyor.
 - Aynı gün stop olunca o günün kapanışındaki yeni giriş sinyali atlanıyor (küçük etki).
