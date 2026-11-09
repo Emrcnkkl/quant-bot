@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-09T06:15+03:00",
+ "generated_at": "2026-11-09T06:17+03:00",
  "data_date": "2026-11-06",
  "demo": false,
  "universe": "BIST 30 (Ekim-Aralık 2026)",
@@ -8,6 +8,15 @@
   "sell": -40
  },
  "disclaimer": "Buradaki bilgiler algoritmik teknik analiz çıktısıdır; yatırım tavsiyesi değildir. Yatırım danışmanlığı hizmeti, SPK lisanslı kuruluşlar tarafından kişiye özel sunulur.",
+ "regime": {
+  "policy_rate": 38.0,
+  "cpi_yoy": 30.89,
+  "real_rate": 7.11,
+  "policy_date": "2025-12-11",
+  "cpi_month": "2025-12",
+  "filter_max": null,
+  "blocking": false
+ },
  "counts": {
   "AL": 4,
   "TUT": 16,

@@ -9,12 +9,12 @@ skor verip **AL / TUT / SAT** sinyali üreten, geriye dönük test (backtest) ra
 ve sonuçları statik bir web sayfasında gösteren bir bot. Şu an **Aşama 1** tamamlandı.
 
 ## Durum (9 Kasım 2026)
-- `bot.py`, `index.html`, workflow ve README yazıldı.
-- Kod yalnızca **sentetik veriyle** (`python3 bot.py --demo`) test edildi; hem Python 3.10/pandas 2.3
-  hem Python 3.12/pandas 3.0'da hatasız çalışıyor. Sayfa Playwright ile masaüstü ve mobilde kontrol edildi.
-- **Gerçek veriyle henüz hiç çalıştırılmadı** (geliştirme ortamından Yahoo Finance'e erişim yoktu).
-  Klasördeki `signals.json` / `backtest.json` DEMO çıktısıdır (`"demo": true`, sayfada uyarı bandı çıkar).
-  İlk iş: `python3 bot.py` ile gerçek veriyi çalıştırıp çıktıları doğrulamak.
+- Bot gerçek veriyle çalışıyor: GitHub Actions hafta içi 18:40'ta çalışıp JSON'ları commit ediyor; GitHub Pages açık
+  (https://emrcnkkl.github.io/quant-bot/). Repo: Emrcnkkl/quant-bot, ana dal `claude/laughing-dijkstra-j1eqmj`.
+- Cloud oturumları için `quant-bot` ortamı Yahoo Finance hostlarına izinli → `python3 bot.py` oturumdan da çalışır.
+- Algoritma tarafı (nakit faizi, duyarlılık analizi, reel faiz filtresi) tamamlandı; **sıradaki odak web sitesi**.
+- Bulgular: strateji test döneminde endeksle başa baş, düşüşü ~1/3; ama 2024 sonrası faizin gerisinde
+  (`docs/duyarlilik-analizi.md`, `docs/reel-faiz-filtresi.md`).
 
 ## Dosya yapısı
 ```
@@ -83,11 +83,13 @@ Bilgi amaçlı stop = kapanış − 2.5×ATR, hedef = kapanış + 4×ATR. Pozisy
 
 ### Tüm ayarlar
 `bot.py` başındaki `CFG` sözlüğü: history_period, warmup_days, buy/sell_threshold, exit_score,
-stop_atr, target_atr, commission, slippage, oos_fraction, min_bars, cash_rate_factor (0 = faiz yok).
+stop_atr, target_atr, commission, slippage, oos_fraction, min_bars, cash_rate_factor (0 = faiz yok),
+real_rate_max (None = kapalı; reel faiz bunun üstündeyse yeni alım yok — `entry_allowed()`, `macro_frame()`).
+`CPI_YOY`: TÜİK yıllık TÜFE, ay → %; **her ay ekle** (2026 verileri eksik, son Aralık 2025).
 `POLICY_RATES`: (tarih, yıllık %) listesi — **her PPK kararından sonra satır ekle**. 2026 kararları henüz eklenmedi; son satır 2025-12-11 %38.
 
 ## JSON şemaları (index.html bunlara bağımlı — alan adı değiştirirken sayfayı da güncelle)
-**signals.json**: `generated_at, data_date, demo, universe, thresholds{buy,sell}, disclaimer, counts{AL,TUT,SAT}, signals[]`
+**signals.json**: `generated_at, data_date, demo, universe, thresholds{buy,sell}, disclaimer, regime{policy_rate,cpi_yoy,real_rate,policy_date,cpi_month,filter_max,blocking}, counts{AL,TUT,SAT}, signals[]`
 - `signals[]`: `ticker, name, date, close, change_pct, score, signal, state, score_5d_ago, components{ema200,...}, rsi, adx, atr_pct, stop, target, position{entry_date,entry_price,last_price,stop,pnl_pct,days}|null, reasons[]`
 
 **backtest.json**: meta alanları + `settings, period{start,end,oos_start}, portfolio{full,oos,benchmark_full,benchmark_oos,cash_full,cash_oos}, equity_curve[{date,strategy,benchmark,cash}] (haftalık), stocks[{ticker,name,strategy,oos,buy_hold_pct}], recent_trades[]`
@@ -115,7 +117,7 @@ stop_atr, target_atr, commission, slippage, oos_fraction, min_bars, cash_rate_fa
 3. ~~Nakit getirisi~~ — yapıldı (TCMB politika faizi). 2026 PPK kararlarını `POLICY_RATES`'e ekle.
 4. Hayatta kalma yanlılığını azaltmak için geçmiş çeyreklerin BIST30 listeleriyle tarihsel evren.
 5. ~~Duyarlılık analizi~~ — yapıldı (`sensitivity.py`, sonuç `docs/duyarlilik-analizi.md`): sonuç ayarlara duyarsız, ayar oynamak OOS'u iyileştirmiyor, hiçbir ayar OOS'ta faizi geçmiyor → mevcut ayarlar korunuyor.
-6. Haftalık trend filtresi (opsiyonel), rejim filtresi (XU030 EMA200 altındayken yeni giriş yok).
+6. ~~Reel faiz filtresi~~ — kodda var, varsayılan kapalı (`docs/reel-faiz-filtresi.md`). Haftalık trend / XU030 EMA200 rejim filtresi denenmedi.
 7. Sinyal değişimlerinde Telegram bildirimi (yalnızca AL↔TUT↔SAT değişince).
 8. Sayfaya hisse detay grafiği (fiyat + EMA + sinyal noktaları), history.json'dan sinyal geçmişi.
 9. Ocak 2027'de BIST30 listesini güncelle.

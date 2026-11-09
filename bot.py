@@ -71,6 +71,7 @@ CFG = {
     "oos_fraction": 0.30,       # son %30'luk dönem örneklem dışı olarak raporlanır
     "min_bars": 260,
     "cash_rate_factor": 1.0,    # nakit getirisi = politika faizi × bu katsayı (0 -> faiz yok)
+    "real_rate_max": None,      # reel faiz (politika − yıllık TÜFE) bunun üstündeyse yeni alım yok; None = filtre kapalı
 }
 
 # TCMB politika faizi (bir hafta vadeli repo), yıllık %. (yürürlük tarihi, oran)
@@ -90,6 +91,28 @@ POLICY_RATES = [
     ("2025-07-24", 43.00), ("2025-09-11", 40.50), ("2025-10-23", 39.50),
     ("2025-12-11", 38.00),
 ]
+
+# TÜİK yıllık TÜFE (%), ay -> oran. Veri ayın bitiminden ~3 gün sonra açıklanır;
+# ileriye bakmamak için her ay verisi bir sonraki ayın 5'inden itibaren kullanılır.
+# Her ay yeni satır ekleyin. 2026 verileri henüz eklenmedi.
+CPI_YOY = {
+    "2020-09": 11.75, "2020-10": 11.89, "2020-11": 14.03, "2020-12": 14.60,
+    "2021-01": 14.97, "2021-02": 15.61, "2021-03": 16.19, "2021-04": 17.14,
+    "2021-05": 16.59, "2021-06": 17.53, "2021-07": 18.95, "2021-08": 19.25,
+    "2021-09": 19.58, "2021-10": 19.89, "2021-11": 21.31, "2021-12": 36.08,
+    "2022-01": 48.69, "2022-02": 54.44, "2022-03": 61.14, "2022-04": 69.97,
+    "2022-05": 73.50, "2022-06": 78.62, "2022-07": 79.60, "2022-08": 80.21,
+    "2022-09": 83.45, "2022-10": 85.51, "2022-11": 84.39, "2022-12": 64.27,
+    "2023-01": 57.68, "2023-02": 55.18, "2023-03": 50.51, "2023-04": 43.68,
+    "2023-05": 39.59, "2023-06": 38.21, "2023-07": 47.83, "2023-08": 58.94,
+    "2023-09": 61.53, "2023-10": 61.36, "2023-11": 61.98, "2023-12": 64.77,
+    "2024-01": 64.86, "2024-02": 67.07, "2024-03": 68.50, "2024-04": 69.80,
+    "2024-05": 75.45, "2024-06": 71.60, "2024-07": 61.78, "2024-08": 51.97,
+    "2024-09": 49.38, "2024-10": 48.58, "2024-11": 47.09, "2024-12": 44.38,
+    "2025-01": 42.12, "2025-02": 39.05, "2025-03": 38.10, "2025-04": 37.86,
+    "2025-05": 35.41, "2025-06": 35.05, "2025-07": 33.52, "2025-08": 32.95,
+    "2025-09": 33.29, "2025-10": 32.87, "2025-11": 31.07, "2025-12": 30.89,
+}
 
 TR_TZ = timezone(timedelta(hours=3))
 OUT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -296,6 +319,27 @@ def cash_returns(index: pd.DatetimeIndex) -> pd.Series:
     return (1 + prev_rate) ** (gap / 365) - 1
 
 
+def macro_frame(index: pd.DatetimeIndex) -> pd.DataFrame:
+    """Her gün için o gün BİLİNEN politika faizi, son açıklanan yıllık TÜFE ve reel faiz."""
+    rates = pd.Series({pd.Timestamp(k): v for k, v in POLICY_RATES}).sort_index()
+    cpi = pd.Series({pd.Timestamp(k + "-01") + pd.DateOffset(months=1, days=4): v
+                     for k, v in CPI_YOY.items()}).sort_index()
+    out = pd.DataFrame(index=index)
+    for name, s in (("policy", rates), ("cpi", cpi)):
+        out[name] = s.reindex(s.index.union(index)).ffill().reindex(index)
+    out["real"] = out["policy"] - out["cpi"]
+    return out
+
+
+def entry_allowed(index: pd.DatetimeIndex) -> pd.Series:
+    """Reel faiz filtresi: reel faiz eşiğin üstündeyken yeni alım yapılmaz."""
+    lim = CFG["real_rate_max"]
+    if lim is None:
+        return pd.Series(True, index=index)
+    real = macro_frame(index)["real"]
+    return ~(real > lim)          # veri yoksa (NaN) alıma izin ver
+
+
 def backtest(d: pd.DataFrame, sc: pd.Series, cash: pd.Series | None = None) -> dict:
     """
     Long-only. t günü kapanışında skor >= buy_threshold ise t+1 açılışta al.
@@ -306,6 +350,7 @@ def backtest(d: pd.DataFrame, sc: pd.Series, cash: pd.Series | None = None) -> d
     o, h, l, c, atr = (d[k].to_numpy() for k in ("Open", "High", "Low", "Close", "atr"))
     score = sc.to_numpy()
     cash_r = cash.reindex(d.index).fillna(0).to_numpy() if cash is not None else np.zeros(len(d))
+    allow = entry_allowed(d.index).to_numpy()
     n = len(d)
     cost = CFG["commission"] + CFG["slippage"]
     start = CFG["warmup_days"]
@@ -357,7 +402,7 @@ def backtest(d: pd.DataFrame, sc: pd.Series, cash: pd.Series | None = None) -> d
             stop = max(stop, c[i] - CFG["stop_atr"] * atr[i])
             if score[i] < CFG["exit_score"]:
                 pending = "sell"
-        elif score[i] >= CFG["buy_threshold"]:
+        elif score[i] >= CFG["buy_threshold"] and allow[i]:
             pending = "buy"
 
     open_trade = None
@@ -531,13 +576,22 @@ def run(demo: bool) -> None:
         "disclaimer": "Buradaki bilgiler algoritmik teknik analiz çıktısıdır; yatırım tavsiyesi değildir. "
                       "Yatırım danışmanlığı hizmeti, SPK lisanslı kuruluşlar tarafından kişiye özel sunulur.",
     }
-    write("signals.json", {**meta, "counts": counts, "signals": signals})
+    # Makro durum: bugün bilinen politika faizi, son TÜFE ve reel faiz (sayfada bilgi olarak gösterilir)
+    today = pd.DatetimeIndex([pd.Timestamp(meta["data_date"])])
+    mf = macro_frame(today).iloc[0]
+    regime = {
+        "policy_rate": r2(mf["policy"]), "cpi_yoy": r2(mf["cpi"]), "real_rate": r2(mf["real"]),
+        "policy_date": POLICY_RATES[-1][0], "cpi_month": max(CPI_YOY),
+        "filter_max": CFG["real_rate_max"],
+        "blocking": bool(CFG["real_rate_max"] is not None and mf["real"] > CFG["real_rate_max"]),
+    }
+    write("signals.json", {**meta, "regime": regime, "counts": counts, "signals": signals})
 
     write("backtest.json", {
         **meta,
         "settings": {k: CFG[k] for k in ("buy_threshold", "exit_score", "stop_atr",
                                           "commission", "slippage", "oos_fraction",
-                                          "cash_rate_factor")},
+                                          "cash_rate_factor", "real_rate_max")},
         "cash_rate_last_pct": POLICY_RATES[-1][1],
         "cash_rate_last_date": POLICY_RATES[-1][0],
         "period": {"start": str(port.index[0].date()), "end": str(port.index[-1].date()),
