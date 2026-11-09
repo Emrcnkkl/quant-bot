@@ -20,7 +20,7 @@
   --line:rgba(255,255,255,.07);--line2:rgba(255,255,255,.12);--hi:rgba(255,255,255,.06);
   --accent:#4f8cff;--accent2:#19c79a;--grad:linear-gradient(110deg,#4f8cff 0%,#38b2ff 45%,#19c79a 100%);
   --al:#2fd47f;--al-bg:rgba(47,212,127,.11);--sat:#ff5c6c;--sat-bg:rgba(255,92,108,.11);--tut:#f7b84b;--tut-bg:rgba(247,184,75,.11);
-  --strat:#2fd47f;--bench:#4f8cff;--cash:#f7b84b;--e20:#6aa7ff;--e50:#ff9a52;--e200:#c18cff;
+  --strat:#2fd47f;--bench:#4f8cff;--cash:#f7b84b;--uni:#b79cff;--e20:#6aa7ff;--e50:#ff9a52;--e200:#c18cff;
   --warn-bg:rgba(247,184,75,.06);--warn-line:rgba(247,184,75,.32);
   --shadow:0 1px 0 var(--hi) inset,0 24px 60px -24px rgba(0,0,0,.75);
   --glow1:rgba(79,140,255,.16);--glow2:rgba(25,199,154,.11);--grid:rgba(255,255,255,.025);
@@ -32,7 +32,7 @@
   --line:rgba(13,19,28,.08);--line2:rgba(13,19,28,.14);--hi:rgba(255,255,255,.9);
   --accent:#2563eb;--accent2:#059669;--grad:linear-gradient(110deg,#2563eb 0%,#0ea5e9 45%,#059669 100%);
   --al:#0d9a58;--al-bg:#e4f6ed;--sat:#d8334a;--sat-bg:#fdebee;--tut:#b2730f;--tut-bg:#fcf2dd;
-  --strat:#0d9a58;--bench:#2563eb;--cash:#d97706;--e20:#2563eb;--e50:#ea580c;--e200:#9333ea;
+  --strat:#0d9a58;--bench:#2563eb;--cash:#d97706;--uni:#7c3aed;--e20:#2563eb;--e50:#ea580c;--e200:#9333ea;
   --warn-bg:#fffaf0;--warn-line:#f2cf8a;
   --shadow:0 1px 0 var(--hi) inset,0 20px 50px -24px rgba(20,35,70,.18);
   --glow1:rgba(37,99,235,.10);--glow2:rgba(5,150,105,.07);--grid:rgba(13,19,28,.035);
@@ -216,7 +216,8 @@ svg text{fill:var(--muted);font-size:11px;font-family:inherit}
 .sc .rng .seg button{padding:4px 11px;font-size:12px}
 .sc .legend{font-size:12px;margin-left:auto;gap:6px 12px}
 
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:14px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:14px}
+@media(max-width:1000px){.stats{grid-template-columns:1fr 1fr}}
 .stat{position:relative;border-radius:18px;padding:18px 20px;overflow:hidden}
 .stat::before{content:"";position:absolute;inset:0 0 auto;height:2px;background:var(--c)}
 .stat .k{display:flex;align-items:center;gap:8px;font-weight:600;color:var(--ink2);font-size:14px}
@@ -361,7 +362,7 @@ footer p{margin:0 0 8px;max-width:860px}
     <div class="card">
       <div class="chart-head">
         <h3>Portföy eğrisi</h3>
-        <div class="legend"><span><i style="background:var(--strat);color:var(--strat)"></i>Model portföy</span><span><i style="background:var(--bench);color:var(--bench)"></i>BIST30 endeksi</span><span><i style="background:var(--cash);color:var(--cash)"></i>Faiz (politika faizi)</span></div>
+        <div class="legend"><span><i style="background:var(--strat);color:var(--strat)"></i>Model portföy</span><span><i style="background:var(--bench);color:var(--bench)"></i>BIST30 endeksi</span><span><i style="background:var(--cash);color:var(--cash)"></i>Faiz (politika faizi)</span><span title="Bugünkü 30 hisseyi başta alıp hiç satmamak"><i style="background:var(--uni);color:var(--uni)"></i>Aynı 30 hisse al-bekle</span></div>
       </div>
       <div class="chartbox" id="chart"></div>
       <div class="muted small" id="btmeta" style="margin-top:6px"></div>
@@ -431,6 +432,10 @@ footer p{margin:0 0 8px;max-width:860px}
     <details><summary>Bu bir yatırım tavsiyesi mi?</summary><div><p>Hayır. Sayfa bir hobi/araştırma projesidir; kimsenin kişisel durumunu, risk tercihini ya da vergisini bilmez. Yatırım danışmanlığı yalnızca SPK lisanslı kuruluşlarca kişiye özel verilir.</p></div></details>
     <details><summary>AL sinyali gelen hisse kesin yükselir mi?</summary><div><p>Hayır. AL, sadece fiyat hareketinin teknik olarak güçlü göründüğü anlamına gelir. Testte işlemlerin yarısından azı kârla kapandı; model kazancını, kârlı işlemlerin zararlılardan daha büyük olmasından elde ediyor.</p></div></details>
     <details><summary>Model endeksi geçiyor mu?</summary><div id="faq-perf"><p>Yükleniyor…</p></div></details>
+    <details id="sss-yanlilik"><summary>Geçmiş rakamlar neden olduğundan iyi görünüyor?</summary><div>
+      <p>Test, bugün BIST 30'da olan hisselerle yapılıyor. Ama bu hisseler bugün listede, çünkü geçmişte değerlendiler; geçmişte listede olup sonra düşen ya da borsadan çıkan şirketler testte yok. Buna "hayatta kalma yanlılığı" denir.</p>
+      <p>Etkisi büyük: bugünkü 30 hisseyi 2009'dan beri eşit ağırlıkla tutmak, gerçek BIST30 endeksinden yılda yaklaşık 15 puan fazla getiri gösteriyor. Bu yüzden modeli değerlendirirken en adil kıyas "aynı 30 hisseyi al-bekle"dir; gerçekte elde edilecek getiri muhtemelen testteki rakamlardan düşüktür.</p>
+    </div></details>
     <details><summary>"Faiz ortamı" kutusu ne anlatıyor?</summary><div><p>Reel faiz = politika faizi − yıllık enflasyon. Pozitifse paranızı faizde tutmak enflasyonun üstünde getiri sağlar; bu dönemlerde hisseler cazibesini yitirebilir. Son 5 yılda reel faiz negatifken hisseler, pozitifken faiz daha çok kazandırdı. Bu bilgi sinyalleri değiştirmez, sadece bağlam verir.</p></div></details>
     <details><summary>Ne sıklıkla güncelleniyor?</summary><div><p>Her iş günü 18:40'ta, borsa kapandıktan sonra otomatik olarak. Sayfanın üstündeki tarih son verinin günüdür.</p></div></details>
     <details><summary>Veriler nereden geliyor?</summary><div><p>Hisse ve endeks fiyatları Yahoo Finance'ten, politika faizi ve enflasyon TCMB'nin sitesinden alınır. Veri kaynaklarında zaman zaman eksik gün veya hata olabilir.</p></div></details>
@@ -500,18 +505,20 @@ function renderHero() {
   $("#bugun .hero .top").insertAdjacentHTML("beforeend", `<span class="tag" title="Sıradaki güncelleme: ${nextUpdate()}"><span class="dot"></span>${trDate(S.data_date)} ${wd} kapanışı</span>`);
   $("#livetxt").textContent = new Date(S.data_date + "T00:00:00").toLocaleDateString("tr-TR", {day: "numeric", month: "short"}).toLocaleUpperCase("tr-TR");
   $("#h-delta").innerHTML = `<span class="${gain >= 0 ? "pos" : "neg"}">${gain >= 0 ? "↗ +" : "↘ "}%${fmt(ret, 0)} (${gain >= 0 ? "+" : ""}${tl(gain)})</span>`;
-  $("#h-sub").innerHTML = `${trDate(B.period.start)} tarihinde 100.000 ₺ ile başlansaydı · yaklaşık ${fmt(yrs, 1)} yıl, yıllık %${fmt(B.portfolio.full.cagr_pct, 0)}<br>Aynı parayla BIST30 endeksi alınsaydı veya faize yatırılsaydı:`;
+  $("#h-sub").innerHTML = `${trDate(B.period.start)} tarihinde 100.000 ₺ ile başlansaydı · yaklaşık ${fmt(yrs, 1)} yıl, yıllık %${fmt(B.portfolio.full.cagr_pct, 0)}<br>Aynı parayla şunlar yapılsaydı:`;
   $("#h-chips").innerHTML =
+    (last.universe ? `<span class="chip" title="Modelin seçtiği 30 hissenin hepsini başta alıp hiç satmamak"><i style="background:var(--uni);color:var(--uni)"></i>Aynı 30 hisseyi al-bekle <b>${tl(START * last.universe)}</b></span>` : "") +
     `<span class="chip"><i style="background:var(--bench);color:var(--bench)"></i>BIST30 al-bekle <b>${tl(START * last.benchmark)}</b></span>` +
     `<span class="chip"><i style="background:var(--cash);color:var(--cash)"></i>Faiz <b>${tl(START * last.cash)}</b></span>` +
     `<span class="chip">En büyük düşüş: model <b>${pct(B.portfolio.full.max_drawdown_pct, 0)}</b></span>` +
     `<span class="chip">endeks <b>${pct(B.portfolio.benchmark_full?.max_drawdown_pct, 0)}</b></span>`;
+  $("#h-chips").insertAdjacentHTML("afterend", `<p class="small muted" style="margin:18px auto 0;max-width:640px">⚠︎ Test bugünkü BIST30 listesiyle yapıldı. Bu hisseler geçmişte yükseldikleri için bugün listede; bu yüzden geçmiş rakamlar olduğundan iyi görünür. <a href="#sss-yanlilik">Neden?</a></p>`);
   if (S.demo) $("#demo").innerHTML = `<div class="warn demo"><div><b>DEMO verisi:</b> Bu sayfa şu an gerçek olmayan, rastgele üretilmiş fiyatlarla çalışıyor.</div></div>`;
   $("#disc").innerHTML = `<b>Yasal uyarı:</b> ${S.disclaimer} Geçmiş performans gelecekteki sonuçların göstergesi değildir.`;
   $("#meta").textContent = `Son veri: ${trDate(S.data_date)} kapanışı · sayfa güncellendi ${new Date(S.generated_at).toLocaleString("tr-TR", {dateStyle: "medium", timeStyle: "short"})} · ${S.universe} · Fiyat: Yahoo Finance · Faiz ve enflasyon: TCMB`;
   // SSS: dürüst performans özeti
   const y = (B.yearly || []).filter(r => !r.partial), beatIdx = y.filter(r => r.strategy > r.benchmark).length;
-  $("#faq-perf").innerHTML = `<p>Tüm dönemde hayır: model ${pct(B.portfolio.full.total_return_pct, 0)}, BIST30 ${pct(B.portfolio.benchmark_full?.total_return_pct, 0)} getirdi. Fark çoğunlukla 2022–2023'teki güçlü yükselişten geliyor; model zamanının yaklaşık yarısında piyasa dışında kalıyor.</p>
+  $("#faq-perf").innerHTML = `<p>Tüm dönemde hayır: model ${pct(B.portfolio.full.total_return_pct, 0)}, BIST30 endeksi ${pct(B.portfolio.benchmark_full?.total_return_pct, 0)}, aynı 30 hisseyi al-bekle ${pct(B.portfolio.universe_full?.total_return_pct, 0)} getirdi. Fark çoğunlukla 2022–2023'teki güçlü yükselişten geliyor; model zamanının yaklaşık yarısında piyasa dışında kalıyor.</p>
     <p>Tam yılların ${y.length}'ünün ${beatIdx}'ünde endeksi geçti ve düşüşleri belirgin şekilde daha küçük. Ama faizin yüksek olduğu son yıllarda hem model hem endeks faizin gerisinde kaldı. Ayrıntılar <a href="#performans">Performans</a> bölümünde.</p>`;
 }
 
@@ -727,7 +734,7 @@ function renderBacktest() {
 
 function renderStats() {
   const P = B.portfolio, oos = period === "oos";
-  const sets = [["Model portföy", "var(--strat)", oos ? P.oos : P.full], ["BIST30 al-bekle", "var(--bench)", oos ? P.benchmark_oos : P.benchmark_full], ["Faiz", "var(--cash)", oos ? P.cash_oos : P.cash_full]];
+  const sets = [["Model portföy", "var(--strat)", oos ? P.oos : P.full], ["BIST30 al-bekle", "var(--bench)", oos ? P.benchmark_oos : P.benchmark_full], ["Aynı 30 hisse al-bekle", "var(--uni)", oos ? P.universe_oos : P.universe_full], ["Faiz", "var(--cash)", oos ? P.cash_oos : P.cash_full]];
   $("#perdesc").textContent = oos ? `${trDate(B.period.oos_start)} – ${trDate(B.period.end)}` : `${trDate(B.period.start)} – ${trDate(B.period.end)}`;
   $("#stats").innerHTML = sets.map(([n, c, m]) => !m ? "" : `<div class="stat" style="--c:${c}">
     <div class="k"><i style="background:${c};color:${c}"></i>${n}</div>
@@ -741,7 +748,7 @@ function renderStats() {
 
 function renderYearly(rows) {
   const short = iso => new Date(iso + "T00:00:00").toLocaleDateString("tr-TR", {day: "numeric", month: "short"});
-  const cols = [["strategy", "Model"], ["benchmark", "BIST30"], ["cash", "Faiz"]];
+  const cols = [["strategy", "Model"], ["benchmark", "BIST30 endeksi"], ["universe", "30 hisse al-bekle"], ["cash", "Faiz"]].filter(([k]) => rows.some(r => r[k] != null));
   const wins = Object.fromEntries(cols.map(([k]) => [k, 0]));
   const body = rows.map(r => {
     const best = cols.map(([k]) => r[k]).filter(v => v != null).reduce((a, b) => Math.max(a, b), -Infinity);
@@ -751,14 +758,14 @@ function renderYearly(rows) {
       `<td>${r.strategy != null && r.benchmark != null ? pct(r.strategy - r.benchmark) : "–"}</td></tr>`;
   }).join("");
   $("#yearly").innerHTML = `<thead><tr><th>Yıl</th>${cols.map(([, n]) => `<th>${n}</th>`).join("")}<th title="Modelin endekse göre farkı (puan)">Model − BIST30</th></tr></thead><tbody>${body}</tbody>` +
-    `<tfoot><tr><td class="muted small" colspan="5" style="text-align:left;white-space:normal">Tam yıllarda birinci: ` +
+    `<tfoot><tr><td class="muted small" colspan="${cols.length + 2}" style="text-align:left;white-space:normal">Tam yıllarda birinci: ` +
     cols.map(([k, n]) => `${n} <b>${wins[k]}</b>`).join(" · ") + `</td></tr></tfoot>`;
 }
 
 function drawChart(c, oos) {
   const box = $("#chart");
   const W = Math.max(300, box.clientWidth), H = W < 560 ? 240 : 320, L = 62, R = 10, T = 12, Bm = 26;
-  const vals = c.flatMap(p => [p.strategy, p.benchmark, p.cash]).filter(v => v != null);
+  const vals = c.flatMap(p => [p.strategy, p.benchmark, p.cash, p.universe]).filter(v => v != null);
   const lo = Math.log(Math.min(...vals) * .95), hi = Math.log(Math.max(...vals) * 1.05);
   const x = i => L + i / (c.length - 1) * (W - L - R), y = v => T + (1 - (Math.log(v) - lo) / (hi - lo)) * (H - T - Bm);
   const path = k => c.map((p, i) => p[k] == null ? "" : `${i ? "L" : "M"}${x(i).toFixed(1)},${y(p[k]).toFixed(1)}`).join("");
@@ -783,6 +790,7 @@ function drawChart(c, oos) {
     <path d="${area}" fill="url(#ga)"/>
     ${oi > 0 ? `<rect x="${x(oi)}" y="${T}" width="${W - R - x(oi)}" height="${H - T - Bm}" fill="var(--accent)" opacity=".06"/><text x="${x(oi) + 8}" y="${T + 14}">test dönemi</text>` : ""}
     <path d="${path("cash")}" fill="none" stroke="var(--cash)" stroke-width="2" stroke-dasharray="6 4"/>
+    <path d="${path("universe")}" fill="none" stroke="var(--uni)" stroke-width="1.6" stroke-dasharray="2 3"/>
     <path d="${path("benchmark")}" fill="none" stroke="var(--bench)" stroke-width="2"/>
     <path d="${path("strategy")}" fill="none" stroke="var(--strat)" stroke-width="2.6" filter="url(#gl)"/>
     <line class="cur" x1="0" x2="0" y1="${T}" y2="${H - Bm}" stroke="var(--muted)" stroke-dasharray="2 3" visibility="hidden"/>
@@ -790,7 +798,7 @@ function drawChart(c, oos) {
   </svg><div class="tip"></div>`;
   hover(box, x, c.length, (k, tip) => {
     const p = c[k];
-    tip.innerHTML = `<b>${trDate(p.date)}</b><br><i style="background:var(--strat)"></i>Model <b>${tl(p.strategy * START)}</b><br><i style="background:var(--bench)"></i>BIST30 <b>${p.benchmark ? tl(p.benchmark * START) : "–"}</b><br><i style="background:var(--cash)"></i>Faiz <b>${tl(p.cash * START)}</b>`;
+    tip.innerHTML = `<b>${trDate(p.date)}</b><br><i style="background:var(--strat)"></i>Model <b>${tl(p.strategy * START)}</b><br><i style="background:var(--bench)"></i>BIST30 <b>${p.benchmark ? tl(p.benchmark * START) : "–"}</b><br><i style="background:var(--cash)"></i>Faiz <b>${tl(p.cash * START)}</b>${p.universe ? `<br><i style="background:var(--uni)"></i>30 hisse al-bekle <b>${tl(p.universe * START)}</b>` : ""}`;
   }, W);
 }
 

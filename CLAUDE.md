@@ -19,6 +19,7 @@ ve sonuçları statik bir web sayfasında gösteren bir bot. Şu an **Aşama 1**
   üstte sabit menü (Bugün / Sinyaller / Performans / Nasıl çalışır / SSS), "yatırım tavsiyesi değildir" bandı,
   "100.000 ₺ ile başlasaydı" özet kartı (endeks ve faizle dürüst kıyas), sade dil (Puan, Zarar-kes, modelde...).
   Tasarım referansı kullanıcının diğer projesi (emrcnkkl.github.io/anlik_bot).
+- Sitede "aynı 30 hisseyi al-bekle" (`universe`) kıyası ve hayatta kalma yanlılığı uyarısı (hero notu + SSS `#sss-yanlilik`) var.
 - Sinyal geçmişi: "Son sinyal değişiklikleri" (Sinyaller bölümü, `#gecmis`) — son 30 işlem günündeki AL/TUT/SAT geçişleri,
   geçmiş fiyatlardan yeniden hesaplanır (`signal_changes()`); history.json'a bağlı değil.
 - Bulgular: strateji test döneminde endeksle başa baş, düşüşü ~1/3; ama 2024 sonrası faizin gerisinde
@@ -113,7 +114,7 @@ exit_rule ("score" varsayılan | ema50 | cross | ema200 | regime), entry_rule ("
 - `changes[]`: `date, ticker, name, from, to, score, close, since_pct` (yeniden eskiye)
 - `signals[]`: `ticker, name, date, close, change_pct, score, signal, state, score_5d_ago, components{ema200,...}, rsi, adx, atr_pct, stop, target, position{entry_date,entry_price,last_price,stop,pnl_pct,days}|null, reasons[]`
 
-**backtest.json**: meta alanları + `settings, period{start,end,oos_start}, portfolio{full,oos,benchmark_full,benchmark_oos,cash_full,cash_oos}, equity_curve[{date,strategy,benchmark,cash}] (haftalık), yearly[{year,from,to,partial,strategy,benchmark,cash}], stocks[{ticker,name,strategy,oos,buy_hold_pct}], recent_trades[]`
+**backtest.json**: meta alanları + `settings, period{start,end,oos_start}, portfolio{full,oos,benchmark_full,benchmark_oos,cash_full,cash_oos}, portfolio{...,universe_full,universe_oos}, equity_curve[{date,strategy,benchmark,cash,universe}] (haftalık), yearly[{year,from,to,partial,strategy,benchmark,cash,universe}], stocks[{ticker,name,strategy,oos,buy_hold_pct}], recent_trades[]`
 - metrik alanları (`metrics()`): `total_return_pct, cagr_pct, sharpe, max_drawdown_pct, exposure_pct` (+ işlem listesi verilirse `trades, win_rate_pct, avg_trade_pct, profit_factor, avg_days`)
 
 **history.json**: `[{date, signals: {TICKER: [signal, score, close]}}]`

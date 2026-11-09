@@ -605,6 +605,7 @@ def run(demo: bool) -> None:
 
     signals, per_stock, all_daily, recent_trades = [], [], {}, []
     changes, change_dates = [], set()
+    uni_daily = {}          # aynı hisselerin al-bekle günlük getirisi (adil kıyas)
     oos_daily = {}
 
     for t in tickers:
@@ -652,6 +653,7 @@ def run(demo: bool) -> None:
 
         daily = bt["daily"]
         all_daily[t] = daily
+        uni_daily[t] = d["Close"].pct_change().reindex(daily.index)
         split = int(len(daily) * (1 - CFG["oos_fraction"]))
         oos_start = daily.index[split]
         oos_daily[t] = daily.iloc[split:]
@@ -677,6 +679,9 @@ def run(demo: bool) -> None:
     port_df = pd.DataFrame(all_daily)
     cash = cash_returns(port_df.index)
     port = port_df.apply(lambda col: col.fillna(cash)).mean(axis=1)
+    # Aynı hisse evreninin eşit ağırlıklı al-bekle'si. Bugünkü BIST30 listesi geçmişte yükselmiş hisselerden
+    # oluştuğu için XU030'dan çok daha iyi görünür; stratejinin adil kıyası budur.
+    uni = pd.DataFrame(uni_daily).reindex(port.index).apply(lambda col: col.fillna(cash)).mean(axis=1)
     split = int(len(port) * (1 - CFG["oos_fraction"]))
     port_eq = (1 + port).cumprod()
     bench_eq = None
@@ -684,10 +689,11 @@ def run(demo: bool) -> None:
         b = bench_close.reindex(port.index).ffill()
         bench_eq = b / b.iloc[0]
     cash_eq = (1 + cash).cumprod()
+    uni_eq = (1 + uni).cumprod()
     weekly = port_eq.resample("W-FRI").last()
     curve = [{"date": str(i.date()), "strategy": round(float(v), 4),
               "benchmark": round(float(bench_eq.asof(i)), 4) if bench_eq is not None else None,
-              "cash": round(float(cash_eq.asof(i)), 4)}
+              "cash": round(float(cash_eq.asof(i)), 4), "universe": round(float(uni_eq.asof(i)), 4)}
              for i, v in weekly.items()]
 
     now = datetime.now(TR_TZ)
@@ -734,9 +740,11 @@ def run(demo: bool) -> None:
             # Nakdin oynaklığı ~0 olduğu için Sharpe anlamsız -> None
             "cash_full": {**metrics(cash), "sharpe": None},
             "cash_oos": {**metrics(cash.iloc[split:]), "sharpe": None},
+            "universe_full": metrics(uni, rf=cash),
+            "universe_oos": metrics(uni.iloc[split:], rf=cash),
         },
         "equity_curve": curve,
-        "yearly": yearly_table(port, bench_eq.pct_change().fillna(0) if bench_eq is not None else None, cash),
+        "yearly": yearly_table(port, bench_eq.pct_change().fillna(0) if bench_eq is not None else None, cash, uni),
         "stocks": sorted(per_stock, key=lambda x: -(x["strategy"].get("total_return_pct") or 0)),
         "recent_trades": sorted(recent_trades, key=lambda x: x["exit_date"], reverse=True)[:40],
     })
@@ -782,7 +790,7 @@ def signal_changes(t: str, d: pd.DataFrame, score: pd.Series) -> list[dict]:
     return out
 
 
-def yearly_table(port: pd.Series, bench: pd.Series | None, cash: pd.Series) -> list[dict]:
+def yearly_table(port: pd.Series, bench: pd.Series | None, cash: pd.Series, uni: pd.Series | None = None) -> list[dict]:
     """Takvim yılı bazında strateji / XU030 / nakit getirisi (%). Eksik yıllar `partial` işaretli."""
     out = []
     for year, p in port.groupby(port.index.year):
@@ -791,7 +799,7 @@ def yearly_table(port: pd.Series, bench: pd.Series | None, cash: pd.Series) -> l
         out.append({
             "year": int(year), "from": str(p.index[0].date()), "to": str(p.index[-1].date()),
             "partial": bool(p.index[0].month > 1 or p.index[0].day > 10 or p.index[-1].month < 12),
-            "strategy": ret(p), "benchmark": ret(bench), "cash": ret(cash),
+            "strategy": ret(p), "benchmark": ret(bench), "cash": ret(cash), "universe": ret(uni),
         })
     return out
 
