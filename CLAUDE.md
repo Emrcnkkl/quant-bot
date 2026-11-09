@@ -24,7 +24,7 @@ YENİ PROJE/
 ├── bot.py             # tüm mantık: veri, indikatörler, skor, backtest, JSON yazımı (tek dosya)
 ├── index.html         # tek dosyalık statik sayfa (inline CSS/JS, kütüphane yok); JSON'ları fetch eder
 ├── requirements.txt   # yfinance, pandas, numpy
-├── bot.yml            # GitHub Actions workflow — repoda .github/workflows/bot.yml yoluna taşınmalı
+├── .github/workflows/bot.yml  # GitHub Actions workflow
 ├── signals.json       # güncel sinyaller (bot üretir)
 ├── backtest.json      # backtest raporu (bot üretir)
 └── history.json       # günlük sinyal geçmişi (yalnızca gerçek veriyle çalışınca oluşur/eklenir, son 500 gün)
@@ -107,7 +107,7 @@ stop_atr, target_atr, commission, slippage, oos_fraction, min_bars.
 
 ## Sıradaki adımlar
 1. **Gerçek veriyle ilk çalıştırma** — `python3 bot.py`; eksik/hatalı hisse var mı, skor dağılımı makul mü (hepsi TUT ya da hepsi AL değil mi), backtest sayıları mantıklı mı kontrol et.
-2. GitHub reposu + GitHub Pages kurulumu; `bot.yml`'i `.github/workflows/` altına taşı, Actions'a yazma izni ver, `workflow_dispatch` ile manuel test et.
+2. GitHub Pages kurulumu; Actions'a yazma izni ver (Settings → Actions → General → Read and write), `workflow_dispatch` ile manuel test et. Repo: Emrcnkkl/quant-bot.
 3. Nakit getirisi (örn. TCMB politika faizi / para piyasası fonu) ile portföy backtest'ini düzelt.
 4. Hayatta kalma yanlılığını azaltmak için geçmiş çeyreklerin BIST30 listeleriyle tarihsel evren.
 5. Eşik/parametre duyarlılık analizi (örn. AL eşiği 30/40/50, stop 2/2.5/3 ATR) — optimizasyon değil, sağlamlık kontrolü.

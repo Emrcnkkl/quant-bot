@@ -10,7 +10,7 @@ BIST 30 hisseleri için günlük veriyle çoklu indikatör skoru hesaplar, AL / 
 | `signals.json` | Güncel sinyaller |
 | `backtest.json` | Geçmiş performans raporu |
 | `history.json` | Günlük sinyal geçmişi (gerçek veriyle her çalıştırmada eklenir) |
-| `bot.yml` | GitHub Actions: hafta içi 18:40'ta otomatik çalıştırma. Repoda `.github/workflows/bot.yml` yoluna taşıyın |
+| `.github/workflows/bot.yml` | GitHub Actions: hafta içi 18:40'ta otomatik çalıştırma (Actions sekmesinden elle de başlatılabilir) |
 
 ## Çalıştırma (Mac Terminal)
 ```bash
