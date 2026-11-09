@@ -1,26 +1,49 @@
 name: BIST30 sinyal botu
 on:
   schedule:
-    - cron: "40 15 * * 1-5"   # Hafta içi 18:40 (TR) - seans kapanışından sonra
-  workflow_dispatch:
+    # Hafta içi her gün, seans kapanışından sonra (saatler UTC; TR = UTC+3).
+    # GitHub zamanlanmış görevleri geciktirebilir ya da atlayabilir; bu yüzden iki yedek saat var.
+    # O günün verisi zaten alınmışsa yedek çalıştırmalar hiçbir şey yapmadan biter.
+    - cron: "40 15 * * 1-5"   # 18:40 TR (asıl)
+    - cron: "25 16 * * 1-5"   # 19:25 TR (yedek)
+    - cron: "10 18 * * 1-5"   # 21:10 TR (yedek)
+  workflow_dispatch:           # Actions sekmesinden elle başlatma
 permissions:
   contents: write
+concurrency:
+  group: bist30-bot
+  cancel-in-progress: false
 jobs:
   run:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+      - name: Bugünün verisi zaten var mı?
+        id: check
+        run: |
+          today=$(TZ=Europe/Istanbul date +%F)
+          have=$(python3 -c "import json;print(json.load(open('signals.json'))['data_date'])" 2>/dev/null || echo yok)
+          echo "Bugün: $today · son veri: $have · tetikleyen: ${{ github.event_name }}"
+          if [ "${{ github.event_name }}" = "schedule" ] && [ "$have" = "$today" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "Bugünün verisi zaten alınmış, atlanıyor."
+          fi
       - uses: actions/setup-python@v6
+        if: steps.check.outputs.skip != 'true'
         with:
           python-version: "3.11"
-      - run: pip install -r requirements.txt
-      - run: python bot.py
+      - if: steps.check.outputs.skip != 'true'
+        run: pip install -r requirements.txt
+      - if: steps.check.outputs.skip != 'true'
+        run: python bot.py
       - name: Sonuçları kaydet
+        if: steps.check.outputs.skip != 'true'
         run: |
           git config user.name "bist30-bot"
           git config user.email "bot@users.noreply.github.com"
           git add signals.json backtest.json history.json stocks/
-          git diff --staged --quiet || git commit -m "Sinyaller güncellendi: $(date +'%Y-%m-%d')"
-          git push
-
-          
+          if git diff --staged --quiet; then echo "Değişiklik yok"; exit 0; fi
+          git commit -m "Sinyaller güncellendi: $(TZ=Europe/Istanbul date +'%Y-%m-%d %H:%M')"
+          # Bu sırada depoya başka bir değişiklik gönderildiyse önce onu al
+          for i in 1 2 3; do git pull --rebase -X theirs && git push && exit 0; sleep 5; done
+          exit 1

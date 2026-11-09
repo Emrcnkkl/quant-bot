@@ -61,7 +61,7 @@ python3 -m http.server   # http://localhost:8000 — index.html file:// ile aç�
 | Strateji tipi | Çoklu indikatör birleşik skoru (tek strateji, parametre optimizasyonu YOK — aşırı uyumdan kaçınmak için) |
 | Yön | Sadece long (açığa satış yok). SAT = çık / uzak dur anlamında |
 | Çıktılar | Python bot + signals.json, backtest raporu, basit web sayfası |
-| Otomasyon | GitHub Actions, hafta içi 18:40 TR (`40 15 * * 1-5` UTC), JSON'ları repoya commit eder |
+| Otomasyon | GitHub Actions, hafta içi 18:40 TR (`40 15 * * 1-5` UTC) + yedek 19:25 ve 21:10; o günün verisi varsa yedekler atlanır. JSON'ları repoya commit eder (push öncesi `pull --rebase`) |
 | Hukuki | Her çıktıda "yatırım tavsiyesi değildir" uyarısı (SPK); disclaimer metni `bot.py` → `meta["disclaimer"]` |
 
 ### Evren — BIST 30 (1 Ekim–31 Aralık 2026 dönemi)
