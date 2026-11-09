@@ -19,7 +19,7 @@ ve sonuçları statik bir web sayfasında gösteren bir bot. Şu an **Aşama 1**
   üstte sabit menü (Bugün / Sinyaller / Performans / Nasıl çalışır / SSS), "yatırım tavsiyesi değildir" bandı,
   "100.000 ₺ ile başlasaydı" özet kartı (endeks ve faizle dürüst kıyas), sade dil (Puan, Zarar-kes, modelde...).
   Tasarım referansı kullanıcının diğer projesi (emrcnkkl.github.io/anlik_bot).
-- Sitede "aynı 30 hisseyi al-bekle" (`universe`) kıyası ve hayatta kalma yanlılığı uyarısı (hero notu + SSS `#sss-yanlilik`) var.
+- Sitede "büyük 30 hisse al-bekle" (`universe`, noktasal evren) kıyası ve yanlılık açıklaması (SSS `#sss-yanlilik`) var.
 - Sinyal geçmişi: "Son sinyal değişiklikleri" (Sinyaller bölümü, `#gecmis`) — son 30 işlem günündeki AL/TUT/SAT geçişleri,
   geçmiş fiyatlardan yeniden hesaplanır (`signal_changes()`); history.json'a bağlı değil.
 - Bulgular: strateji test döneminde endeksle başa baş, düşüşü ~1/3; ama 2024 sonrası faizin gerisinde
@@ -31,7 +31,11 @@ ve sonuçları statik bir web sayfasında gösteren bir bot. Şu an **Aşama 1**
   düşüş −%41 — yanlılıktan en çok etkilenecek strateji.
 - Noktasal evren (`research.py --pit`; 156 aday, her çeyrek TL hacme göre ilk 30, gerçek BIST30 ile 25/30 örtüşme): evren al-bekle %25.9
   vs XU030 %23.4 → yanlılık büyük ölçüde temizlendi. Momentum rotasyonu %26–27 / düşüş −%50–58 → avantajı yanlılıktı, eklenmedi.
-  Mevcut strateji %21 / −%24: Sharpe al-bekle ile aynı, **değeri düşüş koruması**. Bot ayarları değişmedi.
+  Mevcut strateji %21 / −%24: Sharpe al-bekle ile aynı, **değeri düşüş koruması**.
+- Oynaklığa göre pozisyon büyüklüğü iki dönemde de iyileştirdi → `vol_sizing=True`. Payı büyütmek (1.5×+) işe yaramadı.
+- **Botun portföy testi artık noktasal evrenle, 2006'dan** (`CANDIDATES` 156 hisse, `pit_membership`, `sized_portfolio`):
+  model %20.0/yıl, düşüş −%24.5 · XU030 %17.7, −%64 · büyük 30 al-bekle %18.5, −%68 · faiz %15.5.
+  Sinyaller (signals.json) hâlâ bugünkü BIST30 listesi için.
 
 ## Dosya yapısı
 ```
@@ -66,7 +70,7 @@ python3 -m http.server   # http://localhost:8000 — index.html file:// ile aç�
 | Konu | Karar |
 |---|---|
 | Zaman dilimi | Günlük mumlar |
-| Veri kaynağı | yfinance, semboller `XXXXX.IS`, `auto_adjust=True`, 6 yıl; benchmark `XU030.IS` |
+| Veri kaynağı | yfinance, semboller `XXXXX.IS`, `auto_adjust=True`, 2004'ten (2005 öncesi atılır, `fix_jumps`); benchmark `XU030.IS`; ~157 seri, Actions'ta ~1–2 dk |
 | Strateji tipi | Çoklu indikatör birleşik skoru (tek strateji, parametre optimizasyonu YOK — aşırı uyumdan kaçınmak için) |
 | Yön | Sadece long (açığa satış yok). SAT = çık / uzak dur anlamında |
 | Çıktılar | Python bot + signals.json, backtest raporu, basit web sayfası |
@@ -99,13 +103,15 @@ Bilgi amaçlı stop = kapanış − 2.5×ATR, hedef = kapanış + 4×ATR. Pozisy
 - Giriş: skor ≥ 40. Çıkış: skor < 0 (ertesi açılış) **veya** 2.5×ATR iz süren stop gün içinde (fiyat = min(açılış, stop)).
 - Maliyet tek yön %0.10 komisyon + %0.05 kayma.
 - İlk 210 gün ısınma (EMA200). Son %30 örneklem dışı (OOS) ayrı raporlanır.
-- Portföy: 30 hisseye eşit 1/N, sinyal yokken pay nakitte ve **TCMB politika faizi** kazanır (`POLICY_RATES` tablosu, `cash_returns()`, takvim günü bazında bileşik). Verisi kısa olan hissenin payı da o günlerde nakitte. XU030 al-tut ve saf nakit ile kıyaslanır.
+- Portföy (`sized_portfolio`): 2006'dan, noktasal evren (her çeyrek önceki 3 ayın TL hacmine göre ilk 30, `pit_membership`); temel pay 1/30,
+  oynaklık ayarlı (× medyan ATR% / hisse ATR%, 1/3–2), toplam ≤ %100; hisseye yalnızca evrendeyken girilir. Sinyal yokken pay nakitte ve **TCMB politika faizi** kazanır (`POLICY_RATES` tablosu, `cash_returns()`, takvim günü bazında bileşik). Verisi kısa olan hissenin payı da o günlerde nakitte. XU030 al-tut ve saf nakit ile kıyaslanır.
 - Sharpe, nakit getirisinin üzerindeki fazla getiriyle hesaplanır (`metrics(..., rf=cash)`); nakdin kendi Sharpe'ı `None`.
 - `state` alanı backtest durum makinesinden gelir: `POZİSYONDA`, `GİRİŞ` (yarın al), `ÇIKIŞ` (yarın sat), `BEKLE`.
 
 ### Tüm ayarlar
 `bot.py` başındaki `CFG` sözlüğü: history_period, warmup_days, buy/sell_threshold, exit_score,
 stop_atr, target_atr, commission, slippage, oos_fraction, min_bars, cash_rate_factor (0 = faiz yok), changes_days (30),
+history_start, backtest_start (2006), universe_size (30), vol_sizing (True), vol_cap (2), jump_limit (0.25),
 real_rate_max (None = kapalı; reel faiz bunun üstündeyse yeni alım yok — `entry_allowed()`, `macro_frame()`),
 exit_rule ("score" varsayılan | ema50 | cross | ema200 | regime), entry_rule ("score" | ema200), stop_atr=None → stop yok.
 
@@ -136,7 +142,8 @@ exit_rule ("score" varsayılan | ema50 | cross | ema200 | regime), entry_rule ("
 - Sayılar `tr-TR` formatında gösterilir.
 
 ## Bilinen sınırlamalar
-- **Hayatta kalma yanlılığı**: backtest bugünkü BIST30 listesiyle yapılıyor.
+- Hayatta kalma yanlılığı büyük ölçüde giderildi (noktasal evren); borsadan çıkmış hisselerin Yahoo verisi yok → hafif iyimserlik kalabilir.
+- Hisse bazında tablo (`stocks[]`) ve son işlemler hâlâ bugünkü 30 hisse için (2005'ten).
 - Nakit getirisi politika faizi kabul ediliyor; gerçekte para piyasası fonu getirisi vergi/masraf nedeniyle biraz düşük olabilir (`cash_rate_factor` ile ayarlanır).
 - Portföy `exposure_pct` metriği anlamlı değil (günlük ortalama getiri ≠ 0 olduğu sürece ~%100 çıkar); sayfada gösterilmiyor.
 - Aynı gün stop olunca o günün kapanışındaki yeni giriş sinyali atlanıyor (küçük etki).

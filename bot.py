@@ -59,8 +59,30 @@ BIST30 = {
 }
 BENCHMARK = "XU030"
 
+# Geriye dönük test için aday hisseler: bugünkü BIST100'ün büyük kısmı + geçmişte BIST30'da olmuş ve hâlâ
+# Yahoo'da verisi bulunan hisseler. Her çeyrek bunların arasından işlem hacmine göre en büyük 30'u seçilir
+# (noktasal evren) — bugünkü listeyle test etmenin "hayatta kalma yanlılığı"nı büyük ölçüde giderir.
+# Borsadan çıkmış hisselerin (Finansbank, Petrol Ofisi, Trakya Cam...) Yahoo'da verisi yok.
+CANDIDATES = """
+    AEFES AFYON AGHOL AKBNK AKCNS AKENR AKFGY AKGRT AKMGY AKSA AKSEN ALARK ALBRK ALCTL ALFAS ALGYO
+    ALKIM ANHYT ANSGR ARCLK ASELS ASTOR ASUZU AVOD AYDEM AYGAZ BAGFS BANVT BERA BIMAS BIOEN BIZIM
+    BJKAS BRISA BRSAN BRYAT BTCIM BUCIM CANTE CCOLA CEMTS CIMSA CLEBI CRFSA CWENE DEVA DOAS DOGUB
+    DOHOL DYOBY ECILC ECZYT EGEEN EKGYO EMKEL ENERY ENJSA ENKAI EREGL EUPWR EUREN FENER FORTE FROTO
+    GARAN GENIL GESAN GLYHO GOODY GOZDE GSDHO GSRAY GUBRF GWIND HALKB HEKTS HURGZ IHEVA IHLAS INDES
+    ISCTR ISDMR ISFIN ISGYO ISMEN IZMDC KARSN KARTN KCAER KCHOL KLRHO KONTR KONYA KORDS KRDMD KRSTL
+    LOGO MAVI MGROS MIATK MPARK NETAS NTHOL NUHCM ODAS OTKAR OYAKC PARSN PETKM PGSUS PRKME QUAGR
+    RAYSG REEDR SAHOL SARKY SASA SELEC SISE SKBNK SKTAS SMRTG SNGYO SOKM TATGD TAVHL TCELL THYAO
+    TKFEN TKNSA TMSN TOASO TRALT TRCAS TRGYO TRMET TSKB TSPOR TTKOM TTRAK TUKAS TUPRS TURSG ULKER
+    VAKBN VAKKO VERUS VESBE VESTL VKGYO YATAS YKBNK YUNSA YYLGD ZOREN ZRGYO
+""".split()
+
 CFG = {
-    "history_period": "6y",     # indirilecek veri uzunluğu
+    "history_start": "2004-01-01",  # indirilecek verinin başlangıcı (2005 öncesi eski TL, atılır)
+    "backtest_start": "2006-01-01", # portföy testinin başlangıcı (2008 krizi dahil)
+    "universe_size": 30,        # test evreni: her çeyrek işlem hacmine göre en büyük N hisse
+    "vol_sizing": True,         # oynaklığa göre pozisyon büyüklüğü (docs/uzun-donem-arastirma.md)
+    "vol_cap": 2.0,             # bir pozisyon en fazla temel payın bu katı olabilir
+    "jump_limit": 0.25,         # tek günde bundan büyük fiyat sıçraması veri hatası sayılır
     "warmup_days": 210,         # EMA200 için ısınma
     "buy_threshold": 40,        # skor >= bu -> AL
     "sell_threshold": -40,      # skor <= bu -> SAT
@@ -200,23 +222,107 @@ def _clean(df: pd.DataFrame) -> pd.DataFrame:
     return df[~df.index.duplicated(keep="last")].sort_index()
 
 
-def fetch_real(tickers: list[str]) -> dict[str, pd.DataFrame]:
+def fetch_real(tickers: list[str], verbose: bool = True) -> dict[str, pd.DataFrame]:
+    import time
+
     import yfinance as yf
 
     data: dict[str, pd.DataFrame] = {}
     for t in tickers:
         sym = f"{t}.IS"
-        try:
-            raw = yf.download(sym, period=CFG["history_period"], interval="1d",
-                              auto_adjust=True, progress=False, threads=False)
-            if raw is None or raw.empty:
-                print(f"  ! {t}: veri yok", file=sys.stderr)
-                continue
-            data[t] = _clean(raw)
+        for attempt in range(3):          # Yahoo ara sıra geçici hata verir
+            try:
+                raw = yf.download(sym, start=CFG["history_start"], interval="1d",
+                                  auto_adjust=True, progress=False, threads=False)
+                if raw is not None and not raw.empty:
+                    data[t] = _clean(raw)
+                break
+            except Exception as e:  # noqa: BLE001
+                if attempt == 2:
+                    print(f"  ! {t}: {e}", file=sys.stderr)
+                time.sleep(2)
+        if t not in data:
+            print(f"  ! {t}: veri yok", file=sys.stderr)
+        elif verbose:
             print(f"  ✓ {t}: {len(data[t])} gün, son {data[t].index[-1].date()}")
-        except Exception as e:  # noqa: BLE001
-            print(f"  ! {t}: {e}", file=sys.stderr)
     return data
+
+
+def fix_jumps(data: dict[str, pd.DataFrame], start: str = "2005-01-04", quiet: bool = True) -> dict[str, pd.DataFrame]:
+    """1 Ocak 2005'te TL'den 6 sıfır atıldı: öncesini at. Günlük fiyat sınırının çok üstündeki tek günlük
+    sıçramaları (Yahoo'da düzeltilmemiş sermaye artırımı) nötrle: önceki fiyatlar ölçeklenir, o günkü getiri 0 olur."""
+    out = {}
+    for t, df in data.items():
+        df = df.loc[start:].copy()
+        df["Volume"] = df["Volume"].astype(float)
+        if len(df) < 2:
+            continue
+        r = df["Close"].pct_change()
+        for day in r.index[r.abs() > CFG["jump_limit"]]:
+            k = df.loc[day, "Close"] / df["Close"].shift(1).loc[day]
+            df.loc[df.index < day, ["Open", "High", "Low", "Close"]] *= k
+            df.loc[df.index < day, "Volume"] /= k
+            if not quiet:
+                print(f"  düzeltildi: {t} {day.date()} ({(k - 1) * 100:+.0f}%)")
+        out[t] = df
+    return out
+
+
+def dedupe(data: dict[str, pd.DataFrame]) -> dict[str, pd.DataFrame]:
+    """Aynı seriyi iki farklı kodla tutan kayıtları ayıkla (yeniden adlandırılan şirketler)."""
+    seen, out = set(), {}
+    for t in sorted(data, key=lambda x: (x not in BIST30, x)):   # bugünkü kod öncelikli
+        df = data[t]
+        key = (str(df.index[0].date()), round(float(df["Close"].iloc[-1]), 4), len(df))
+        if key not in seen:
+            seen.add(key)
+            out[t] = df
+    return out
+
+
+def pit_membership(data: dict[str, pd.DataFrame], cal: pd.DatetimeIndex, n: int) -> pd.DataFrame:
+    """Noktasal evren: her çeyrek başında, önceki 3 ayın ortalama TL işlem hacmine göre en büyük `n` hisse
+    (en az 6 aylık geçmişi olanlar) o çeyreğin evrenidir. Yalnızca o güne kadarki veri kullanılır."""
+    tv = pd.DataFrame({t: df["Close"] * df["Volume"] for t, df in data.items()}).reindex(cal)
+    avg = tv.rolling(63, min_periods=40).mean().shift(1)
+    age = tv.notna().cumsum()
+    mem = pd.DataFrame(False, index=cal, columns=tv.columns)
+    q = pd.Series(cal, index=cal).dt.to_period("Q")
+    starts = q[q != q.shift(1)].index
+    for i, day in enumerate(starts):
+        top = avg.loc[day].where(age.loc[day] >= 126).dropna().nlargest(n).index
+        end = starts[i + 1] if i + 1 < len(starts) else cal[-1] + pd.Timedelta(days=1)
+        mem.loc[(cal >= day) & (cal < end), top] = True
+    return mem
+
+
+def sized_portfolio(prep: dict, cal: pd.DatetimeIndex, cash: pd.Series, mem: pd.DataFrame,
+                    mult: float = 1.0, vol: bool = True, cap: float = 2.0) -> tuple[pd.Series, pd.Series, dict]:
+    """
+    Portföy: her pozisyon temel olarak sermayenin mult/N'i (N = evren büyüklüğü). Hisseye yalnızca evrendeyken girilir.
+    vol=True: oynak hissede küçük, sakin hissede büyük pozisyon (temel pay × evren medyan ATR% / hissenin ATR%'si,
+    1/3 ile `cap` arası). Toplam hisse payı %100'ü aşarsa hepsi orantılı küçültülür (kaldıraç yok). Boş pay faizde.
+    Yaklaşıklık: ağırlıklar günlük yeniden dengelenir; evrenden çıkan hissedeki pozisyon maliyetsiz kapanmış sayılır.
+    Döner: (günlük getiri, günlük hisse payı, hisse bazında backtest sonuçları)
+    """
+    n = CFG["universe_size"]
+    rets, held, atrp, bts = {}, {}, {}, {}
+    for t, (d, sc) in prep.items():
+        bt = backtest(d, sc, cash.reindex(d.index).fillna(0), entry_mask=mem[t])
+        bts[t] = bt
+        rets[t], held[t] = bt["daily"], bt["held"]
+        atrp[t] = (d["atr"] / d["Close"]).shift(1)
+    M = mem.reindex(index=cal, columns=list(prep)).fillna(False)
+    R = pd.DataFrame(rets).reindex(cal)
+    H = pd.DataFrame(held).reindex(cal).fillna(False).astype(bool) & M
+    Wt = H.astype(float) * mult / n
+    if vol:
+        A = pd.DataFrame(atrp).reindex(cal)
+        med = A.where(M).median(axis=1)
+        Wt = Wt * A.pow(-1).mul(med, axis=0).clip(1 / 3, cap).fillna(1)
+    Wt = Wt.div(Wt.sum(axis=1).clip(lower=1), axis=0)
+    expo = Wt.sum(axis=1)
+    return (Wt * R.fillna(0)).sum(axis=1) + (1 - expo) * cash, expo, bts
 
 
 def fetch_demo(tickers: list[str]) -> dict[str, pd.DataFrame]:
@@ -479,6 +585,7 @@ def backtest(d: pd.DataFrame, sc: pd.Series, cash: pd.Series | None = None,
     start = CFG["warmup_days"]
 
     daily = np.zeros(n)
+    held = np.zeros(n, dtype=bool)   # o günün getirisi hisseden mi geldi (değilse faizden)
     in_pos = False
     entry_px = stop = 0.0
     entry_i = -1
@@ -491,6 +598,7 @@ def backtest(d: pd.DataFrame, sc: pd.Series, cash: pd.Series | None = None,
             entry_px = o[i] * (1 + cost)
             stop = o[i] - CFG["stop_atr"] * atr[i - 1] if use_stop else -np.inf
             in_pos, entry_i = True, i
+            held[i] = True
             day_ret = c[i] / entry_px - 1
             pending = None
             # aynı gün stop
@@ -502,12 +610,14 @@ def backtest(d: pd.DataFrame, sc: pd.Series, cash: pd.Series | None = None,
                 continue
             daily[i] = day_ret
         elif pending == "sell" and in_pos:
+            held[i] = True
             exit_px = o[i] * (1 - cost)
             daily[i] = exit_px / c[i - 1] - 1
             trades.append(_trade(d, entry_i, i, entry_px, exit_px, "sinyal"))
             in_pos = False
             pending = None
         elif in_pos:
+            held[i] = True
             # 2) Gün içi stop kontrolü
             if l[i] <= stop:
                 exit_px = min(o[i], stop) * (1 - cost)
@@ -541,6 +651,7 @@ def backtest(d: pd.DataFrame, sc: pd.Series, cash: pd.Series | None = None,
         }
     return {
         "daily": pd.Series(daily, index=d.index).iloc[start:],
+        "held": pd.Series(held, index=d.index).iloc[start:],
         "trades": trades,
         "open": open_trade,
         "pending": pending,
@@ -599,8 +710,14 @@ def run(demo: bool) -> None:
     print(f"BIST30 sinyal botu — {'DEMO (sentetik veri)' if demo else 'gerçek veri'}")
     if not demo:
         fetch_macro()
-    fetch = fetch_demo if demo else fetch_real
-    data = fetch(tickers + [BENCHMARK])
+    if demo:
+        data = fetch_demo(tickers + [BENCHMARK])
+    else:
+        universe = sorted(set(tickers) | set(CANDIDATES))
+        print(f"  {len(universe)} hisse + endeks indiriliyor (2004'ten beri)...")
+        data = fetch_real(universe + [BENCHMARK], verbose=False)
+        print(f"  {len(data)} seri indirildi")
+        data = fix_jumps(data)
     bench = data.pop(BENCHMARK, None)
     bench_close = bench["Close"] if bench is not None else None
     if bench is None:
@@ -608,8 +725,7 @@ def run(demo: bool) -> None:
 
     signals, per_stock, all_daily, recent_trades = [], [], {}, []
     changes, change_dates = [], set()
-    uni_daily = {}          # aynı hisselerin al-bekle günlük getirisi (adil kıyas)
-    oos_daily = {}
+    prepared = {}           # hesaplanmış indikatör/skorlar (portföy testinde yeniden kullanılır)
 
     for t in tickers:
         df = data.get(t)
@@ -618,6 +734,7 @@ def run(demo: bool) -> None:
             continue
         d = add_indicators(df, bench_close)
         sc = score_frame(d)
+        prepared[t] = (d, sc["score"])
         cash_d = cash_returns(d.index)
         bt = backtest(d, sc["score"], cash_d)
 
@@ -655,11 +772,8 @@ def run(demo: bool) -> None:
         })
 
         daily = bt["daily"]
-        all_daily[t] = daily
-        uni_daily[t] = d["Close"].pct_change().reindex(daily.index)
         split = int(len(daily) * (1 - CFG["oos_fraction"]))
         oos_start = daily.index[split]
-        oos_daily[t] = daily.iloc[split:]
         bh = d["Close"].iloc[CFG["warmup_days"]:]
         per_stock.append({
             "ticker": t, "name": BIST30[t],
@@ -677,14 +791,34 @@ def run(demo: bool) -> None:
     if not signals:
         sys.exit("Hiç veri işlenemedi. İnternet bağlantısını ve yfinance kurulumunu kontrol edin.")
 
-    # --- Portföy: tüm hisselere eşit ağırlık (1/N), günlük yeniden dengeleme
-    # Verisi daha kısa olan hisselerin (örn. sonradan halka arz) payı o günlerde nakitte bekler
-    port_df = pd.DataFrame(all_daily)
-    cash = cash_returns(port_df.index)
-    port = port_df.apply(lambda col: col.fillna(cash)).mean(axis=1)
-    # Aynı hisse evreninin eşit ağırlıklı al-bekle'si. Bugünkü BIST30 listesi geçmişte yükselmiş hisselerden
-    # oluştuğu için XU030'dan çok daha iyi görünür; stratejinin adil kıyası budur.
-    uni = pd.DataFrame(uni_daily).reindex(port.index).apply(lambda col: col.fillna(cash)).mean(axis=1)
+    # --- Portföy testi: noktasal evren (her çeyrek o zamanki en büyük 30 hisse) + oynaklığa göre pozisyon
+    if bench is None:
+        sys.exit("XU030 verisi olmadan portföy testi yapılamıyor.")
+    cand = dedupe(data)
+    full_cal = bench.index
+    mem_full = pit_membership(cand, full_cal, CFG["universe_size"])
+    first = max(pd.Timestamp(CFG["backtest_start"]), full_cal[min(CFG["warmup_days"], len(full_cal) - 1)])
+    cal = full_cal[full_cal >= first]
+    mem = mem_full.reindex(cal).fillna(False)
+    prep = {}
+    for t, df in cand.items():
+        if len(df) < CFG["min_bars"] or not mem[t].any():
+            continue
+        if t in prepared:
+            prep[t] = prepared[t]
+        else:
+            d_ = add_indicators(df, bench_close)
+            prep[t] = (d_, score_frame(d_)["score"])
+    mem = mem[list(prep)]
+    cash = cash_returns(cal)
+    port, expo, _ = sized_portfolio(prep, cal, cash, mem, 1.0, CFG["vol_sizing"], CFG["vol_cap"])
+    # Adil kıyas: aynı evrenin (her gün o günün üyeleri) eşit ağırlıklı al-bekle'si
+    closes = pd.DataFrame({t: d_["Close"] for t, (d_, _) in prep.items()}).reindex(cal)
+    rets = closes.pct_change().where(closes.notna() & closes.shift(1).notna() & mem)
+    uni = rets.mean(axis=1).fillna(cash)
+    universe_note = (f"Her çeyrek, önceki 3 ayın işlem hacmine göre en büyük {CFG['universe_size']} hisse "
+                     f"({len(cand)} aday, {len(prep)} farklı hisse en az bir kez evrende)")
+    print(f"  Portföy testi: {cal[0].date()} – {cal[-1].date()} · {universe_note} · ortalama hisse payı %{expo.mean() * 100:.0f}")
     split = int(len(port) * (1 - CFG["oos_fraction"]))
     port_eq = (1 + port).cumprod()
     bench_eq = None
@@ -693,7 +827,7 @@ def run(demo: bool) -> None:
         bench_eq = b / b.iloc[0]
     cash_eq = (1 + cash).cumprod()
     uni_eq = (1 + uni).cumprod()
-    weekly = port_eq.resample("W-FRI").last()
+    weekly = port_eq.resample("W-FRI").last().dropna()   # tamamen tatil olan haftaları atla
     curve = [{"date": str(i.date()), "strategy": round(float(v), 4),
               "benchmark": round(float(bench_eq.asof(i)), 4) if bench_eq is not None else None,
               "cash": round(float(cash_eq.asof(i)), 4), "universe": round(float(uni_eq.asof(i)), 4)}
@@ -728,7 +862,9 @@ def run(demo: bool) -> None:
 
     write("backtest.json", {
         **meta,
-        "settings": {k: CFG[k] for k in ("buy_threshold", "exit_score", "stop_atr",
+        "backtest_universe": universe_note,
+        "avg_exposure_pct": r2(expo.mean() * 100),
+        "settings": {k: CFG[k] for k in ("buy_threshold", "exit_score", "stop_atr", "vol_sizing", "universe_size",
                                           "commission", "slippage", "oos_fraction",
                                           "cash_rate_factor", "real_rate_max")},
         "cash_rate_last_pct": POLICY_RATES[-1][1],

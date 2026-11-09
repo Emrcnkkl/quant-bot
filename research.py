@@ -55,46 +55,16 @@ def load(refresh: bool) -> dict[str, pd.DataFrame]:
 
 
 def fix(data: dict[str, pd.DataFrame], quiet: bool = False) -> dict[str, pd.DataFrame]:
-    """2005 öncesini at; günlük fiyat sınırının çok üstündeki sıçramaları (düzeltilmemiş sermaye artırımı) nötrle."""
-    fixed = {}
-    for t, df in data.items():
-        df = df.loc[START:].copy()
-        df["Volume"] = df["Volume"].astype(float)
-        if len(df) < 2:
-            continue
-        r = df["Close"].pct_change()
-        for day in r.index[r.abs() > JUMP]:
-            # Sıçramadan önceki tüm fiyatları ölçekle: o günkü getiri 0 olur
-            k = df.loc[day, "Close"] / df["Close"].shift(1).loc[day]
-            cols = ["Open", "High", "Low", "Close"]
-            df.loc[df.index < day, cols] *= k
-            df.loc[df.index < day, "Volume"] /= k
-            if not quiet:
-                print(f"  düzeltildi: {t} {day.date()} ({(k - 1) * 100:+.0f}%)")
-        fixed[t] = df
-    return fixed
+    """bot.fix_jumps ile aynı (2005 öncesini at, veri hatası sıçramalarını nötrle)."""
+    return bot.fix_jumps(data, START, quiet)
 
 
 WIDE = os.path.join(bot.OUT_DIR, ".cache", "wide.pkl")
 
 
 def pit_membership(data: dict[str, pd.DataFrame], cal: pd.DatetimeIndex, n: int = 30) -> pd.DataFrame:
-    """
-    Noktasal (point-in-time) evren: her çeyrek başında, önceki 3 ayın ortalama işlem hacmine (TL) göre
-    en büyük `n` hisse o çeyreğin evrenidir. Yalnızca o güne kadarki veri kullanılır.
-    """
-    tv = pd.DataFrame({t: (df["Close"] * df["Volume"]) for t, df in data.items()}).reindex(cal)
-    avg = tv.rolling(63, min_periods=40).mean().shift(1)
-    age = tv.notna().cumsum()
-    mem = pd.DataFrame(False, index=cal, columns=tv.columns)
-    q = pd.Series(cal, index=cal).dt.to_period("Q")
-    starts = q[q != q.shift(1)].index
-    for i, day in enumerate(starts):
-        row = avg.loc[day].where(age.loc[day] >= 126).dropna()
-        top = row.nlargest(n).index
-        end = starts[i + 1] if i + 1 < len(starts) else cal[-1] + pd.Timedelta(days=1)
-        mem.loc[(cal >= day) & (cal < end), top] = True
-    return mem
+    """bot.pit_membership ile aynı (her çeyrek önceki 3 ayın işlem hacmine göre ilk n)."""
+    return bot.pit_membership(data, cal, n)
 
 
 # --------------------------------------------------------------------------- #
@@ -242,6 +212,81 @@ def main(refresh: bool) -> None:
     print("\nKayan pencere seçimleri:", picks)
 
 
+def sized(prep, cal, cash, mem, over: dict, mult: float, vol: bool, cap: float = 2.0) -> tuple[pd.Series, pd.Series]:
+    """bot.sized_portfolio ile aynı; `over` ile CFG geçici olarak değiştirilebilir."""
+    base = dict(bot.CFG)
+    bot.CFG.update(over)
+    try:
+        port, expo, _ = bot.sized_portfolio(prep, cal, cash, mem, mult, vol, cap)
+    finally:
+        bot.CFG.clear()
+        bot.CFG.update(base)
+    return port, expo
+
+
+def main_sizing() -> None:
+    """Pozisyon büyüklüğü deneyleri (noktasal evren)."""
+    bot.fetch_macro()
+    data, bench, cal, cash, mem, prep = pit_setup()
+    b = bench["Close"].reindex(cal).pct_change().fillna(0)
+    C = pd.DataFrame({t: d["Close"] for t, (d, _) in prep.items()}).reindex(cal)
+    R = C.pct_change()
+    ew = R.where(C.notna() & C.shift(1).notna() & mem).mean(axis=1).fillna(0)
+    yrs = cal.year
+    IS, OOS = (yrs >= FIRST_WF_YEAR) & (yrs <= 2020), yrs >= 2021
+    ALL = yrs >= FIRST_WF_YEAR
+
+    def stats(r, mask):
+        m = bot.metrics(r[mask], rf=cash[mask])
+        return m["cagr_pct"], m["max_drawdown_pct"], m["sharpe"]
+
+    rows = []
+    variants = [(m_, v) for v in (False, True) for m_ in (1.0, 1.5, 2.0, 3.0)]
+    series = {}
+    for m_, v in variants:
+        name = f"{'oynaklik_' if v else ''}{m_:g}x"
+        r, e = sized(prep, cal, cash, mem, {}, m_, v)
+        series[name] = r
+        rows.append({"cesit": name, "ort_hisse_payi": round(float(e[ALL].mean()) * 100),
+                     **{f"{k}_{lab}": val for lab, msk in (("egitim", IS), ("test", OOS), ("tum", ALL))
+                        for k, val in zip(("yillik", "dusus", "sharpe"), stats(r, msk))}})
+    for name, r in (("evren_al_bekle", ew), ("XU030", b), ("faiz", cash)):
+        series[name] = r
+        rows.append({"cesit": name, "ort_hisse_payi": 100 if name != "faiz" else 0,
+                     **{f"{k}_{lab}": val for lab, msk in (("egitim", IS), ("test", OOS), ("tum", ALL))
+                        for k, val in zip(("yillik", "dusus", "sharpe"), stats(r, msk))}})
+    df = pd.DataFrame(rows)
+    # Önceden belirlenen karar kuralı: eğitimde düşüşü evren al-bekle'den derin olmayanlar arasında en yüksek yıllık getiri
+    lim = df.loc[df.cesit == "evren_al_bekle", "dusus_egitim"].iloc[0]
+    cand = df[(df.cesit.str.contains("x")) & (df.dusus_egitim >= lim)]
+    pick = cand.sort_values("yillik_egitim", ascending=False).iloc[0]["cesit"]
+    ytab = pd.DataFrame({k: yearly(v) for k, v in series.items()})
+    bot.write("research_sizing.json", {"rows": rows, "pick": pick, "dd_limit_is": lim,
+                                       "yearly": {str(y): r.dropna().to_dict() for y, r in ytab.iterrows()}})
+    pd.set_option("display.width", 250)
+    print(df.to_string(index=False))
+    print(f"\nKarar kuralı (eğitim düşüşü ≥ {lim}% olanlar içinde en yüksek eğitim getirisi): {pick}")
+    print(ytab.loc[FIRST_WF_YEAR:, [pick, "1x", "evren_al_bekle", "XU030", "faiz"]].to_string())
+
+
+def pit_setup():
+    with open(WIDE, "rb") as f:
+        wide = fix(pickle.load(f), quiet=True)
+    with open(CACHE, "rb") as f:
+        bench = fix(pickle.load(f), quiet=True)[bot.BENCHMARK]
+    data = bot.dedupe(wide)
+    cal = bench.index[bot.CFG["warmup_days"]:]
+    cash = bot.cash_returns(cal)
+    mem = pit_membership(data, bench.index).reindex(cal).fillna(False)
+    prep = {}
+    for t, df in data.items():
+        if len(df) < bot.CFG["min_bars"] or not mem[t].any():
+            continue
+        d = bot.add_indicators(df, bench["Close"])
+        prep[t] = (d, bot.score_frame(d)["score"])
+    return data, bench, cal, cash, mem[list(prep)], prep
+
+
 def main_pit() -> None:
     """Noktasal evrenle aynı testler: her çeyrek, o zamanki en likit 30 hisse."""
     bot.fetch_macro()
@@ -328,5 +373,6 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--refresh", action="store_true")
     ap.add_argument("--pit", action="store_true", help="noktasal (o dönemin en likit 30 hissesi) evrenle test")
+    ap.add_argument("--sizing", action="store_true", help="pozisyon büyüklüğü deneyleri (noktasal evren)")
     a = ap.parse_args()
-    main_pit() if a.pit else main(a.refresh)
+    main_sizing() if a.sizing else main_pit() if a.pit else main(a.refresh)

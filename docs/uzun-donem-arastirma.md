@@ -74,3 +74,28 @@ Bugünkü evren gerçek BIST30 ile 25/30 örtüşüyor → yöntem gerçek endek
 4. Kayan pencereli seçim sabit kuraldan iyi değil → geçmişe göre kural değiştirmek değer katmıyor.
 
 Bot ayarları değişmedi. Sitedeki geriye dönük test hâlâ bugünkü listeyle yapılıyor (yanlılık uyarısı sitede var).
+
+---
+
+# Ek 2: Pozisyon büyüklüğü (`python3 research.py --sizing`, noktasal evren)
+
+Önceden belirlenen 8 çeşit: temel pay 1× / 1.5× / 2× / 3× (sermayenin m/30'u), her biri oynaklık ayarlı ve ayarsız.
+Oynaklık ayarı: pay × (evren medyan ATR% / hissenin ATR%), 1/3–2 arası; toplam hisse payı %100'ü aşmaz (kaldıraç yok).
+Karar kuralı (önceden): eğitimde (2009–2020) düşüşü evren al-bekle'den (−%39) derin olmayanlar arasında en yüksek eğitim getirisi.
+
+| Çeşit | Ort. hisse payı | Eğitim yıllık / düşüş / Sharpe | Test (2021–26) yıllık / düşüş / Sharpe |
+|---|---|---|---|
+| 1× (eski) | %46 | %13.4 / −%15.1 / 0.41 | %38.1 / −%24.1 / 0.48 |
+| **oynaklık 1×** | %46 | **%14.4 / −%14.2 / 0.51** | **%40.2 / −%24.5 / 0.58** |
+| 1.5× | %64 | %13.8 / −%26.2 / 0.36 | %35.1 / −%32.9 / 0.32 |
+| oynaklık 1.5× (kuralın seçimi) | %63 | %14.9 / −%22.8 / 0.45 | %38.3 / −%32.4 / 0.43 |
+| 2× / 3× | %73 / %82 | daha kötü | daha kötü |
+| evren al-bekle | %100 | %19.2 / −%39.2 / 0.48 | %41.0 / −%28.3 / 0.43 |
+
+- **Oynaklık ayarı her iki dönemde de iyileştirdi** (Sharpe 0.41→0.51 ve 0.48→0.58, getiri arttı, düşüş aynı) → **bota eklendi** (`vol_sizing=True`).
+- **Payı büyütmek işe yaramadı:** kuralın seçtiği oynaklık 1.5× testte oynaklık 1×'ten hem az kazandırdı hem derin düştü → eklenmedi.
+  Sinyaller aynı anda geldiği için pay büyüyünce risk getiriden hızlı artıyor; faizdeki para da kaybediliyor.
+
+# Botun geriye dönük testi artık noktasal evrenle (2006–bugün)
+`bot.py` her gün 156 aday hisseyi indirir, her çeyrek en büyük 30'u seçer, oynaklık ayarlı pozisyonla 2006'dan test eder.
+İlk sonuç (9 Kasım 2026): model yıllık %20.0 / en büyük düşüş −%24.5; XU030 %17.7 / −%63.5; büyük 30 al-bekle %18.5 / −%68.0; faiz %15.5.
