@@ -1,0 +1,494 @@
+{
+ "period": {
+  "start": "2005-10-31",
+  "end": "2026-11-09",
+  "wf_start": 2009
+ },
+ "n_stocks": 30,
+ "yearly": {
+  "2005": {
+   "mevcut": 9.1,
+   "kesisim": 11.5,
+   "rot_skor_5": 2.1,
+   "rot_skor_8": 2.1,
+   "rot_skor0_5": 2.1,
+   "rot_mom_5": 2.1,
+   "rot_mom_8": 2.1,
+   "XU030": 23.7,
+   "faiz": 2.1,
+   "esit_30_al_bekle": 25.7
+  },
+  "2006": {
+   "mevcut": 8.6,
+   "kesisim": 16.5,
+   "rot_skor_5": -3.1,
+   "rot_skor_8": 3.2,
+   "rot_skor0_5": 2.3,
+   "rot_mom_5": 12.4,
+   "rot_mom_8": 0.3,
+   "XU030": -3.8,
+   "faiz": 15.5,
+   "esit_30_al_bekle": 15.8
+  },
+  "2007": {
+   "mevcut": 17.2,
+   "kesisim": 26.7,
+   "rot_skor_5": 18.6,
+   "rot_skor_8": 11.6,
+   "rot_skor0_5": 41.3,
+   "rot_mom_5": 70.0,
+   "rot_mom_8": 70.4,
+   "XU030": 45.1,
+   "faiz": 17.3,
+   "esit_30_al_bekle": 58.7
+  },
+  "2008": {
+   "mevcut": 7.9,
+   "kesisim": 1.2,
+   "rot_skor_5": -0.5,
+   "rot_skor_8": 2.9,
+   "rot_skor0_5": -34.0,
+   "rot_mom_5": -36.6,
+   "rot_mom_8": -29.5,
+   "XU030": -50.3,
+   "faiz": 16.1,
+   "esit_30_al_bekle": -45.9
+  },
+  "2009": {
+   "mevcut": 56.8,
+   "kesisim": 79.9,
+   "rot_skor_5": 103.4,
+   "rot_skor_8": 86.7,
+   "rot_skor0_5": 100.8,
+   "rot_mom_5": 79.2,
+   "rot_mom_8": 76.8,
+   "kayan_secim": 79.9,
+   "XU030": 91.4,
+   "faiz": 9.2,
+   "esit_30_al_bekle": 125.8
+  },
+  "2010": {
+   "mevcut": 16.5,
+   "kesisim": 29.3,
+   "rot_skor_5": 28.4,
+   "rot_skor_8": 30.4,
+   "rot_skor0_5": 33.7,
+   "rot_mom_5": 24.2,
+   "rot_mom_8": 27.7,
+   "kayan_secim": 29.3,
+   "XU030": 21.4,
+   "faiz": 6.8,
+   "esit_30_al_bekle": 44.8
+  },
+  "2011": {
+   "mevcut": -7.6,
+   "kesisim": -7.9,
+   "rot_skor_5": -20.6,
+   "rot_skor_8": -21.8,
+   "rot_skor0_5": -8.4,
+   "rot_mom_5": -18.9,
+   "rot_mom_8": -6.1,
+   "kayan_secim": -7.9,
+   "XU030": -24.1,
+   "faiz": 6.0,
+   "esit_30_al_bekle": -12.8
+  },
+  "2012": {
+   "mevcut": 19.7,
+   "kesisim": 34.6,
+   "rot_skor_5": 15.9,
+   "rot_skor_8": 16.2,
+   "rot_skor0_5": 18.8,
+   "rot_mom_5": 70.4,
+   "rot_mom_8": 66.0,
+   "kayan_secim": 34.6,
+   "XU030": 58.4,
+   "faiz": 5.8,
+   "esit_30_al_bekle": 62.8
+  },
+  "2013": {
+   "mevcut": 2.5,
+   "kesisim": -4.6,
+   "rot_skor_5": -28.0,
+   "rot_skor_8": -19.1,
+   "rot_skor0_5": -21.4,
+   "rot_mom_5": 13.6,
+   "rot_mom_8": 3.1,
+   "kayan_secim": -4.6,
+   "XU030": -15.6,
+   "faiz": 4.8,
+   "esit_30_al_bekle": -4.5
+  },
+  "2014": {
+   "mevcut": 18.1,
+   "kesisim": 26.3,
+   "rot_skor_5": 29.2,
+   "rot_skor_8": 24.3,
+   "rot_skor0_5": 17.2,
+   "rot_mom_5": 32.6,
+   "rot_mom_8": 25.6,
+   "kayan_secim": 26.3,
+   "XU030": 28.7,
+   "faiz": 8.6,
+   "esit_30_al_bekle": 36.5
+  },
+  "2015": {
+   "mevcut": -2.2,
+   "kesisim": -3.1,
+   "rot_skor_5": -23.6,
+   "rot_skor_8": -14.2,
+   "rot_skor0_5": -20.4,
+   "rot_mom_5": -6.7,
+   "rot_mom_8": -14.7,
+   "kayan_secim": -3.1,
+   "XU030": -17.6,
+   "faiz": 7.6,
+   "esit_30_al_bekle": -9.0
+  },
+  "2016": {
+   "mevcut": 6.8,
+   "kesisim": 5.5,
+   "rot_skor_5": 17.9,
+   "rot_skor_8": 21.7,
+   "rot_skor0_5": 18.0,
+   "rot_mom_5": 27.3,
+   "rot_mom_8": 18.1,
+   "kayan_secim": 5.5,
+   "XU030": 9.2,
+   "faiz": 7.5,
+   "esit_30_al_bekle": 19.2
+  },
+  "2017": {
+   "mevcut": 46.9,
+   "kesisim": 54.2,
+   "rot_skor_5": 114.5,
+   "rot_skor_8": 97.6,
+   "rot_skor0_5": 123.4,
+   "rot_mom_5": 226.1,
+   "rot_mom_8": 152.8,
+   "kayan_secim": 54.2,
+   "XU030": 48.8,
+   "faiz": 8.0,
+   "esit_30_al_bekle": 79.9
+  },
+  "2018": {
+   "mevcut": -3.1,
+   "kesisim": 3.9,
+   "rot_skor_5": -29.4,
+   "rot_skor_8": -15.9,
+   "rot_skor0_5": -26.9,
+   "rot_mom_5": -12.8,
+   "rot_mom_8": -8.3,
+   "kayan_secim": 3.9,
+   "XU030": -19.5,
+   "faiz": 15.4,
+   "esit_30_al_bekle": -15.2
+  },
+  "2019": {
+   "mevcut": 32.4,
+   "kesisim": 30.4,
+   "rot_skor_5": 18.0,
+   "rot_skor_8": 31.0,
+   "rot_skor0_5": 26.6,
+   "rot_mom_5": 55.0,
+   "rot_mom_8": 42.8,
+   "kayan_secim": 30.4,
+   "XU030": 21.4,
+   "faiz": 20.6,
+   "esit_30_al_bekle": 45.0
+  },
+  "2020": {
+   "mevcut": 32.3,
+   "kesisim": 33.5,
+   "rot_skor_5": 17.2,
+   "rot_skor_8": 30.2,
+   "rot_skor0_5": 25.0,
+   "rot_mom_5": 126.7,
+   "rot_mom_8": 101.4,
+   "kayan_secim": 33.5,
+   "XU030": 17.8,
+   "faiz": 10.2,
+   "esit_30_al_bekle": 46.1
+  },
+  "2021": {
+   "mevcut": 44.9,
+   "kesisim": 41.0,
+   "rot_skor_5": 38.3,
+   "rot_skor_8": 47.0,
+   "rot_skor0_5": 42.9,
+   "rot_mom_5": 76.3,
+   "rot_mom_8": 52.0,
+   "kayan_secim": 76.3,
+   "XU030": 23.8,
+   "faiz": 17.8,
+   "esit_30_al_bekle": 41.2
+  },
+  "2022": {
+   "mevcut": 121.6,
+   "kesisim": 176.5,
+   "rot_skor_5": 153.5,
+   "rot_skor_8": 178.8,
+   "rot_skor0_5": 165.3,
+   "rot_mom_5": 251.2,
+   "rot_mom_8": 236.5,
+   "kayan_secim": 251.2,
+   "XU030": 193.6,
+   "faiz": 12.9,
+   "esit_30_al_bekle": 235.3
+  },
+  "2023": {
+   "mevcut": 16.4,
+   "kesisim": 28.1,
+   "rot_skor_5": -19.6,
+   "rot_skor_8": -4.1,
+   "rot_skor0_5": -10.1,
+   "rot_mom_5": 33.4,
+   "rot_mom_8": 32.5,
+   "kayan_secim": 28.1,
+   "XU030": 34.9,
+   "faiz": 17.8,
+   "esit_30_al_bekle": 49.5
+  },
+  "2024": {
+   "mevcut": 39.7,
+   "kesisim": 43.9,
+   "rot_skor_5": 35.1,
+   "rot_skor_8": 19.2,
+   "rot_skor0_5": 25.8,
+   "rot_mom_5": 54.6,
+   "rot_mom_8": 50.3,
+   "kayan_secim": 43.9,
+   "XU030": 34.1,
+   "faiz": 49.1,
+   "esit_30_al_bekle": 52.2
+  },
+  "2025": {
+   "mevcut": 18.2,
+   "kesisim": 16.2,
+   "rot_skor_5": -26.6,
+   "rot_skor_8": -19.5,
+   "rot_skor0_5": -9.5,
+   "rot_mom_5": 13.1,
+   "rot_mom_8": 28.4,
+   "kayan_secim": 13.1,
+   "XU030": 13.6,
+   "faiz": 43.2,
+   "esit_30_al_bekle": 19.5
+  },
+  "2026": {
+   "mevcut": 26.6,
+   "kesisim": 17.0,
+   "rot_skor_5": 3.9,
+   "rot_skor_8": 9.6,
+   "rot_skor0_5": -9.2,
+   "rot_mom_5": 20.5,
+   "rot_mom_8": 14.5,
+   "kayan_secim": 20.5,
+   "XU030": 19.5,
+   "faiz": 31.0,
+   "esit_30_al_bekle": 12.4
+  }
+ },
+ "summary": {
+  "mevcut": {
+   "tum": {
+    "cagr": 22.98,
+    "max_dd": -20.92,
+    "sharpe": 0.59,
+    "total": 7378.88
+   },
+   "wf_donemi": {
+    "cagr": 24.68,
+    "max_dd": -20.92,
+    "sharpe": 0.7,
+    "total": 4889.17
+   }
+  },
+  "kesisim": {
+   "tum": {
+    "cagr": 27.59,
+    "max_dd": -21.47,
+    "sharpe": 0.71,
+    "total": 16023.95
+   },
+   "wf_donemi": {
+    "cagr": 29.44,
+    "max_dd": -21.47,
+    "sharpe": 0.79,
+    "total": 9578.71
+   }
+  },
+  "rot_skor_5": {
+   "tum": {
+    "cagr": 13.6,
+    "max_dd": -49.23,
+    "sharpe": 0.07,
+    "total": 1329.34
+   },
+   "wf_donemi": {
+    "cagr": 15.18,
+    "max_dd": -49.23,
+    "sharpe": 0.12,
+    "total": 1124.45
+   }
+  },
+  "rot_skor_8": {
+   "tum": {
+    "cagr": 18.24,
+    "max_dd": -38.28,
+    "sharpe": 0.22,
+    "total": 3193.83
+   },
+   "wf_donemi": {
+    "cagr": 20.49,
+    "max_dd": -38.28,
+    "sharpe": 0.31,
+    "total": 2622.24
+   }
+  },
+  "rot_skor0_5": {
+   "tum": {
+    "cagr": 16.07,
+    "max_dd": -45.91,
+    "sharpe": 0.16,
+    "total": 2141.32
+   },
+   "wf_donemi": {
+    "cagr": 19.36,
+    "max_dd": -42.82,
+    "sharpe": 0.26,
+    "total": 2201.36
+   }
+  },
+  "rot_mom_5": {
+   "tum": {
+    "cagr": 40.39,
+    "max_dd": -51.36,
+    "sharpe": 0.79,
+    "total": 118324.83
+   },
+   "wf_donemi": {
+    "cagr": 47.3,
+    "max_dd": -40.57,
+    "sharpe": 0.97,
+    "total": 95659.46
+   }
+  },
+  "rot_mom_8": {
+   "tum": {
+    "cagr": 35.48,
+    "max_dd": -40.31,
+    "sharpe": 0.71,
+    "total": 56247.17
+   },
+   "wf_donemi": {
+    "cagr": 41.3,
+    "max_dd": -40.31,
+    "sharpe": 0.88,
+    "total": 45704.95
+   }
+  },
+  "kayan_secim": {
+   "tum": {
+    "cagr": 32.87,
+    "max_dd": -32.0,
+    "sharpe": 0.79,
+    "total": 15298.79
+   },
+   "wf_donemi": {
+    "cagr": 32.87,
+    "max_dd": -32.0,
+    "sharpe": 0.79,
+    "total": 15298.79
+   }
+  },
+  "XU030": {
+   "tum": {
+    "cagr": 18.71,
+    "max_dd": -63.54,
+    "sharpe": 0.24,
+    "total": 3482.08
+   },
+   "wf_donemi": {
+    "cagr": 23.44,
+    "max_dd": -35.69,
+    "sharpe": 0.39,
+    "total": 4074.33
+   }
+  },
+  "faiz": {
+   "tum": {
+    "cagr": 15.46,
+    "max_dd": 0.0,
+    "sharpe": 0.0,
+    "total": 1906.48
+   },
+   "wf_donemi": {
+    "cagr": 15.31,
+    "max_dd": 0.0,
+    "sharpe": 0.0,
+    "total": 1148.98
+   }
+  },
+  "esit_30_al_bekle": {
+   "tum": {
+    "cagr": 33.01,
+    "max_dd": -56.74,
+    "sharpe": 0.66,
+    "total": 38296.68
+   },
+   "wf_donemi": {
+    "cagr": 38.15,
+    "max_dd": -32.77,
+    "sharpe": 0.84,
+    "total": 30617.3
+   }
+  }
+ },
+ "wf_picks": {
+  "2009": "kesisim",
+  "2010": "kesisim",
+  "2011": "kesisim",
+  "2012": "kesisim",
+  "2013": "kesisim",
+  "2014": "kesisim",
+  "2015": "kesisim",
+  "2016": "kesisim",
+  "2017": "kesisim",
+  "2018": "kesisim",
+  "2019": "kesisim",
+  "2020": "kesisim",
+  "2021": "rot_mom_5",
+  "2022": "rot_mom_5",
+  "2023": "kesisim",
+  "2024": "kesisim",
+  "2025": "rot_mom_5",
+  "2026": "rot_mom_5"
+ },
+ "years_beat_index": {
+  "mevcut": 10,
+  "kesisim": 11,
+  "rot_skor_5": 8,
+  "rot_skor_8": 9,
+  "rot_skor0_5": 8,
+  "rot_mom_5": 15,
+  "rot_mom_8": 14,
+  "kayan_secim": 12,
+  "XU030": 0,
+  "faiz": 7,
+  "esit_30_al_bekle": 17
+ },
+ "years_beat_cash": {
+  "mevcut": 9,
+  "kesisim": 10,
+  "rot_skor_5": 9,
+  "rot_skor_8": 10,
+  "rot_skor0_5": 10,
+  "rot_mom_5": 13,
+  "rot_mom_8": 12,
+  "kayan_secim": 10,
+  "XU030": 11,
+  "faiz": 0,
+  "esit_30_al_bekle": 12
+ }
+}
