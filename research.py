@@ -269,6 +269,40 @@ def main_sizing() -> None:
     print(ytab.loc[FIRST_WF_YEAR:, [pick, "1x", "evren_al_bekle", "XU030", "faiz"]].to_string())
 
 
+def main_faiz() -> None:
+    """Reel faiz filtresi, 2006–bugün, noktasal evren + oynaklık ayarlı pozisyon (botun portföy testiyle aynı)."""
+    bot.fetch_macro()
+    data, bench, cal, cash, mem, prep = pit_setup()
+    cal = cal[cal >= pd.Timestamp(bot.CFG["backtest_start"])]
+    cash, mem = cash.reindex(cal), mem.reindex(cal)
+    b = bench["Close"].reindex(cal).pct_change().fillna(0)
+    periods = {"2006-08": (2006, 2008), "2009-17": (2009, 2017), "2018-20": (2018, 2020),
+               "2021-24": (2021, 2024), "2025-26": (2025, 2026), "egitim_06-20": (2006, 2020),
+               "test_21-26": (2021, 2026), "tum": (2006, 2026)}
+    variants = {"filtre_yok": None, "esik_0": 0.0, "esik_+2.5": 2.5, "esik_+5": 5.0, "esik_+7.5": 7.5, "esik_+10": 10.0}
+    rows, series = [], {}
+    for name, lim in variants.items():
+        r, e = sized(prep, cal, cash, mem, {"real_rate_max": lim}, 1.0, True)
+        series[name] = (r, e)
+    series["XU030"] = (b, pd.Series(1.0, index=cal))
+    for name, (r, e) in series.items():
+        row = {"cesit": name}
+        for pn, (a_, z) in periods.items():
+            m = (cal.year >= a_) & (cal.year <= z)
+            met = bot.metrics(r[m], rf=cash[m])
+            row[f"{pn}_yil"], row[f"{pn}_dd"], row[f"{pn}_sh"] = met["cagr_pct"], met["max_drawdown_pct"], met["sharpe"]
+        row["hisse_payi"] = round(float(e.mean()) * 100)
+        rows.append(row)
+    df = pd.DataFrame(rows).set_index("cesit")
+    bot.write("research_faiz.json", {"rows": df.reset_index().to_dict("records"),
+                                     "yearly": {k: yearly(v[0]).to_dict() for k, v in series.items()}})
+    pd.set_option("display.width", 250)
+    for kind, lab in (("yil", "Yıllık getiri %"), ("dd", "En büyük düşüş %"), ("sh", "Sharpe (faiz üstü)")):
+        print(f"\n{lab}:")
+        print(df[[c for c in df.columns if c.endswith("_" + kind)]].rename(columns=lambda c: c.rsplit("_", 1)[0]).to_string())
+    print("\nOrtalama hisse payı %:", df["hisse_payi"].to_dict())
+
+
 def pit_setup():
     with open(WIDE, "rb") as f:
         wide = fix(pickle.load(f), quiet=True)
@@ -374,5 +408,9 @@ if __name__ == "__main__":
     ap.add_argument("--refresh", action="store_true")
     ap.add_argument("--pit", action="store_true", help="noktasal (o dönemin en likit 30 hissesi) evrenle test")
     ap.add_argument("--sizing", action="store_true", help="pozisyon büyüklüğü deneyleri (noktasal evren)")
+    ap.add_argument("--faiz", action="store_true", help="reel faiz filtresi, 2006–bugün")
     a = ap.parse_args()
-    main_sizing() if a.sizing else main_pit() if a.pit else main(a.refresh)
+    if a.faiz:
+        main_faiz()
+    else:
+        main_sizing() if a.sizing else main_pit() if a.pit else main(a.refresh)

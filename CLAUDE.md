@@ -8,34 +8,35 @@ BIST 30 hisseleri için günlük veriyle teknik analiz yapan, her hisseye −100
 skor verip **AL / TUT / SAT** sinyali üreten, geriye dönük test (backtest) raporu çıkaran
 ve sonuçları statik bir web sayfasında gösteren bir bot. Şu an **Aşama 1** tamamlandı.
 
-## Durum (9 Kasım 2026)
-- Bot gerçek veriyle çalışıyor: GitHub Actions hafta içi 18:40'ta çalışıp JSON'ları commit ediyor; GitHub Pages açık
-  (https://emrcnkkl.github.io/quant-bot/). Repo: Emrcnkkl/quant-bot, ana dal `claude/laughing-dijkstra-j1eqmj`.
-- Cloud oturumları için `quant-bot` ortamı Yahoo Finance hostlarına izinli → `python3 bot.py` oturumdan da çalışır.
-- Algoritma tarafı (nakit faizi, duyarlılık analizi, reel faiz filtresi) tamamlandı; **odak web sitesi**.
-- Sitede yapılanlar: faiz ortamı kutusu (reel faiz), satıra tıklayınca hisse grafiği (fiyat+EMA, alış/satış işaretleri,
-  skor şeridi, 3A/6A/1Y/2Y, üzerine gelince ayrıntı), yıl yıl getiri tablosu.
-- Site arkadaşlara açılacak → genel kitleye yönelik: koyu tema varsayılan (açık tema `prefers-color-scheme: light`),
-  üstte sabit menü (Bugün / Sinyaller / Performans / Nasıl çalışır / SSS), "yatırım tavsiyesi değildir" bandı,
-  "100.000 ₺ ile başlasaydı" özet kartı (endeks ve faizle dürüst kıyas), sade dil (Puan, Zarar-kes, modelde...).
-  Tasarım referansı kullanıcının diğer projesi (emrcnkkl.github.io/anlik_bot).
-- Sitede "büyük 30 hisse al-bekle" (`universe`, noktasal evren) kıyası ve yanlılık açıklaması (SSS `#sss-yanlilik`) var.
-- Sinyal geçmişi: "Son sinyal değişiklikleri" (Sinyaller bölümü, `#gecmis`) — son 30 işlem günündeki AL/TUT/SAT geçişleri,
-  geçmiş fiyatlardan yeniden hesaplanır (`signal_changes()`); history.json'a bağlı değil.
-- Bulgular: strateji test döneminde endeksle başa baş, düşüşü ~1/3; ama 2024 sonrası faizin gerisinde
-  (`docs/duyarlilik-analizi.md`, `docs/reel-faiz-filtresi.md`).
-- Al-bekle'yi geçen hisse: tüm dönemde 6/30 ama test döneminde 18/30; 9 kural denendi, hiçbiri iki dönemi birden iyileştirmedi
-  → mevcut kural korunuyor (`docs/kural-deneyleri.md`).
-- Uzun dönem (2009–2026, `docs/uzun-donem-arastirma.md`): bugünkü listeyle test yanlılığı çok büyük — bugünkü 30 hisse eşit ağırlık
-  al-bekle %38/yıl vs XU030 %23. Mevcut strateji %25/yıl ama düşüş −%21 (2008: +%8). 12-1 ay momentum rotasyonu (en iyi 5) %47/yıl,
-  düşüş −%41 — yanlılıktan en çok etkilenecek strateji.
-- Noktasal evren (`research.py --pit`; 156 aday, her çeyrek TL hacme göre ilk 30, gerçek BIST30 ile 25/30 örtüşme): evren al-bekle %25.9
-  vs XU030 %23.4 → yanlılık büyük ölçüde temizlendi. Momentum rotasyonu %26–27 / düşüş −%50–58 → avantajı yanlılıktı, eklenmedi.
-  Mevcut strateji %21 / −%24: Sharpe al-bekle ile aynı, **değeri düşüş koruması**.
-- Oynaklığa göre pozisyon büyüklüğü iki dönemde de iyileştirdi → `vol_sizing=True`. Payı büyütmek (1.5×+) işe yaramadı.
-- **Botun portföy testi artık noktasal evrenle, 2006'dan** (`CANDIDATES` 156 hisse, `pit_membership`, `sized_portfolio`):
-  model %20.0/yıl, düşüş −%24.5 · XU030 %17.7, −%64 · büyük 30 al-bekle %18.5, −%68 · faiz %15.5.
-  Sinyaller (signals.json) hâlâ bugünkü BIST30 listesi için.
+## Durum (10 Kasım 2026)
+- Bot gerçek veriyle çalışıyor: GitHub Actions hafta içi 18:40 (+ yedek 19:25, 21:10) çalışıp JSON'ları commit ediyor; GitHub Pages
+  açık (https://emrcnkkl.github.io/quant-bot/). Repo: Emrcnkkl/quant-bot, ana dal `claude/laughing-dijkstra-j1eqmj`.
+- Cloud oturumları için `quant-bot` ortamı Yahoo Finance ve www.tcmb.gov.tr'ye izinli → `python3 bot.py` oturumdan da çalışır (~1 dk).
+- **Portföy testi (sitedeki rakamlar)**: 2006'dan, noktasal evren (her çeyrek TL hacme göre en büyük 30), oynaklık ayarlı pozisyon,
+  reel faiz filtresi (+5). Sonuç (Kasım 2026): model %21/yıl, düşüş −%25 · XU030 %17.7, −%64 · faiz %15.5.
+  **Enflasyondan arındırılmış**: model +%1.7/yıl, XU030 −%1.2, faiz −%3.0. Dolar bazında model +%1.7, XU030 −%1.2.
+- Modelin değeri getiri değil **düşüş koruması** (2008: endeks −%50, model +%7). Teknik göstergelerle al-bekle'yi getiride
+  belirgin geçmek gerçekçi testte mümkün olmadı; aşağıdaki "Araştırma bulguları"na bakmadan yeni kural ekleme.
+- **Canlı model portföy** (`live.json`): 9 Kasım 2026'da 100.000 ₺ ile başladı; her çalıştırmada yalnızca yeni günler eklenir,
+  geçmiş kayıtlar ASLA yeniden yazılmaz (`update_live`). Model mantığı değişirse eski kayıtlar olduğu gibi kalır.
+- **Telegram**: AL'a giren/çıkan hisseler ve model alım/satımları (`notify`, durum `notify.json`). Token/kanal ID GitHub
+  Secrets'ta (`TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`) — depoya ya da sohbete yazılmaz. Elle deneme: Actions → Run workflow →
+  "telegram_test" kutusu, ya da `python3 bot.py --telegram-test`.
+- Site: koyu premium tema, genel kitleye sade dil; Bugün (özet kartı, AL/TUT/SAT, faiz ortamı, canlı portföy) · Sinyaller (tablo,
+  hisse grafiği, son sinyal değişiklikleri, faiz filtresi uyarısı) · Performans (TL / enflasyondan arındırılmış / dolar anahtarı,
+  yıl yıl tablo) · Nasıl çalışır · SSS. Tasarım referansı kullanıcının diğer projesi (emrcnkkl.github.io/anlik_bot).
+
+### Araştırma bulguları (ayrıntı `docs/`)
+| Konu | Sonuç | Karar |
+|---|---|---|
+| Nakit faizi | Boştaki para politika faizi kazanmalı | eklendi |
+| Parametre duyarlılığı (`sensitivity.py`) | sonuç ayarlara duyarsız; ayar oynamak işe yaramıyor | ayarlar sabit |
+| Çıkış kuralları (`experiments.py`) | hiçbir kural iki dönemi birden iyileştirmedi | değişmedi |
+| Bugünkü listeyle test | ~15 puan/yıl şişirme (hayatta kalma yanlılığı) | noktasal evren |
+| Momentum rotasyonu | avantajı yanlılıktı; doğru evrende al-bekle kadar, düşüş −%50+ | eklenmedi |
+| Oynaklığa göre pozisyon | iki dönemde de risk başına getiri arttı | **eklendi** (`vol_sizing`) |
+| Payı büyütmek (1.5×+) | testte daha kötü | eklenmedi |
+| Reel faiz filtresi 20 yıl (`research.py --faiz`) | +2.5…+7.5 arası eşikler iyileştiriyor; +5 iki dönemde de | **eklendi** (`real_rate_max=5`) |
 
 ## Dosya yapısı
 ```
@@ -50,11 +51,13 @@ YENİ PROJE/
 ├── signals.json       # güncel sinyaller (bot üretir)
 ├── backtest.json      # backtest raporu (bot üretir)
 ├── stocks/TICKER.json # hisse detay grafiği verisi, son 500 gün (bot üretir)
+├── live.json          # canlı model portföy kaydı (yalnızca eklenir, geçmişi değişmez)
+├── notify.json        # son Telegram bildirimi tarihi
 ├── sensitivity.py     # parametre duyarlılık analizi (bot.py fonksiyonlarını kullanır, veriyi .cache/ altına kaydeder)
 ├── sensitivity.json   # analiz çıktısı
 ├── experiments.py     # giriş/çıkış kuralı deneyleri (al-bekle'yi geçen hisse sayısı), çıktı experiments.json
 ├── research.py        # 2005–bugün uzun dönem testi, momentum rotasyonu, kayan pencereli seçim; veri .cache/long.pkl, çıktı research.json
-│                      # --pit: noktasal evren (.cache/wide.pkl, 156 aday hisse), çıktı research_pit.json
+│                      # --pit noktasal evren · --sizing pozisyon büyüklüğü · --faiz reel faiz filtresi (research_*.json)
 └── history.json       # günlük sinyal geçmişi (yalnızca gerçek veriyle çalışınca oluşur/eklenir, son 500 gün)
 ```
 
@@ -109,10 +112,10 @@ Bilgi amaçlı stop = kapanış − 2.5×ATR, hedef = kapanış + 4×ATR. Pozisy
 - `state` alanı backtest durum makinesinden gelir: `POZİSYONDA`, `GİRİŞ` (yarın al), `ÇIKIŞ` (yarın sat), `BEKLE`.
 
 ### Tüm ayarlar
-`bot.py` başındaki `CFG` sözlüğü: history_period, warmup_days, buy/sell_threshold, exit_score,
+`bot.py` başındaki `CFG` sözlüğü: warmup_days, buy/sell_threshold, exit_score,
 stop_atr, target_atr, commission, slippage, oos_fraction, min_bars, cash_rate_factor (0 = faiz yok), changes_days (30),
 history_start, backtest_start (2006), universe_size (30), vol_sizing (True), vol_cap (2), jump_limit (0.25),
-real_rate_max (None = kapalı; reel faiz bunun üstündeyse yeni alım yok — `entry_allowed()`, `macro_frame()`),
+real_rate_max (5.0; None = kapalı; reel faiz bunun üstündeyse yeni alım yok — `entry_allowed()`, `macro_frame()`),
 exit_rule ("score" varsayılan | ema50 | cross | ema200 | regime), entry_rule ("score" | ema200), stop_atr=None → stop yok.
 
 `POLICY_RATES` (2010-05 öncesi `POLICY_RATES_PRE2010` = gecelik borç alma, sonrası 1 hafta repo; 2003'ten) ve `CPI_YOY` (yıllık TÜFE, 2005'ten) yerleşik tablolar; gerçek çalıştırmada
@@ -124,8 +127,10 @@ exit_rule ("score" varsayılan | ema50 | cross | ema200 | regime), entry_rule ("
 - `changes[]`: `date, ticker, name, from, to, score, close, since_pct` (yeniden eskiye)
 - `signals[]`: `ticker, name, date, close, change_pct, score, signal, state, score_5d_ago, components{ema200,...}, rsi, adx, atr_pct, stop, target, position{entry_date,entry_price,last_price,stop,pnl_pct,days}|null, reasons[]`
 
-**backtest.json**: meta alanları + `settings, period{start,end,oos_start}, portfolio{full,oos,benchmark_full,benchmark_oos,cash_full,cash_oos}, portfolio{...,universe_full,universe_oos}, equity_curve[{date,strategy,benchmark,cash,universe}] (haftalık), yearly[{year,from,to,partial,strategy,benchmark,cash,universe}], stocks[{ticker,name,strategy,oos,buy_hold_pct}], recent_trades[]`
+**backtest.json**: meta alanları + `backtest_universe, avg_exposure_pct, fx_start, units{real,usd}{strategy,benchmark,universe,cash}{full,oos}, settings, period{start,end,oos_start}, portfolio{full,oos,benchmark_full,benchmark_oos,cash_full,cash_oos}, portfolio{...,universe_full,universe_oos}, equity_curve[{date,strategy,benchmark,cash,universe,cpi,usd}] (haftalık), yearly[{year,from,to,partial,strategy,benchmark,cash,universe,cpi_pct,usd_pct}], stocks[{ticker,name,strategy,oos,buy_hold_pct}], recent_trades[]`
 - metrik alanları (`metrics()`): `total_return_pct, cagr_pct, sharpe, max_drawdown_pct, exposure_pct` (+ işlem listesi verilirse `trades, win_rate_pct, avg_trade_pct, profit_factor, avg_days`)
+
+**live.json**: `start_date, start_value, start_bench, points[{date,value,bench,stock_pct}], events[{date,ticker,name,type}], holdings[{ticker,name,weight_pct}], updated`
 
 **history.json**: `[{date, signals: {TICKER: [signal, score, close]}}]`
 
@@ -151,12 +156,7 @@ exit_rule ("score" varsayılan | ema50 | cross | ema200 | regime), entry_rule ("
 - Demo veri rastgeledir; demo backtest sonuçları hiçbir şey ifade etmez.
 
 ## Sıradaki adımlar
-1. **Gerçek veriyle ilk çalıştırma** — `python3 bot.py`; eksik/hatalı hisse var mı, skor dağılımı makul mü (hepsi TUT ya da hepsi AL değil mi), backtest sayıları mantıklı mı kontrol et.
-2. GitHub Pages kurulumu; Actions'a yazma izni ver (Settings → Actions → General → Read and write), `workflow_dispatch` ile manuel test et. Repo: Emrcnkkl/quant-bot.
-3. ~~Nakit getirisi~~ — yapıldı (TCMB politika faizi). 2026 PPK kararlarını `POLICY_RATES`'e ekle.
-4. ~~Hayatta kalma yanlılığı~~ — ölçüldü (~15 puan/yıl) ve araştırmada noktasal evrenle giderildi. Bot/site backtest'i hâlâ bugünkü listeyle (uyarı var).
-5. ~~Duyarlılık analizi~~ — yapıldı (`sensitivity.py`, sonuç `docs/duyarlilik-analizi.md`): sonuç ayarlara duyarsız, ayar oynamak OOS'u iyileştirmiyor, hiçbir ayar OOS'ta faizi geçmiyor → mevcut ayarlar korunuyor.
-6. ~~Reel faiz filtresi~~ — kodda var, varsayılan kapalı (`docs/reel-faiz-filtresi.md`). Haftalık trend / XU030 EMA200 rejim filtresi denenmedi.
-7. Sinyal değişimlerinde Telegram bildirimi (yalnızca AL↔TUT↔SAT değişince).
-8. ~~Hisse detay grafiği~~ ve ~~sinyal geçmişi listesi~~ — yapıldı.
-9. Ocak 2027'de BIST30 listesini güncelle.
+1. Kullanıcı Telegram token'ını GitHub Secrets'a ekleyince `telegram_test` ile dene.
+2. Ocak 2027'de BIST30 listesini (`BIST30` sözlüğü) Borsa İstanbul duyurusuna göre güncelle; `CANDIDATES`'e yeni büyük hisseleri ekle.
+3. Fikirler: puan bileşenlerini tek tek sınamak (eğitim/test ayrımıyla), endeks EMA200 rejim filtresi (20 yıl testi),
+   değerleme verisi (F/K) — veri kaynağı gerekli. Canlı portföy birkaç ay biriktikten sonra geriye dönük testle kıyasla.

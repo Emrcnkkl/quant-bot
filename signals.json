@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-09T19:57+03:00",
+ "generated_at": "2026-11-09T20:16+03:00",
  "data_date": "2026-11-09",
  "demo": false,
  "universe": "BIST 30 (Ekim-Aralık 2026)",
@@ -15,8 +15,8 @@
   "policy_date": "2026-10-23",
   "cpi_month": "2026-10",
   "source": "TCMB (canlı)",
-  "filter_max": null,
-  "blocking": false
+  "filter_max": 5.0,
+  "blocking": true
  },
  "counts": {
   "AL": 7,
@@ -32,7 +32,7 @@
    "change_pct": 6.1,
    "score": 97.1,
    "signal": "AL",
-   "state": "POZİSYONDA",
+   "state": "BEKLE",
    "score_5d_ago": -34.1,
    "components": {
     "ema200": 15.0,
@@ -49,14 +49,7 @@
    "atr_pct": 3.31,
    "stop": 140.45,
    "target": 173.34,
-   "position": {
-    "entry_date": "2026-11-05",
-    "entry_price": 138.81,
-    "last_price": 153.1,
-    "stop": 140.45,
-    "pnl_pct": 10.3,
-    "days": 2
-   },
+   "position": null,
    "reasons": [
     "Fiyat EMA200 üzerinde (uzun vade yukarı)",
     "EMA20 > EMA50 (kısa vade pozitif)",
@@ -76,7 +69,7 @@
    "change_pct": 3.14,
    "score": 82.2,
    "signal": "AL",
-   "state": "POZİSYONDA",
+   "state": "BEKLE",
    "score_5d_ago": -33.6,
    "components": {
     "ema200": 15.0,
@@ -93,14 +86,7 @@
    "atr_pct": 3.88,
    "stop": 274.26,
    "target": 350.93,
-   "position": {
-    "entry_date": "2026-11-06",
-    "entry_price": 288.93,
-    "last_price": 303.75,
-    "stop": 274.26,
-    "pnl_pct": 5.13,
-    "days": 1
-   },
+   "position": null,
    "reasons": [
     "Fiyat EMA200 üzerinde (uzun vade yukarı)",
     "EMA20 > EMA50 (kısa vade pozitif)",
@@ -118,7 +104,7 @@
    "change_pct": 4.03,
    "score": 81.3,
    "signal": "AL",
-   "state": "POZİSYONDA",
+   "state": "BEKLE",
    "score_5d_ago": -29.4,
    "components": {
     "ema200": 15.0,
@@ -135,14 +121,7 @@
    "atr_pct": 3.65,
    "stop": 35.2,
    "target": 44.4,
-   "position": {
-    "entry_date": "2026-11-09",
-    "entry_price": 37.46,
-    "last_price": 38.74,
-    "stop": 35.2,
-    "pnl_pct": 3.43,
-    "days": 0
-   },
+   "position": null,
    "reasons": [
     "Fiyat EMA200 üzerinde (uzun vade yukarı)",
     "EMA20 > EMA50 (kısa vade pozitif)",
@@ -160,7 +139,7 @@
    "change_pct": 3.35,
    "score": 58.5,
    "signal": "AL",
-   "state": "GİRİŞ",
+   "state": "BEKLE",
    "score_5d_ago": -56.9,
    "components": {
     "ema200": 15.0,
@@ -196,7 +175,7 @@
    "change_pct": 3.59,
    "score": 55.7,
    "signal": "AL",
-   "state": "POZİSYONDA",
+   "state": "BEKLE",
    "score_5d_ago": -55.1,
    "components": {
     "ema200": 15.0,
@@ -213,14 +192,7 @@
    "atr_pct": 3.49,
    "stop": 282.94,
    "target": 353.29,
-   "position": {
-    "entry_date": "2026-11-09",
-    "entry_price": 301.95,
-    "last_price": 310.0,
-    "stop": 282.94,
-    "pnl_pct": 2.67,
-    "days": 0
-   },
+   "position": null,
    "reasons": [
     "Fiyat EMA200 üzerinde (uzun vade yukarı)",
     "EMA20 < EMA50 (kısa vade negatif)",
@@ -239,7 +211,7 @@
    "change_pct": 1.69,
    "score": 55.1,
    "signal": "AL",
-   "state": "GİRİŞ",
+   "state": "BEKLE",
    "score_5d_ago": -53.1,
    "components": {
     "ema200": 15.0,
@@ -274,7 +246,7 @@
    "change_pct": 3.09,
    "score": 53.1,
    "signal": "AL",
-   "state": "GİRİŞ",
+   "state": "BEKLE",
    "score_5d_ago": -34.7,
    "components": {
     "ema200": 15.0,

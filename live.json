@@ -1,0 +1,17 @@
+{
+ "start_date": "2026-11-09",
+ "start_value": 100000.0,
+ "start_bench": 14610.9599609375,
+ "note": "Her gün yalnızca yeni günün getirisi eklenir; geçmiş kayıtlar değiştirilmez.",
+ "points": [
+  {
+   "date": "2026-11-09",
+   "value": 100000.0,
+   "bench": 100000.0,
+   "stock_pct": 0.0
+  }
+ ],
+ "events": [],
+ "holdings": [],
+ "updated": "2026-11-09"
+}

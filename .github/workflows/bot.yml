@@ -8,6 +8,11 @@ on:
     - cron: "25 16 * * 1-5"   # 19:25 TR (yedek)
     - cron: "10 18 * * 1-5"   # 21:10 TR (yedek)
   workflow_dispatch:           # Actions sekmesinden elle başlatma
+    inputs:
+      telegram_test:
+        description: "Değişiklik olmasa da Telegram'a deneme mesajı gönder"
+        type: boolean
+        default: false
 permissions:
   contents: write
 concurrency:
@@ -35,13 +40,17 @@ jobs:
       - if: steps.check.outputs.skip != 'true'
         run: pip install -r requirements.txt
       - if: steps.check.outputs.skip != 'true'
-        run: python bot.py
+        env:
+          # GitHub → Settings → Secrets and variables → Actions içinde tanımlanır; kodda ya da depoda yer almaz
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python bot.py ${{ inputs.telegram_test && '--telegram-test' || '' }}
       - name: Sonuçları kaydet
         if: steps.check.outputs.skip != 'true'
         run: |
           git config user.name "bist30-bot"
           git config user.email "bot@users.noreply.github.com"
-          git add signals.json backtest.json history.json stocks/
+          git add signals.json backtest.json history.json live.json notify.json stocks/
           if git diff --staged --quiet; then echo "Değişiklik yok"; exit 0; fi
           git commit -m "Sinyaller güncellendi: $(TZ=Europe/Istanbul date +'%Y-%m-%d %H:%M')"
           # Bu sırada depoya başka bir değişiklik gönderildiyse önce onu al

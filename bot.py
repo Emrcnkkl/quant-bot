@@ -94,7 +94,7 @@ CFG = {
     "oos_fraction": 0.30,       # son %30'luk dönem örneklem dışı olarak raporlanır
     "min_bars": 260,
     "cash_rate_factor": 1.0,    # nakit getirisi = politika faizi × bu katsayı (0 -> faiz yok)
-    "real_rate_max": None,
+    "real_rate_max": 5.0,       # reel faiz %5'in üstündeyken yeni alım yok (docs/uzun-donem-arastirma.md, 20 yıl testi)
     "changes_days": 30,
     # Çıkış kuralı: "score" = skor < exit_score | "ema50" = kapanış < EMA50 |
     #               "cross" = EMA20 < EMA50 | "ema200" = kapanış < EMA200 |
@@ -199,6 +199,53 @@ CPI_YOY = {
     "2026-01": 30.65, "2026-02": 31.53, "2026-03": 30.87, "2026-04": 32.37, "2026-05": 32.61, "2026-06": 32.11,
     "2026-07": 31.75, "2026-08": 31.51, "2026-09": 29.73, "2026-10": 29.77,
 }
+# Aylık TÜFE değişimi (%), ay -> oran: getirileri enflasyondan arındırmak için (fiyat endeksi buradan kurulur)
+CPI_MOM = {
+    "2005-01": 0.55, "2005-02": 0.02, "2005-03": 0.26, "2005-04": 0.71, "2005-05": 0.92, "2005-06": 0.10,
+    "2005-07": -0.57, "2005-08": 0.85, "2005-09": 1.02, "2005-10": 1.79, "2005-11": 1.40, "2005-12": 0.42,
+    "2006-01": 0.75, "2006-02": 0.22, "2006-03": 0.27, "2006-04": 1.34, "2006-05": 1.88, "2006-06": 0.34,
+    "2006-07": 0.85, "2006-08": -0.44, "2006-09": 1.29, "2006-10": 1.27, "2006-11": 1.29, "2006-12": 0.23,
+    "2007-01": 1.00, "2007-02": 0.43, "2007-03": 0.92, "2007-04": 1.21, "2007-05": 0.50, "2007-06": -0.24,
+    "2007-07": -0.73, "2007-08": 0.02, "2007-09": 1.03, "2007-10": 1.81, "2007-11": 1.95, "2007-12": 0.22,
+    "2008-01": 0.80, "2008-02": 1.29, "2008-03": 0.96, "2008-04": 1.68, "2008-05": 1.49, "2008-06": -0.36,
+    "2008-07": 0.58, "2008-08": -0.24, "2008-09": 0.45, "2008-10": 2.60, "2008-11": 0.83, "2008-12": -0.41,
+    "2009-01": 0.29, "2009-02": -0.34, "2009-03": 1.10, "2009-04": 0.02, "2009-05": 0.64, "2009-06": 0.11,
+    "2009-07": 0.25, "2009-08": -0.30, "2009-09": 0.39, "2009-10": 2.41, "2009-11": 1.27, "2009-12": 0.53,
+    "2010-01": 1.85, "2010-02": 1.45, "2010-03": 0.58, "2010-04": 0.60, "2010-05": -0.36, "2010-06": -0.56,
+    "2010-07": -0.48, "2010-08": 0.40, "2010-09": 1.23, "2010-10": 1.83, "2010-11": 0.03, "2010-12": -0.30,
+    "2011-01": 0.41, "2011-02": 0.73, "2011-03": 0.42, "2011-04": 0.87, "2011-05": 2.42, "2011-06": -1.43,
+    "2011-07": -0.41, "2011-08": 0.73, "2011-09": 0.75, "2011-10": 3.27, "2011-11": 1.73, "2011-12": 0.58,
+    "2012-01": 0.56, "2012-02": 0.56, "2012-03": 0.41, "2012-04": 1.52, "2012-05": -0.21, "2012-06": -0.90,
+    "2012-07": -0.23, "2012-08": 0.56, "2012-09": 1.03, "2012-10": 1.96, "2012-11": 0.38, "2012-12": 0.38,
+    "2013-01": 1.65, "2013-02": 0.30, "2013-03": 0.66, "2013-04": 0.42, "2013-05": 0.15, "2013-06": 0.76,
+    "2013-07": 0.31, "2013-08": -0.10, "2013-09": 0.77, "2013-10": 1.80, "2013-11": 0.01, "2013-12": 0.46,
+    "2014-01": 1.98, "2014-02": 0.43, "2014-03": 1.13, "2014-04": 1.34, "2014-05": 0.40, "2014-06": 0.31,
+    "2014-07": 0.45, "2014-08": 0.09, "2014-09": 0.14, "2014-10": 1.90, "2014-11": 0.18, "2014-12": -0.44,
+    "2015-01": 1.10, "2015-02": 0.71, "2015-03": 1.19, "2015-04": 1.63, "2015-05": 0.56, "2015-06": -0.51,
+    "2015-07": 0.09, "2015-08": 0.40, "2015-09": 0.89, "2015-10": 1.55, "2015-11": 0.67, "2015-12": 0.21,
+    "2016-01": 1.82, "2016-02": -0.02, "2016-03": -0.04, "2016-04": 0.78, "2016-05": 0.58, "2016-06": 0.47,
+    "2016-07": 1.16, "2016-08": -0.29, "2016-09": 0.18, "2016-10": 1.44, "2016-11": 0.52, "2016-12": 1.64,
+    "2017-01": 2.46, "2017-02": 0.81, "2017-03": 1.02, "2017-04": 1.31, "2017-05": 0.45, "2017-06": -0.27,
+    "2017-07": 0.15, "2017-08": 0.52, "2017-09": 0.65, "2017-10": 2.08, "2017-11": 1.49, "2017-12": 0.69,
+    "2018-01": 1.02, "2018-02": 0.73, "2018-03": 0.99, "2018-04": 1.87, "2018-05": 1.62, "2018-06": 2.61,
+    "2018-07": 0.55, "2018-08": 2.30, "2018-09": 6.30, "2018-10": 2.67, "2018-11": -1.44, "2018-12": -0.40,
+    "2019-01": 1.06, "2019-02": 0.16, "2019-03": 1.03, "2019-04": 1.69, "2019-05": 0.95, "2019-06": 0.03,
+    "2019-07": 1.36, "2019-08": 0.86, "2019-09": 0.99, "2019-10": 2.00, "2019-11": 0.38, "2019-12": 0.74,
+    "2020-01": 1.35, "2020-02": 0.35, "2020-03": 0.57, "2020-04": 0.85, "2020-05": 1.36, "2020-06": 1.13,
+    "2020-07": 0.58, "2020-08": 0.86, "2020-09": 0.97, "2020-10": 2.13, "2020-11": 2.30, "2020-12": 1.25,
+    "2021-01": 1.68, "2021-02": 0.91, "2021-03": 1.08, "2021-04": 1.68, "2021-05": 0.89, "2021-06": 1.94,
+    "2021-07": 1.80, "2021-08": 1.12, "2021-09": 1.25, "2021-10": 2.39, "2021-11": 3.51, "2021-12": 13.58,
+    "2022-01": 11.10, "2022-02": 4.81, "2022-03": 5.46, "2022-04": 7.25, "2022-05": 2.98, "2022-06": 4.95,
+    "2022-07": 2.37, "2022-08": 1.46, "2022-09": 3.08, "2022-10": 3.54, "2022-11": 2.88, "2022-12": 1.18,
+    "2023-01": 6.65, "2023-02": 3.15, "2023-03": 2.29, "2023-04": 2.39, "2023-05": 0.04, "2023-06": 3.92,
+    "2023-07": 9.49, "2023-08": 9.09, "2023-09": 4.75, "2023-10": 3.43, "2023-11": 3.28, "2023-12": 2.93,
+    "2024-01": 6.70, "2024-02": 4.53, "2024-03": 3.16, "2024-04": 3.18, "2024-05": 3.37, "2024-06": 1.64,
+    "2024-07": 3.23, "2024-08": 2.47, "2024-09": 2.97, "2024-10": 2.88, "2024-11": 2.24, "2024-12": 1.03,
+    "2025-01": 5.03, "2025-02": 2.27, "2025-03": 2.46, "2025-04": 3.00, "2025-05": 1.53, "2025-06": 1.37,
+    "2025-07": 2.06, "2025-08": 2.04, "2025-09": 3.23, "2025-10": 2.55, "2025-11": 0.87, "2025-12": 0.89,
+    "2026-01": 4.84, "2026-02": 2.96, "2026-03": 1.94, "2026-04": 4.18, "2026-05": 1.71, "2026-06": 0.99,
+    "2026-07": 1.78, "2026-08": 1.84, "2026-09": 1.84, "2026-10": 2.58,
+}
 MACRO_SOURCE = "yerleşik tablo"   # fetch_macro başarılı olursa "TCMB (canlı)" olur
 
 TCMB = "https://www.tcmb.gov.tr/wps/wcm/connect/TR/TCMB+TR/Main+Menu/"
@@ -297,13 +344,13 @@ def pit_membership(data: dict[str, pd.DataFrame], cal: pd.DatetimeIndex, n: int)
 
 
 def sized_portfolio(prep: dict, cal: pd.DatetimeIndex, cash: pd.Series, mem: pd.DataFrame,
-                    mult: float = 1.0, vol: bool = True, cap: float = 2.0) -> tuple[pd.Series, pd.Series, dict]:
+                    mult: float = 1.0, vol: bool = True, cap: float = 2.0, weights: bool = False):
     """
     Portföy: her pozisyon temel olarak sermayenin mult/N'i (N = evren büyüklüğü). Hisseye yalnızca evrendeyken girilir.
     vol=True: oynak hissede küçük, sakin hissede büyük pozisyon (temel pay × evren medyan ATR% / hissenin ATR%'si,
     1/3 ile `cap` arası). Toplam hisse payı %100'ü aşarsa hepsi orantılı küçültülür (kaldıraç yok). Boş pay faizde.
     Yaklaşıklık: ağırlıklar günlük yeniden dengelenir; evrenden çıkan hissedeki pozisyon maliyetsiz kapanmış sayılır.
-    Döner: (günlük getiri, günlük hisse payı, hisse bazında backtest sonuçları)
+    Döner: (günlük getiri, günlük hisse payı, hisse bazında backtest sonuçları[, günlük ağırlık tablosu])
     """
     n = CFG["universe_size"]
     rets, held, atrp, bts = {}, {}, {}, {}
@@ -322,7 +369,8 @@ def sized_portfolio(prep: dict, cal: pd.DatetimeIndex, cash: pd.Series, mem: pd.
         Wt = Wt * A.pow(-1).mul(med, axis=0).clip(1 / 3, cap).fillna(1)
     Wt = Wt.div(Wt.sum(axis=1).clip(lower=1), axis=0)
     expo = Wt.sum(axis=1)
-    return (Wt * R.fillna(0)).sum(axis=1) + (1 - expo) * cash, expo, bts
+    port = (Wt * R.fillna(0)).sum(axis=1) + (1 - expo) * cash
+    return (port, expo, bts, Wt) if weights else (port, expo, bts)
 
 
 def fetch_demo(tickers: list[str]) -> dict[str, pd.DataFrame]:
@@ -359,16 +407,18 @@ def _page_text(url: str) -> str:
 def fetch_macro() -> None:
     """Politika faizi ve TÜFE tablolarını TCMB sitesinden günceller.
     Başarısız olursa (internet yok, sayfa yapısı değişti...) yerleşik tablolar kalır."""
-    global POLICY_RATES, CPI_YOY, MACRO_SOURCE
+    global POLICY_RATES, CPI_YOY, CPI_MOM, MACRO_SOURCE
     try:
         rows = re.findall(r"(\d{2})\.(\d{2})\.(\d{4}) - (\d+\.\d+)", _page_text(TCMB_REPO_URL))
         rates = POLICY_RATES_PRE2010 + sorted((f"{y}-{m}-{d}", float(v)) for d, m, y, v in rows)
-        cpi = {f"{y}-{m}": float(v) for m, y, v in
-               re.findall(r"\b(\d{2})-(\d{4}) (-?\d+\.\d+) -?\d+\.\d+", _page_text(TCMB_CPI_URL))}
+        rows_cpi = re.findall(r"\b(\d{2})-(\d{4}) (-?\d+\.\d+) (-?\d+\.\d+)", _page_text(TCMB_CPI_URL))
+        cpi = {f"{y}-{m}": float(v) for m, y, v, _ in rows_cpi}
+        mom = {f"{y}-{m}": float(x) for m, y, _, x in rows_cpi}
         # Basit akıl sağlığı kontrolü: yerleşik tablodaki son kayıtları içermeli
         if len(rates) < 30 or POLICY_RATES[-1] not in rates or len(cpi) < 60 or max(cpi) < max(CPI_YOY):
             raise ValueError(f"beklenmeyen içerik ({len(rates)} faiz, {len(cpi)} TÜFE satırı)")
         POLICY_RATES, CPI_YOY, MACRO_SOURCE = rates, cpi, "TCMB (canlı)"
+        CPI_MOM = dict(sorted(mom.items()))
         print(f"  ✓ TCMB: politika faizi %{rates[-1][1]} ({rates[-1][0]}), "
               f"TÜFE %{cpi[max(cpi)]} ({max(cpi)})")
     except Exception as e:  # noqa: BLE001
@@ -705,7 +755,7 @@ def r2(x):
     return None if x is None or (isinstance(x, float) and math.isnan(x)) else round(float(x), 2)
 
 
-def run(demo: bool) -> None:
+def run(demo: bool, telegram_test: bool = False) -> None:
     tickers = list(BIST30)
     print(f"BIST30 sinyal botu — {'DEMO (sentetik veri)' if demo else 'gerçek veri'}")
     if not demo:
@@ -718,6 +768,16 @@ def run(demo: bool) -> None:
         data = fetch_real(universe + [BENCHMARK], verbose=False)
         print(f"  {len(data)} seri indirildi")
         data = fix_jumps(data)
+    usdtry = None
+    if not demo:
+        try:
+            import yfinance as yf
+            fx = _clean(yf.download("TRY=X", start=CFG["history_start"], interval="1d", auto_adjust=True,
+                                    progress=False, threads=False))
+            usdtry = fx["Close"].loc["2005-01-03":]
+            print(f"  ✓ USD/TRY: {usdtry.iloc[-1]:.2f} ({usdtry.index[-1].date()})")
+        except Exception as e:  # noqa: BLE001
+            print(f"  ! USD/TRY alınamadı, dolar bazlı getiri atlanacak: {e}", file=sys.stderr)
     bench = data.pop(BENCHMARK, None)
     bench_close = bench["Close"] if bench is not None else None
     if bench is None:
@@ -811,7 +871,7 @@ def run(demo: bool) -> None:
             prep[t] = (d_, score_frame(d_)["score"])
     mem = mem[list(prep)]
     cash = cash_returns(cal)
-    port, expo, _ = sized_portfolio(prep, cal, cash, mem, 1.0, CFG["vol_sizing"], CFG["vol_cap"])
+    port, expo, _, weights = sized_portfolio(prep, cal, cash, mem, 1.0, CFG["vol_sizing"], CFG["vol_cap"], weights=True)
     # Adil kıyas: aynı evrenin (her gün o günün üyeleri) eşit ağırlıklı al-bekle'si
     closes = pd.DataFrame({t: d_["Close"] for t, (d_, _) in prep.items()}).reindex(cal)
     rets = closes.pct_change().where(closes.notna() & closes.shift(1).notna() & mem)
@@ -826,13 +886,24 @@ def run(demo: bool) -> None:
         b = bench_close.reindex(port.index).ffill()
         bench_eq = b / b.iloc[0]
     cash_eq = (1 + cash).cumprod()
+    # Enflasyon ve dolar: aynı getirileri TÜFE'ye ve USD/TRY'ye göre de raporla
+    cpi_l = cpi_level(port.index)
+    usd_l = usdtry.reindex(port.index).ffill().bfill() if usdtry is not None else None
+    cpi_eq = cpi_l / cpi_l.iloc[0]
+    usd_eq = usd_l / usd_l.iloc[0] if usd_l is not None else None
     uni_eq = (1 + uni).cumprod()
     weekly = port_eq.resample("W-FRI").last().dropna()   # tamamen tatil olan haftaları atla
     curve = [{"date": str(i.date()), "strategy": round(float(v), 4),
               "benchmark": round(float(bench_eq.asof(i)), 4) if bench_eq is not None else None,
-              "cash": round(float(cash_eq.asof(i)), 4), "universe": round(float(uni_eq.asof(i)), 4)}
+              "cash": round(float(cash_eq.asof(i)), 4), "universe": round(float(uni_eq.asof(i)), 4),
+              "cpi": round(float(cpi_eq.asof(i)), 4),
+              "usd": round(float(usd_eq.asof(i)), 4) if usd_eq is not None else None}
              for i, v in weekly.items()]
 
+    live = update_live(port, weights, bench_close, demo)
+    unit_src = {"strategy": port, "cash": cash, "universe": uni}
+    if bench_eq is not None:
+        unit_src["benchmark"] = bench_eq.pct_change().fillna(0)
     now = datetime.now(TR_TZ)
     order = {"AL": 0, "TUT": 1, "SAT": 2}
     signals.sort(key=lambda x: (order[x["signal"]], -x["score"]))
@@ -856,6 +927,7 @@ def run(demo: bool) -> None:
         "blocking": bool(CFG["real_rate_max"] is not None and mf["real"] > CFG["real_rate_max"]),
     }
     changes.sort(key=lambda x: (x["date"], x["to"] == "AL", x["score"]), reverse=True)
+    notify_args = (meta, regime, counts)
     write("signals.json", {**meta, "regime": regime, "counts": counts, "signals": signals,
                            "changes_days": CFG["changes_days"],
                            "changes_dates": sorted(change_dates)[-(CFG["changes_days"] + 1):], "changes": changes})
@@ -883,10 +955,19 @@ def run(demo: bool) -> None:
             "universe_oos": metrics(uni.iloc[split:], rf=cash),
         },
         "equity_curve": curve,
-        "yearly": yearly_table(port, bench_eq.pct_change().fillna(0) if bench_eq is not None else None, cash, uni),
+        "yearly": yearly_table(port, bench_eq.pct_change().fillna(0) if bench_eq is not None else None, cash, uni,
+                               cpi_l, usd_l),
+        "fx_start": r2(usd_l.iloc[0]) if usd_l is not None else None,
+        "units": {
+            "real": unit_metrics(unit_src, cpi_l, split),
+            **({"usd": unit_metrics(unit_src, usd_l, split)} if usd_l is not None else {}),
+        },
         "stocks": sorted(per_stock, key=lambda x: -(x["strategy"].get("total_return_pct") or 0)),
         "recent_trades": sorted(recent_trades, key=lambda x: x["exit_date"], reverse=True)[:40],
     })
+
+    # --- Telegram bildirimi (AL'a giren / çıkan hisseler, model portföy işlemleri)
+    notify(*notify_args, changes, live, demo, test=telegram_test)
 
     # --- Geçmiş (her çalıştırma, aynı veri günü tekrar yazılmaz)
     hist_path = os.path.join(OUT_DIR, "history.json")
@@ -929,7 +1010,171 @@ def signal_changes(t: str, d: pd.DataFrame, score: pd.Series) -> list[dict]:
     return out
 
 
-def yearly_table(port: pd.Series, bench: pd.Series | None, cash: pd.Series, uni: pd.Series | None = None) -> list[dict]:
+SITE_URL = "https://emrcnkkl.github.io/quant-bot/"
+
+
+def telegram_send(text: str) -> bool:
+    """Telegram kanalına mesaj gönderir. Token ve kanal ID'si ortam değişkenlerinden okunur
+    (GitHub → Settings → Secrets: TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID). Yoksa sessizce atlar."""
+    import urllib.parse
+    import urllib.request
+    token, chat = os.environ.get("TELEGRAM_BOT_TOKEN"), os.environ.get("TELEGRAM_CHAT_ID")
+    if not token or not chat:
+        print("  · Telegram ayarlı değil (TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID yok), bildirim atlandı")
+        return False
+    body = urllib.parse.urlencode({"chat_id": chat, "text": text, "parse_mode": "HTML",
+                                   "disable_web_page_preview": "true"}).encode()
+    try:
+        with urllib.request.urlopen(f"https://api.telegram.org/bot{token}/sendMessage", data=body, timeout=30) as r:
+            ok = json.load(r).get("ok", False)
+        print(f"  {'✓' if ok else '!'} Telegram mesajı {'gönderildi' if ok else 'gönderilemedi'}")
+        return ok
+    except Exception as e:  # noqa: BLE001  (token hata mesajına karışmasın diye yalnızca tür yazılır)
+        print(f"  ! Telegram hatası: {type(e).__name__}", file=sys.stderr)
+        return False
+
+
+def notify(meta: dict, regime: dict, counts: dict, changes: list[dict], live: dict | None,
+           demo: bool, test: bool = False) -> None:
+    """Son bildirimden bu yana AL'a girenler / AL'dan çıkanlar ve model portföy işlemleri için Telegram mesajı.
+    Durum notify.json'da tutulur; aynı gün için iki kez gönderilmez. İlk çalıştırmada geçmişi göndermez."""
+    if demo:
+        return
+    path = os.path.join(OUT_DIR, "notify.json")
+    try:
+        with open(path, encoding="utf-8") as f:
+            last = json.load(f).get("last_date")
+    except (FileNotFoundError, json.JSONDecodeError):
+        last = None
+    today = meta["data_date"]
+    if last is None and not test:
+        write("notify.json", {"last_date": today})
+        print("  · Telegram: ilk çalıştırma, başlangıç tarihi kaydedildi (geçmiş gönderilmez)")
+        return
+    if last == today and not test:
+        return
+    since = last if (last and last != today) else str(pd.Timestamp(today) - pd.Timedelta(days=1))[:10]
+    new = [c for c in changes if c["date"] > since]
+    ins = [c for c in new if c["to"] == "AL"]
+    outs = [c for c in new if c["from"] == "AL"]
+    ev = [e for e in (live or {}).get("events", []) if e["date"] > since]
+    if not (ins or outs or ev or test):
+        write("notify.json", {"last_date": today})
+        print("  · Telegram: AL değişikliği yok, mesaj gönderilmedi")
+        return
+
+    def fmt_ch(c):
+        return f"<b>{c['ticker']}</b> ({c['score']:+.0f})"
+    day = pd.Timestamp(today)
+    months = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"]
+    lines = [f"📊 <b>BIST30 Sinyal</b> · {day.day} {months[day.month - 1]} {day.year} kapanışı"]
+    if test and not (ins or outs or ev):
+        lines.append("🔔 Deneme mesajı: bildirimler çalışıyor.")
+    if ins:
+        lines.append("🟢 AL'a girenler: " + ", ".join(fmt_ch(c) for c in ins))
+    if outs:
+        lines.append("🟠 AL'dan çıkanlar: " + ", ".join(f"<b>{c['ticker']}</b> → {c['to']}" for c in outs))
+    if ev:
+        buys = [e["ticker"] for e in ev if e["type"] == "alış"]
+        sells = [e["ticker"] for e in ev if e["type"] == "satış"]
+        if buys:
+            lines.append("🛒 Model portföy aldı: " + ", ".join(buys))
+        if sells:
+            lines.append("💼 Model portföy sattı: " + ", ".join(sells))
+    if regime.get("blocking"):
+        lines.append(f"⏸ Reel faiz %{regime['real_rate']:+.1f} (eşik %{regime['filter_max']:.0f}): model yeni alım yapmıyor.")
+    lines.append(f"Toplam: {counts['AL']} AL · {counts['TUT']} TUT · {counts['SAT']} SAT")
+    if live and len(live["points"]) > 1:
+        p0, p1 = live["points"][0], live["points"][-1]
+        lines.append(f"Canlı portföy ({p0['date']}'den beri): %{(p1['value'] / p0['value'] - 1) * 100:+.1f} · "
+                     f"BIST30 %{(p1['bench'] / p0['bench'] - 1) * 100:+.1f}")
+    lines.append(f'<a href="{SITE_URL}">Siteye git</a> · <i>Yatırım tavsiyesi değildir.</i>')
+    if telegram_send("\n".join(lines)) or not test:
+        write("notify.json", {"last_date": today})
+
+
+def update_live(port: pd.Series, weights: pd.DataFrame, bench_close: pd.Series, demo: bool) -> dict | None:
+    """
+    Canlı model portföy kaydı (live.json). İlk çalıştırmada 100.000 ₺ ile başlar; sonraki her çalıştırmada
+    yalnızca son kayıttan SONRAKİ günler eklenir — geçmiş kayıtlar asla yeniden yazılmaz.
+    Böylece geriye dönük testten bağımsız, sonradan değiştirilemeyen bir performans kaydı birikir.
+    """
+    if demo:
+        return None
+    path = os.path.join(OUT_DIR, "live.json")
+    try:
+        with open(path, encoding="utf-8") as f:
+            live = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        live = None
+
+    def holdings(day):
+        w = weights.loc[day]
+        w = w[w > 1e-6].sort_values(ascending=False)
+        return [{"ticker": t, "name": BIST30.get(t, t), "weight_pct": r2(v * 100)} for t, v in w.items()]
+
+    last_day = port.index[-1]
+    b_last = float(bench_close.asof(last_day))
+    if live is None:
+        live = {"start_date": str(last_day.date()), "start_value": 100000.0, "start_bench": b_last,
+                "note": "Her gün yalnızca yeni günün getirisi eklenir; geçmiş kayıtlar değiştirilmez.",
+                "points": [{"date": str(last_day.date()), "value": 100000.0, "bench": 100000.0,
+                            "stock_pct": r2(weights.loc[last_day].sum() * 100)}],
+                "events": []}
+    else:
+        prev = pd.Timestamp(live["points"][-1]["date"])
+        value = live["points"][-1]["value"]
+        prev_set = {h["ticker"] for h in live.get("holdings", [])}
+        for day in port.index[port.index > prev]:
+            value *= 1 + float(port.loc[day])
+            bench_v = live["start_value"] * float(bench_close.asof(day)) / live["start_bench"]
+            live["points"].append({"date": str(day.date()), "value": round(value, 2), "bench": round(bench_v, 2),
+                                   "stock_pct": r2(weights.loc[day].sum() * 100)})
+            cur = set(weights.columns[weights.loc[day] > 1e-6])
+            for t in sorted(cur - prev_set):
+                live["events"].append({"date": str(day.date()), "ticker": t, "name": BIST30.get(t, t), "type": "alış"})
+            for t in sorted(prev_set - cur):
+                live["events"].append({"date": str(day.date()), "ticker": t, "name": BIST30.get(t, t), "type": "satış"})
+            prev_set = cur
+        live["events"] = live["events"][-100:]
+    live["holdings"] = holdings(last_day)
+    live["updated"] = str(last_day.date())
+    write("live.json", live)
+    return live
+
+
+def cpi_level(index: pd.DatetimeIndex) -> pd.Series:
+    """Günlük TÜFE seviyesi (aylık değişimlerden kurulur, ay içinde geometrik ara değer).
+    Henüz açıklanmamış aylar için son 3 ayın ortalama aylık değişimi varsayılır."""
+    mom = pd.Series({pd.Period(k, "M"): v / 100 for k, v in CPI_MOM.items()}).sort_index()
+    last = mom.index[-1]
+    need = pd.period_range(mom.index[0], max(index[-1].to_period("M"), last), freq="M")
+    mom = mom.reindex(need).fillna(mom.iloc[-3:].mean())
+    lvl_end = (1 + mom).cumprod()                       # ay sonu seviyesi
+    lvl_start = lvl_end / (1 + mom)                     # ay başı seviyesi
+    per = index.to_period("M")
+    frac = (index.day - 1) / index.days_in_month
+    out = lvl_start.reindex(per).to_numpy() * (1 + mom.reindex(per).to_numpy()) ** frac
+    return pd.Series(out, index=index)
+
+
+def unit_metrics(series: dict[str, pd.Series], deflator: pd.Series, split: int) -> dict:
+    """Getirileri bir ölçüye (TÜFE seviyesi ya da USD/TRY kuru) bölerek yıllık getiri ve toplam getiri."""
+    out = {}
+    d = deflator / deflator.iloc[0]
+    for k, r in series.items():
+        eq = (1 + r.fillna(0)).cumprod() / d
+        rr = eq.pct_change().fillna(eq.iloc[0] - 1)
+        out[k] = {"full": {"cagr_pct": metrics(rr)["cagr_pct"], "total_return_pct": r2((eq.iloc[-1] - 1) * 100),
+                           "max_drawdown_pct": metrics(rr)["max_drawdown_pct"]},
+                  "oos": {"cagr_pct": metrics(rr.iloc[split:])["cagr_pct"],
+                          "total_return_pct": r2((eq.iloc[-1] / eq.iloc[split - 1] - 1) * 100),
+                          "max_drawdown_pct": metrics(rr.iloc[split:])["max_drawdown_pct"]}}
+    return out
+
+
+def yearly_table(port: pd.Series, bench: pd.Series | None, cash: pd.Series, uni: pd.Series | None = None,
+                 cpi: pd.Series | None = None, usd: pd.Series | None = None) -> list[dict]:
     """Takvim yılı bazında strateji / XU030 / nakit getirisi (%). Eksik yıllar `partial` işaretli."""
     out = []
     for year, p in port.groupby(port.index.year):
@@ -939,6 +1184,9 @@ def yearly_table(port: pd.Series, bench: pd.Series | None, cash: pd.Series, uni:
             "year": int(year), "from": str(p.index[0].date()), "to": str(p.index[-1].date()),
             "partial": bool(p.index[0].month > 1 or p.index[0].day > 10 or p.index[-1].month < 12),
             "strategy": ret(p), "benchmark": ret(bench), "cash": ret(cash), "universe": ret(uni),
+            # o yıl TÜFE ve USD/TRY değişimi (%): sayfa reel / dolar bazlı yıllık getiriyi bundan hesaplar
+            "cpi_pct": None if cpi is None else r2(((1 + cpi.pct_change().loc[p.index].fillna(0)).prod() - 1) * 100),
+            "usd_pct": None if usd is None else r2(((1 + usd.pct_change().loc[p.index].fillna(0)).prod() - 1) * 100),
         })
     return out
 
@@ -971,4 +1219,6 @@ def write(name: str, obj, quiet: bool = False) -> None:
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description="BIST30 teknik analiz sinyal botu")
     ap.add_argument("--demo", action="store_true", help="sentetik veri ile çalıştır")
-    run(ap.parse_args().demo)
+    ap.add_argument("--telegram-test", action="store_true", help="değişiklik olmasa da Telegram'a deneme mesajı gönder")
+    a = ap.parse_args()
+    run(a.demo, a.telegram_test)
