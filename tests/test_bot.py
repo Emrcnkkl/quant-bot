@@ -84,6 +84,27 @@ class TestHesaplar(unittest.TestCase):
             bot.CFG["real_rate_max"] = old
 
 
+class TestUcuzluk(unittest.TestCase):
+    def test_dolar_raporlayan_sirket_kurla_cevrilir(self):
+        sig = [{"ticker": "AAA", "name": "A", "close": 310.0, "signal": "TUT"}]
+        fund = {"AAA": {"eps": 2.0, "book": 16.85, "currency": "USD", "sector": "Industrials"}}
+        v = bot.valuation(sig, fund, 50.0)["items"][0]
+        # Yahoo özsermayeyi zaten TL vermişse (çevirince PD/DD saçma küçük olur) çevrilmez
+        fund2 = {"AAA": {"eps": 20.0, "book": 200.0, "currency": "USD"}}
+        self.assertAlmostEqual(bot.valuation(sig, fund2, 50.0)["items"][0]["pb"], 310 / 200, places=2)
+        self.assertAlmostEqual(v["pb"], 310 / (16.85 * 50), places=2)
+        self.assertAlmostEqual(v["pe"], 310 / (2.0 * 50), places=2)
+
+    def test_zarar_eden_sirketin_fk_si_yok_ve_ucuz_olan_yuksek_puan(self):
+        sig = [{"ticker": t, "name": t, "close": 100.0, "signal": "TUT"} for t in "ABCDE"]
+        fund = {"A": {"eps": 20, "book": 200}, "B": {"eps": 10, "book": 100}, "C": {"eps": 5, "book": 50},
+                "D": {"eps": 2, "book": 20}, "E": {"eps": -1, "book": 10}}
+        items = {i["ticker"]: i for i in bot.valuation(sig, fund, None)["items"]}
+        self.assertIsNone(items["E"]["pe"])
+        self.assertTrue(items["E"]["loss"])
+        self.assertGreater(items["A"]["score"], items["D"]["score"])   # A en düşük F/K ve PD/DD -> en ucuz
+
+
 class TestCanliPortfoy(unittest.TestCase):
     def test_gecmis_kayitlar_degismez(self):
         with tempfile.TemporaryDirectory() as tmp:

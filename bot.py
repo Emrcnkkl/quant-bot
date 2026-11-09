@@ -331,6 +331,116 @@ def signal_accuracy(prep: dict, mem: pd.DataFrame, start: str, horizons=(5, 21, 
             "all": summ(buckets), "recent": summ(recent), "by_ticker": by_t}
 
 
+SECTOR_TR = {"Financial Services": "Finans", "Industrials": "Sanayi", "Basic Materials": "Temel malzeme",
+             "Consumer Defensive": "Temel tüketim", "Consumer Cyclical": "Dayanıklı tüketim", "Energy": "Enerji",
+             "Utilities": "Elektrik ve kamu hizmetleri", "Communication Services": "İletişim", "Technology": "Teknoloji",
+             "Real Estate": "Gayrimenkul", "Healthcare": "Sağlık"}
+
+
+def fetch_fundamentals(tickers: list[str], max_age_days: int = 7, limit: int = 60) -> dict:
+    """
+    Temel veriler (hisse başına kâr, özsermaye, temettü verimi, sektör...) Yahoo'dan haftada bir alınır ve
+    fundamentals.json'da saklanır. Oranlar (F/K, PD/DD) her gün güncel fiyatla yeniden hesaplanır (valuation).
+    Alınamayan hisse için önceki kayıt korunur.
+    """
+    path = os.path.join(OUT_DIR, "fundamentals.json")
+    try:
+        with open(path, encoding="utf-8") as f:
+            cache = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        cache = {"items": {}}
+    items = cache.setdefault("items", {})
+    today = pd.Timestamp.today().normalize()
+    stale = [t for t in tickers if t not in items
+             or (today - pd.Timestamp(items[t].get("fetched", "2000-01-01"))).days >= max_age_days]
+    if stale:
+        import time
+
+        import yfinance as yf
+        got = 0
+        for t in stale[:limit]:
+            try:
+                i = yf.Ticker(f"{t}.IS").info
+                items[t] = {"eps": i.get("trailingEps"), "book": i.get("bookValue"),
+                            "currency": i.get("financialCurrency") or "TRY",
+                            "div_yield": i.get("dividendYield"), "roe": i.get("returnOnEquity"),
+                            "mcap": i.get("marketCap"), "sector": i.get("sector"), "industry": i.get("industry"),
+                            "fetched": str(today.date())}
+                got += 1
+            except Exception as e:  # noqa: BLE001
+                print(f"  ! {t}: temel veri alınamadı ({type(e).__name__})", file=sys.stderr)
+            time.sleep(0.3)
+        cache["updated"] = str(today.date())
+        print(f"  ✓ Temel veriler: {got}/{len(stale[:limit])} hisse güncellendi")
+        write("fundamentals.json", cache)
+    return items
+
+
+def valuation(signals: list[dict], fund: dict, fx: float | dict | None) -> dict:
+    """
+    Ucuzluk endeksi (bilgi amaçlı; modelin parçası değildir, test edilmemiştir).
+    F/K = fiyat / son 12 ay hisse başına kâr; PD/DD = fiyat / hisse başına özsermaye. Dolarla raporlayan
+    şirketlerde kâr ve özsermaye USD/TRY ile TL'ye çevrilir (Yahoo'nun hazır oranları bu durumda hatalıdır).
+    Ucuzluk puanı 0–100: F/K ve PD/DD'nin sektör içi sıralamasının ortalaması (sektörde 4'ten az veri varsa
+    50 hissenin tümüyle kıyaslanır). Zarar eden şirketin F/K'sı yoktur; puanı yalnızca PD/DD'den gelir.
+    """
+    rates = fx if isinstance(fx, dict) else {"USD": fx}
+    rows = []
+    for x in signals:
+        f = fund.get(x["ticker"]) or {}
+        cur = (f.get("currency") or "TRY").upper()
+        price = x["close"]
+        # Yahoo, yabancı parayla raporlayan şirketlerde kâr/özsermayeyi bazen o parada, bazen TL verir.
+        # İki ihtimal de denenir; PD/DD'si makul aralıkta (0,1–15) kalan seçilir, ikisi de makulse kur çevrimi.
+        k = 1.0
+        if cur != "TRY":
+            r_ = rates.get(cur)
+            raw = price / f["book"] if f.get("book") and f["book"] > 0 else None
+            conv = price / (f["book"] * r_) if r_ and f.get("book") and f["book"] > 0 else None
+            ok = lambda v: v is not None and 0.1 <= v <= 15  # noqa: E731
+            k = r_ if ok(conv) else 1.0 if ok(raw) else None
+        eps = f.get("eps") * k if f.get("eps") is not None and k else None
+        book = f.get("book") * k if f.get("book") is not None and k else None
+        pe = price / eps if eps and eps > 0 and price else None
+        pb = price / book if book and book > 0 and price else None
+        if pe is not None and pe > 100:      # çok küçük kâr ya da hatalı veri: anlamlı değil
+            pe = None
+        rows.append({"ticker": x["ticker"], "name": x["name"], "sector": SECTOR_TR.get(f.get("sector"), f.get("sector") or "Diğer"),
+                     "industry": f.get("industry"), "close": x["close"], "signal": x["signal"],
+                     "pe": r2(pe), "pb": r2(pb) if pb and pb < 100 else None,
+                     "loss": bool(eps is not None and eps <= 0),
+                     "div_yield": r2(f.get("div_yield")), "roe": r2(f["roe"] * 100) if f.get("roe") is not None else None,
+                     "mcap_bn": r2(f["mcap"] / 1e9) if f.get("mcap") else None, "fx_converted": k not in (1.0, None)})
+    df = pd.DataFrame(rows)
+    if df.empty:
+        return {}
+
+    def pct_rank(col):
+        # Düşük oran = ucuz = yüksek puan. Sektörde ≥4 değer varsa sektör içi, yoksa tüm evren.
+        out = pd.Series(np.nan, index=df.index)
+        allr = 1 - df[col].rank(pct=True, method="average") + 1 / (2 * df[col].count() or 1)
+        for sec, g in df.groupby("sector"):
+            ok = g[col].dropna()
+            if len(ok) >= 4:
+                r = 1 - ok.rank(pct=True, method="average") + 1 / (2 * len(ok))
+                out.loc[r.index] = r
+            else:
+                out.loc[g.index] = allr.loc[g.index]
+        return (out * 100).clip(0, 100)
+    df["pe_score"], df["pb_score"] = pct_rank("pe"), pct_rank("pb")
+    df["score"] = df[["pe_score", "pb_score"]].mean(axis=1).round(0)
+    df["peer"] = df.groupby("sector")["pe"].transform(lambda v: "sektör" if v.count() >= 4 else "tümü")
+    med = {sec: {"pe": r2(g["pe"].median()), "pb": r2(g["pb"].median()), "n": int(len(g))}
+           for sec, g in df.groupby("sector")}
+    items = df.replace({np.nan: None}).to_dict("records")
+    for it in items:
+        for c in ("pe_score", "pb_score", "score"):
+            it[c] = None if it[c] is None else int(round(it[c]))
+    return {"items": sorted(items, key=lambda i: -(i["score"] if i["score"] is not None else -1)),
+            "sectors": med, "fx": {k_: r2(v_) for k_, v_ in rates.items() if v_},
+            "fundamentals_updated": max((v.get("fetched", "") for v in (fund or {}).values()), default=None)}
+
+
 def data_quality(data: dict, tickers: list[str], bench: pd.DataFrame, usdtry, demo: bool) -> dict:
     """Veri kalite kontrolü. Ciddi eksiklikte (evrenin %25'inden fazlası son gün verisiz) hiçbir dosyayı
     değiştirmeden durur; küçük sorunları signals.json'a ve yöneticiye Telegram uyarısı olarak yazar."""
@@ -925,8 +1035,10 @@ def run(demo: bool, telegram_test: bool = False) -> None:
         except (FileNotFoundError, json.JSONDecodeError):
             prev_date = None
         if prev_date and str(newest) < prev_date:
-            sys.exit(f"  ! Yahoo'dan gelen en yeni veri ({newest}) yayındaki veriden ({prev_date}) eski; "
-                     "dosyalar değiştirilmedi. Daha sonra tekrar çalıştırın.")
+            # Hata değil: yayındaki veri zaten daha yeni. Hiçbir şeyi değiştirmeden normal çık.
+            print(f"  · Yahoo'dan gelen en yeni veri ({newest}) yayındaki veriden ({prev_date}) eski; "
+                  "dosyalar değiştirilmedi.")
+            sys.exit(0)
 
     # --- Evren: her çeyrek işlem hacmine göre en büyük N hisse. Sinyaller bugünkü üyeler için üretilir.
     cand = dedupe(data)
@@ -1102,6 +1214,23 @@ def run(demo: bool, telegram_test: bool = False) -> None:
             if telegram_send("⚠️ <b>BIST50 Sinyal</b> veri uyarısı\n• " + "\n• ".join(quality["warnings"]), admin=True):
                 ns["last_warn"] = meta["data_date"]
                 write("notify.json", ns)
+    if not demo:
+        try:
+            fund = fetch_fundamentals([x["ticker"] for x in signals])
+            rates = {"USD": float(usdtry.iloc[-1]) if usdtry is not None else None}
+            if any((v.get("currency") or "TRY").upper() == "EUR" for v in fund.values()):
+                try:
+                    import yfinance as yf
+                    rates["EUR"] = float(_clean(yf.download("EURTRY=X", period="1mo", progress=False,
+                                                            auto_adjust=True, threads=False))["Close"].iloc[-1])
+                except Exception:  # noqa: BLE001
+                    pass
+            val = valuation(signals, fund, rates)
+            if val:
+                write("valuation.json", {"generated_at": meta["generated_at"], "data_date": meta["data_date"],
+                                         "disclaimer": meta["disclaimer"], **val})
+        except Exception as e:  # noqa: BLE001  (ucuzluk endeksi bilgi amaçlı; hata botu durdurmasın)
+            print(f"  ! Ucuzluk endeksi hesaplanamadı: {type(e).__name__}: {e}", file=sys.stderr)
     write("signals.json", {**meta, "regime": regime, "counts": counts, "signals": signals, "quality": quality,
                            "accuracy": accuracy,
                            "changes_days": CFG["changes_days"],
