@@ -1016,6 +1016,7 @@ SITE_URL = "https://emrcnkkl.github.io/quant-bot/"
 def telegram_send(text: str) -> bool:
     """Telegram kanalına mesaj gönderir. Token ve kanal ID'si ortam değişkenlerinden okunur
     (GitHub → Settings → Secrets: TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID). Yoksa sessizce atlar."""
+    import urllib.error
     import urllib.parse
     import urllib.request
     token, chat = os.environ.get("TELEGRAM_BOT_TOKEN"), os.environ.get("TELEGRAM_CHAT_ID")
@@ -1029,6 +1030,16 @@ def telegram_send(text: str) -> bool:
             ok = json.load(r).get("ok", False)
         print(f"  {'✓' if ok else '!'} Telegram mesajı {'gönderildi' if ok else 'gönderilemedi'}")
         return ok
+    except urllib.error.HTTPError as e:
+        # Telegram'ın açıklaması (ör. "chat not found") token içermez; URL ise içerdiği için yazdırılmaz
+        try:
+            desc = json.load(e).get("description", "")
+        except Exception:  # noqa: BLE001
+            desc = ""
+        hint = {400: "kanal ID'sini kontrol edin (kanallar için -100 ile başlar)",
+                401: "token hatalı", 403: "bot kanalda yönetici değil ya da mesaj izni yok"}.get(e.code, "")
+        print(f"  ! Telegram hatası {e.code}: {desc} {('→ ' + hint) if hint else ''}", file=sys.stderr)
+        return False
     except Exception as e:  # noqa: BLE001  (token hata mesajına karışmasın diye yalnızca tür yazılır)
         print(f"  ! Telegram hatası: {type(e).__name__}", file=sys.stderr)
         return False
