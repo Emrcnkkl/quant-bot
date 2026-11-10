@@ -61,8 +61,8 @@ ve sonuçları statik bir web sayfasında gösteren bir bot. Şu an **Aşama 1**
   aynı anda tek sekme görünür; `#ucuzluk`/`#sss` gibi eski bağlantılar `ALIAS` ile çalışır, iç bağlantılar (#gecmis) ilgili sekmeyi açar):
   Bugün (özet kartı, AL/TUT/SAT, faiz ortamı, canlı portföy) · Sinyaller (tablo, hisse grafiği, son sinyal değişiklikleri, faiz
   filtresi uyarısı) · Performans (TL / enflasyondan arındırılmış / dolar anahtarı, yıl yıl tablo) · Değerleme · Nasıl çalışır + SSS ·
-  **İletişim** (form → FormSubmit AJAX `formsubmit.co/ajax/<kullanıcının e-postası>`, `MAIL_TO`; ilk mesajda FormSubmit bir kez
-  e-postayla onay ister; başarısızsa mailto bağlantısı). Grafikler sekme açılınca yeniden çizilir (`redraw`). Tasarım referansı kullanıcının diğer projesi (emrcnkkl.github.io/anlik_bot).
+  **İletişim** (form → FormSubmit AJAX `formsubmit.co/ajax/<FORM_KEY>`; FORM_KEY FormSubmit'in rastgele anahtarı, form
+  etkinleştirildi, e-posta adresi sayfada yazmaz; başarısızsa "tekrar deneyin" mesajı). Grafikler sekme açılınca yeniden çizilir (`redraw`). Tasarım referansı kullanıcının diğer projesi (emrcnkkl.github.io/anlik_bot).
 
 ### Araştırma bulguları (ayrıntı `docs/`)
 | Konu | Sonuç | Karar |

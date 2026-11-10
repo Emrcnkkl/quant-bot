@@ -1133,7 +1133,7 @@ addEventListener("hashchange", route);
 route();
 
 // ---------------- İletişim formu ----------------
-const MAIL_TO = "canakkaleemir59@gmail.com";
+const FORM_KEY = "3e7bf7d5b6955fd0cf54b436ca9a33c0";   // FormSubmit rastgele anahtarı (e-posta adresi sayfada görünmez)
 $("#cform").addEventListener("submit", async e => {
   e.preventDefault();
   const f = e.target, st = $("#cstat"), btn = f.querySelector("button");
@@ -1144,7 +1144,7 @@ $("#cform").addEventListener("submit", async e => {
   if (d.email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(d.email)) { st.className = "small err"; st.textContent = "E-posta adresi geçerli görünmüyor."; f.email.focus(); return; }
   btn.disabled = true; st.textContent = "Gönderiliyor…";
   try {
-    const r = await fetch(`https://formsubmit.co/ajax/${MAIL_TO}`, {
+    const r = await fetch(`https://formsubmit.co/ajax/${FORM_KEY}`, {
       method: "POST", headers: {"Content-Type": "application/json", Accept: "application/json"},
       body: JSON.stringify({Ad: d.name || "-", "E-posta": d.email || "-", Konu: d.topic, Mesaj: d.message,
                             _subject: `BIST50 Sinyal · ${d.topic}${d.name ? " · " + d.name : ""}`,
@@ -1154,7 +1154,7 @@ $("#cform").addEventListener("submit", async e => {
     f.reset(); st.className = "small ok"; st.textContent = "Teşekkürler, mesajınız iletildi.";
   } catch (err) {
     st.className = "small err";
-    st.innerHTML = `Mesaj gönderilemedi. Doğrudan <a href="mailto:${MAIL_TO}?subject=${encodeURIComponent("BIST50 Sinyal · " + d.topic)}&body=${encodeURIComponent(d.message)}">e-posta ile</a> yazabilirsiniz.`;
+    st.textContent = "Mesaj gönderilemedi. İnternet bağlantınızı kontrol edip biraz sonra tekrar deneyin.";
   } finally { btn.disabled = false; }
 });
 // Kaydırınca beliren öğeler
