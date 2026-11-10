@@ -333,12 +333,12 @@ footer p{margin:0 0 8px;max-width:860px}
       <span>BIST50 <span class="gtext">Sinyal</span></span>
     </a>
     <div class="links">
-      <a href="#bugun">Bugün</a><a href="#sinyaller">Sinyaller</a><a href="#performans">Performans</a><a href="#ucuzluk">Değerleme</a><a href="#nasil">Nasıl çalışır</a>
+      <a href="#bugun">Bugün</a><a href="#sinyaller">Sinyaller</a><a href="#performans">Performans</a><a href="#ucuzluk" hidden>Değerleme</a><a href="#nasil">Nasıl çalışır</a>
     </div>
     <span class="live" title="Her iş günü 18:40'ta otomatik güncellenir"><span class="dot"></span><span class="t" id="livetxt">GÜNCEL</span></span>
     <a class="help" href="#sss" title="Sık sorulan sorular">?</a>
   </div>
-  <div class="mnav"><a href="#bugun">Bugün</a><a href="#sinyaller">Sinyaller</a><a href="#performans">Performans</a><a href="#ucuzluk">Değerleme</a><a href="#nasil">Nasıl çalışır</a><a href="#sss">SSS</a></div>
+  <div class="mnav"><a href="#bugun">Bugün</a><a href="#sinyaller">Sinyaller</a><a href="#performans">Performans</a><a href="#ucuzluk" hidden>Değerleme</a><a href="#nasil">Nasıl çalışır</a><a href="#sss">SSS</a></div>
 </nav>
 
 <main class="wrap">
@@ -448,7 +448,7 @@ footer p{margin:0 0 8px;max-width:860px}
   </section>
 
   <!-- ===== NASIL ÇALIŞIR ===== -->
-  <section id="ucuzluk">
+  <section id="ucuzluk" hidden>
     <div class="kicker"><span class="gtext">03 · Değerleme</span></div>
     <h2>Ucuzluk endeksi</h2>
     <p class="lead">Hissenin fiyatı, şirketin kârına ve özsermayesine göre ucuz mu pahalı mı? Her hisse kendi sektöründeki büyük hisselerle karşılaştırılır: <b>100 = sektörünün en ucuzu, 0 = en pahalısı.</b></p>
@@ -728,7 +728,9 @@ function renderSignals() {
 let V = null, vSector = "Tümü", vSort = ["score", -1];
 async function loadValuation() {
   V = await fetch("valuation.json?v=" + Date.now()).then(r => r.ok ? r.json() : null).catch(() => null);
-  if (!V || !V.items?.length) { $("#ucuzluk").hidden = true; document.querySelectorAll('a[href="#ucuzluk"]').forEach(a => a.hidden = true); return; }
+  if (!V || !V.items?.length) return;          // veri yoksa bölüm ve menü bağlantısı gizli kalır
+  $("#ucuzluk").hidden = false;
+  document.querySelectorAll('a[href="#ucuzluk"]').forEach(a => a.hidden = false);
   renderValuation();
 }
 function renderValuation() {
