@@ -60,9 +60,10 @@ ve sonuçları statik bir web sayfasında gösteren bir bot. Şu an **Aşama 1**
 - Site: koyu premium tema, genel kitleye sade dil. **Sekmeli** (tek index.html, `#…` ile yönlendirme: `route()`, `PAGES`,
   aynı anda tek sekme görünür; `#ucuzluk`/`#sss` gibi eski bağlantılar `ALIAS` ile çalışır, iç bağlantılar (#gecmis) ilgili sekmeyi açar):
   Bugün (özet kartı, AL/TUT/SAT, faiz ortamı, canlı portföy) · Sinyaller (tablo, hisse grafiği, son sinyal değişiklikleri, faiz
-  filtresi uyarısı) · Performans (TL / enflasyondan arındırılmış / dolar anahtarı, yıl yıl tablo) · Değerleme · Nasıl çalışır + SSS ·
+  filtresi uyarısı) · Performans (TL / enflasyondan arındırılmış / dolar anahtarı, yıl yıl tablo) · Değerleme · Nasıl çalışır + SSS · **Sözlük** (`GL.T` terim listesi, kategoriler + arama, örnek grafikler tohumlu sentetik seriyle gerçek EMA/RSI/MACD formülleriyle çizilir; kartlar `#s-<id>` ile bağlanabilir) ·
   **İletişim** (form → FormSubmit AJAX `formsubmit.co/ajax/<FORM_KEY>`; FORM_KEY FormSubmit'in rastgele anahtarı, form
-  etkinleştirildi, e-posta adresi sayfada yazmaz; başarısızsa "tekrar deneyin" mesajı). Grafikler sekme açılınca yeniden çizilir (`redraw`). Tasarım referansı kullanıcının diğer projesi (emrcnkkl.github.io/anlik_bot).
+  etkinleştirildi, e-posta adresi sayfada yazmaz; başarısızsa "tekrar deneyin" mesajı). Grafikler sekme açılınca yeniden çizilir (`redraw`).
+  Telegram kanalı davet bağlantısı (herkese açık, t.me/+…) menüde, Bugün kartında, İletişim'de ve altbilgide. Tasarım referansı kullanıcının diğer projesi (emrcnkkl.github.io/anlik_bot).
 
 ### Araştırma bulguları (ayrıntı `docs/`)
 | Konu | Sonuç | Karar |
