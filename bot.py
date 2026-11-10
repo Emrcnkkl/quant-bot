@@ -453,6 +453,10 @@ def data_quality(data: dict, tickers: list[str], bench: pd.DataFrame, usdtry, de
              for r in [data[t]["Close"].iloc[-1] / data[t]["Close"].iloc[-2] - 1] if abs(r) > 0.21]
     if jumps:
         warns.append("Günlük fiyat sınırını aşan hareket (veri hatası olabilir): " + ", ".join(jumps))
+    patched = sorted(PATCHED & (set(tickers) | {BENCHMARK}))
+    if patched:
+        warns.append(f"Son gün kapanışı Yahoo'da eksikti, saatlik veriden tamamlandı ({len(patched)} seri): "
+                     + ", ".join(patched[:12]) + (" …" if len(patched) > 12 else ""))
     if bench.index[-1] < newest:
         warns.append(f"BIST30 endeksinin son verisi geride ({bench.index[-1].date()})")
     if not demo and MACRO_SOURCE != "TCMB (canlı)":
@@ -506,7 +510,13 @@ def fetch_real(tickers: list[str], verbose: bool = True) -> dict[str, pd.DataFra
                 raw = yf.download(sym, start=CFG["history_start"], interval="1d",
                                   auto_adjust=True, progress=False, threads=False)
                 if raw is not None and not raw.empty:
-                    data[t] = _clean(raw)
+                    df = _clean(raw)
+                    # Yahoo günlük veride son günün kapanışını bazen boş bırakır (hacim vardır, kapanış yoktur).
+                    # Bu durumda o gün saatlik veriden tamamlanır (kapanış = son saatin kapanışı).
+                    raw_last = pd.to_datetime(raw.index[-1]).tz_localize(None).normalize()
+                    if len(df) and raw_last > df.index[-1]:
+                        df = _patch_from_intraday(yf, sym, df, raw_last, t)
+                    data[t] = df
                 break
             except Exception as e:  # noqa: BLE001
                 if attempt == 2:
@@ -517,6 +527,35 @@ def fetch_real(tickers: list[str], verbose: bool = True) -> dict[str, pd.DataFra
         elif verbose:
             print(f"  ✓ {t}: {len(data[t])} gün, son {data[t].index[-1].date()}")
     return data
+
+
+PATCHED: set[str] = set()   # son günü saatlik veriden tamamlanan hisseler (kalite uyarısı için)
+
+
+def _patch_from_intraday(yf, sym: str, df: pd.DataFrame, upto: pd.Timestamp, t: str) -> pd.DataFrame:
+    try:
+        intr = yf.download(sym, period="5d", interval="60m", progress=False, threads=False)
+        if intr is None or intr.empty:
+            return df
+        if isinstance(intr.columns, pd.MultiIndex):
+            intr.columns = intr.columns.get_level_values(0)
+        idx = pd.to_datetime(intr.index)
+        idx = idx.tz_convert("Europe/Istanbul") if idx.tz is not None else idx
+        intr = intr.dropna(subset=["Close"])
+        intr.index = idx[: len(intr)] if len(idx) == len(intr) else pd.to_datetime(intr.index)
+        days = pd.Series(intr.index, index=intr.index).dt.tz_localize(None).dt.normalize() \
+            if intr.index.tz is not None else pd.Series(intr.index.normalize(), index=intr.index)
+        g = intr.groupby(days.values)
+        agg = pd.DataFrame({"Open": g["Open"].first(), "High": g["High"].max(), "Low": g["Low"].min(),
+                            "Close": g["Close"].last(), "Volume": g["Volume"].sum()})
+        agg.index = pd.to_datetime(agg.index)
+        new = agg[(agg.index > df.index[-1]) & (agg.index <= upto)]
+        if len(new):
+            PATCHED.add(t)
+            df = pd.concat([df, new]).sort_index()
+    except Exception as e:  # noqa: BLE001
+        print(f"  ! {t}: saatlik veriyle tamamlanamadı ({type(e).__name__})", file=sys.stderr)
+    return df
 
 
 def fix_jumps(data: dict[str, pd.DataFrame], start: str = "2005-01-04", quiet: bool = True) -> dict[str, pd.DataFrame]:
