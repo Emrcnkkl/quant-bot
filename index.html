@@ -513,7 +513,7 @@ footer p{margin:0 0 8px;max-width:860px}
     <details><summary>Enflasyona göre gerçekte kazandırıyor mu?</summary><div id="faq-real"><p>Yükleniyor…</p></div></details>
     <details><summary>"Canlı model portföy" nedir?</summary><div><p>Sayfadaki diğer performans rakamları geriye dönük testtir: kurallar geçmişe uygulanarak hesaplanır. Canlı portföy ise 9 Kasım 2026'da 100.000 ₺ ile başlatıldı ve her gün yalnızca o günün sonucu eklenir; geçmiş kayıtlar sonradan değiştirilmez. Zamanla modelin gerçek performansının en güvenilir göstergesi olacak. Gerçek para değildir, işlem yapılmaz.</p></div></details>
     <details><summary>Ne sıklıkla güncelleniyor?</summary><div><p>Her iş günü 18:40'ta, borsa kapandıktan sonra otomatik olarak. Sayfanın üstündeki tarih son verinin günüdür.</p></div></details>
-    <details><summary>Veriler nereden geliyor?</summary><div><p>Hisse ve endeks fiyatları Yahoo Finance'ten, politika faizi ve enflasyon TCMB'nin sitesinden alınır. Veri kaynaklarında zaman zaman eksik gün veya hata olabilir.</p></div></details>
+    <details><summary>Veriler nereden geliyor?</summary><div><p>Geçmiş fiyatlar Yahoo Finance'ten alınır; son günün fiyatı her akşam Borsa İstanbul'un resmî günlük bülteniyle kontrol edilir ve gerekirse oradan tamamlanır (bülten alınamazsa İş Yatırım verisi kullanılır). Şirket kârı ve özkaynağı İş Yatırım'daki mali tablolardan, politika faizi ve enflasyon TCMB'nin sitesinden gelir. Veri kaynaklarında zaman zaman eksik gün veya hata olabilir.</p></div></details>
   </section>
 
   <footer>
@@ -605,7 +605,7 @@ function renderHero() {
   $("#h-chips").insertAdjacentHTML("afterend", `<p class="small muted" style="margin:18px auto 0;max-width:640px">Test her dönemde o zamanın en büyük 50 hissesiyle yapıldı (bugünkü listeyle değil); 2008 ve 2018 krizleri dahil. <a href="#sss-yanlilik">Neden önemli?</a></p>`);
   if (S.demo) $("#demo").innerHTML = `<div class="warn demo"><div><b>DEMO verisi:</b> Bu sayfa şu an gerçek olmayan, rastgele üretilmiş fiyatlarla çalışıyor.</div></div>`;
   $("#disc").innerHTML = `<b>Yasal uyarı:</b> ${S.disclaimer} Geçmiş performans gelecekteki sonuçların göstergesi değildir.`;
-  $("#meta").textContent = `Son veri: ${trDate(S.data_date)} kapanışı · sayfa güncellendi ${new Date(S.generated_at).toLocaleString("tr-TR", {dateStyle: "medium", timeStyle: "short"})} · ${S.universe} · Fiyat: Yahoo Finance · Faiz ve enflasyon: TCMB`;
+  $("#meta").textContent = `Son veri: ${trDate(S.data_date)} kapanışı · sayfa güncellendi ${new Date(S.generated_at).toLocaleString("tr-TR", {dateStyle: "medium", timeStyle: "short"})} · ${S.universe} · Fiyat: Yahoo Finance + Borsa İstanbul bülteni · Faiz ve enflasyon: TCMB`;
   // SSS: dürüst performans özeti
   const y = (B.yearly || []).filter(r => !r.partial), beatIdx = y.filter(r => r.strategy > r.benchmark).length;
   const P0 = B.portfolio, up = P0.full.cagr_pct > (P0.benchmark_full?.cagr_pct ?? 0);
@@ -755,12 +755,13 @@ function renderValuation() {
       <th data-k="score" title="0–100: sektörüne göre ucuzluk (F/K ve PD/DD sıralamasının ortalaması)">Ucuzluk</th>
       <th data-k="signal">Sinyal</th></tr></thead><tbody>` +
     rows.map(i => `<tr><td>${who(i.ticker, i.name)}</td><td style="text-align:left;white-space:normal">${i.sector}<span class="nm">sektör F/K ${fmt(med[i.sector]?.pe, 1)} · PD/DD ${fmt(med[i.sector]?.pb, 2)}</span></td>
-      <td class="${i.loss ? "loss" : ""}">${i.pe != null ? fmt(i.pe, 1) : i.loss ? "zarar" : "–"}</td><td>${fmt(i.pb, 2)}</td>
+      <td class="${i.loss ? "loss" : ""}" title="${i.period ? "Bilanço dönemi: " + i.period.replace("/", " / ") + " (son 12 ay kâr)" : "Kaynak: Yahoo Finance"}">${i.pe != null ? fmt(i.pe, 1) : i.loss ? "zarar" : "–"}</td><td>${fmt(i.pb, 2)}</td>
       <td>${i.div_yield ? "%" + fmt(i.div_yield, 1) : "–"}</td><td>${i.roe != null ? pct(i.roe, 0) : "–"}</td>
       <td>${bar(i.score)}${i.loss && i.score != null ? `<span class="nm" title="Zarar eden şirketin F/K'sı olmadığı için puan yalnızca PD/DD'den geliyor">yalnızca PD/DD</span>` : i.peer === "tümü" ? `<span class="nm" title="Sektöründe yeterli hisse olmadığı için 50 hissenin tümüyle kıyaslandı">tümüyle kıyas</span>` : ""}</td>
       <td><span class="badge ${i.signal}">${i.signal}</span></td></tr>`).join("") + `</tbody>`;
   const fx = V.fx ? Object.entries(V.fx).map(([c, v]) => `${c}/TRY ${fmt(v, 2)}`).join(", ") : "";
-  $("#valnote").innerHTML = `Kaynak: Yahoo Finance (şirketlerin son 12 ay kârı ve son bilanço özsermayesi; haftada bir güncellenir, son: ${V.fundamentals_updated ? trDate(V.fundamentals_updated) : "–"}). Oranlar ${trDate(V.data_date)} kapanış fiyatıyla hesaplandı. Dolar ya da euro ile raporlayan şirketlerin rakamları kurla TL'ye çevrildi${fx ? ` (${fx})` : ""}. Yahoo verisinde hata olabilir; kararlarınızı şirketin KAP'taki finansal tablolarıyla doğrulayın. Bir hissenin üzerine dokunarak sinyal tablosunda açabilirsiniz.`;
+  const nIsy = V.items.filter(i => i.source === "isyatirim").length, nY = V.items.length - nIsy;
+  $("#valnote").innerHTML = `Kaynak: şirketlerin mali tabloları (İş Yatırım; son 12 ay net kâr ve son bilanço özkaynağı, TL) — haftada bir güncellenir, son: ${V.fundamentals_updated ? trDate(V.fundamentals_updated) : "–"}.${nY ? ` ${nY} hissede bu veri alınamadığı için Yahoo Finance kullanıldı${fx ? ` (yabancı parayla raporlayanlar kurla çevrildi: ${fx})` : ""}.` : ""} Oranlar ${trDate(V.data_date)} kapanış fiyatıyla hesaplandı; F/K'nın üzerine gelince hangi bilançonun kullanıldığı görünür. Enflasyon muhasebesi nedeniyle oranlar başka sitelerdekinden biraz farklı olabilir; kararlarınızı şirketin KAP'taki finansal tablolarıyla doğrulayın. Bir hissenin üzerine dokunarak sinyal tablosunda açabilirsiniz.`;
 }
 
 // ---------------- Sinyal isabeti ----------------

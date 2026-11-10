@@ -357,11 +357,12 @@ def fetch_fundamentals(tickers: list[str], max_age_days: int = 7, limit: int = 6
         import time
 
         import yfinance as yf
-        got = 0
+        got = got_isy = 0
         for t in stale[:limit]:
+            prev = items.get(t, {})
             try:
                 i = yf.Ticker(f"{t}.IS").info
-                items[t] = {"eps": i.get("trailingEps"), "book": i.get("bookValue"),
+                items[t] = {**prev, "eps": i.get("trailingEps"), "book": i.get("bookValue"),
                             "currency": i.get("financialCurrency") or "TRY",
                             "div_yield": i.get("dividendYield"), "roe": i.get("returnOnEquity"),
                             "mcap": i.get("marketCap"), "sector": i.get("sector"), "industry": i.get("industry"),
@@ -369,18 +370,32 @@ def fetch_fundamentals(tickers: list[str], max_age_days: int = 7, limit: int = 6
                 got += 1
             except Exception as e:  # noqa: BLE001
                 print(f"  ! {t}: temel veri alınamadı ({type(e).__name__})", file=sys.stderr)
+                items[t] = dict(prev)
+            # Asıl kaynak: İş Yatırım mali tabloları (TL, son 12 ay). Alınamazsa Yahoo verisi kullanılır.
+            try:
+                g = prev.get("fin_group")
+                fin = isy_financials(t, today, (g,) + tuple(x for x in ("XI_29", "UFRS_K", "UFRS") if x != g)
+                                     if g else ("XI_29", "UFRS_K", "UFRS"))
+                if fin:
+                    items[t].update(fin)
+                    items[t]["fetched"] = str(today.date())
+                    got_isy += 1
+            except Exception as e:  # noqa: BLE001
+                print(f"  ! {t}: İş Yatırım bilançosu alınamadı ({type(e).__name__})", file=sys.stderr)
             time.sleep(0.3)
         cache["updated"] = str(today.date())
-        print(f"  ✓ Temel veriler: {got}/{len(stale[:limit])} hisse güncellendi")
+        print(f"  ✓ Temel veriler: Yahoo {got}, İş Yatırım bilanço {got_isy} / {len(stale[:limit])} hisse")
         write("fundamentals.json", cache)
     return items
 
 
-def valuation(signals: list[dict], fund: dict, fx: float | dict | None) -> dict:
+def valuation(signals: list[dict], fund: dict, fx: float | dict | None, shares: dict | None = None) -> dict:
     """
     Ucuzluk endeksi (bilgi amaçlı; modelin parçası değildir, test edilmemiştir).
-    F/K = fiyat / son 12 ay hisse başına kâr; PD/DD = fiyat / hisse başına özsermaye. Dolarla raporlayan
-    şirketlerde kâr ve özsermaye USD/TRY ile TL'ye çevrilir (Yahoo'nun hazır oranları bu durumda hatalıdır).
+    F/K = piyasa değeri / son 12 ay net kâr (ana ortaklık); PD/DD = piyasa değeri / özkaynak.
+    Asıl kaynak İş Yatırım mali tabloları (TL; hisse sayısı İş Yatırım piyasa değerinden, yoksa ödenmiş
+    sermayeden). Bu veri yoksa Yahoo'nun hisse başı kâr/özsermaye verisi kullanılır; dolarla raporlayan
+    şirketlerde Yahoo verisi USD/TRY ile TL'ye çevrilir (Yahoo'nun hazır oranları bu durumda hatalıdır).
     Ucuzluk puanı 0–100: F/K ve PD/DD'nin sektör içi sıralamasının ortalaması (sektörde 4'ten az veri varsa
     50 hissenin tümüyle kıyaslanır). Zarar eden şirketin F/K'sı yoktur; puanı yalnızca PD/DD'den gelir.
     """
@@ -390,6 +405,8 @@ def valuation(signals: list[dict], fund: dict, fx: float | dict | None) -> dict:
         f = fund.get(x["ticker"]) or {}
         cur = (f.get("currency") or "TRY").upper()
         price = x["close"]
+        sh = (shares or {}).get(x["ticker"]) or f.get("capital")
+        isy = bool(sh and f.get("equity") and f.get("equity") > 0)
         # Yahoo, yabancı parayla raporlayan şirketlerde kâr/özsermayeyi bazen o parada, bazen TL verir.
         # İki ihtimal de denenir; PD/DD'si makul aralıkta (0,1–15) kalan seçilir, ikisi de makulse kur çevrimi.
         k = 1.0
@@ -401,6 +418,14 @@ def valuation(signals: list[dict], fund: dict, fx: float | dict | None) -> dict:
             k = r_ if ok(conv) else 1.0 if ok(raw) else None
         eps = f.get("eps") * k if f.get("eps") is not None and k else None
         book = f.get("book") * k if f.get("book") is not None and k else None
+        roe = f["roe"] * 100 if f.get("roe") is not None else None
+        mcap = f.get("mcap")
+        if isy:
+            k = 1.0
+            eps = f["net_ttm"] / sh if f.get("net_ttm") is not None else None
+            book = f["equity"] / sh
+            roe = f["net_ttm"] / f["equity"] * 100 if f.get("net_ttm") is not None else None
+            mcap = sh * price
         pe = price / eps if eps and eps > 0 and price else None
         pb = price / book if book and book > 0 and price else None
         if pe is not None and pe > 100:      # çok küçük kâr ya da hatalı veri: anlamlı değil
@@ -409,9 +434,10 @@ def valuation(signals: list[dict], fund: dict, fx: float | dict | None) -> dict:
                      "industry": f.get("industry"), "close": x["close"], "signal": x["signal"],
                      "pe": r2(pe), "pb": r2(pb) if pb and pb < 100 else None,
                      "loss": bool(eps is not None and eps <= 0),
-                     "div_yield": r2(f.get("div_yield")), "roe": r2(f["roe"] * 100) if f.get("roe") is not None else None,
-                     "mcap_bn": r2(f["mcap"] / 1e9) if f.get("mcap") else None, "fx_converted": k not in (1.0, None),
-                     "eps": r2(eps), "book": r2(book), "fund_date": f.get("fetched")})
+                     "div_yield": r2(f.get("div_yield")), "roe": r2(roe),
+                     "mcap_bn": r2(mcap / 1e9) if mcap else None, "fx_converted": k not in (1.0, None),
+                     "eps": r2(eps), "book": r2(book), "fund_date": f.get("fetched"),
+                     "period": f.get("fin_period") if isy else None, "source": "isyatirim" if isy else "yahoo"})
     df = pd.DataFrame(rows)
     if df.empty:
         return {}
@@ -443,7 +469,7 @@ def valuation(signals: list[dict], fund: dict, fx: float | dict | None) -> dict:
 
 
 VAL_HIST_COLS = ["date", "ticker", "close", "eps", "book", "pe", "pb", "div_yield", "roe", "mcap_bn",
-                 "sector", "score", "signal", "fund_date"]
+                 "sector", "score", "signal", "fund_date", "period", "source"]
 
 
 def append_valuation_history(items: list[dict], date: str, path: str | None = None) -> bool:
@@ -489,6 +515,17 @@ def data_quality(data: dict, tickers: list[str], bench: pd.DataFrame, usdtry, de
     if patched:
         notes.append(f"Son gün kapanışı Yahoo'da eksikti, saatlik veriden tamamlandı ({len(patched)} seri): "
                      + ", ".join(patched[:12]) + (" …" if len(patched) > 12 else ""))
+    if OFFICIAL & set(tickers):
+        o = sorted(OFFICIAL & set(tickers))
+        notes.append(f"Son gün fiyatı Borsa İstanbul resmî bülteninden alındı ({len(o)} hisse): "
+                     + ", ".join(o[:12]) + (" …" if len(o) > 12 else ""))
+    if ISY_FILLED & set(tickers):
+        notes.append("Son gün İş Yatırım verisinden tamamlandı (açılış yaklaşık): "
+                     + ", ".join(sorted(ISY_FILLED & set(tickers))))
+    mm = [m for m in MISMATCH if m.split()[0] in tickers]
+    if mm:
+        (warns if len(mm) > 5 else notes).append("Yahoo kapanışı resmî kapanıştan farklıydı, resmî değer kullanıldı: "
+                                                + ", ".join(mm))
     if bench.index[-1] < newest:
         lag = len(pd.bdate_range(bench.index[-1], newest)) - 1
         (warns if lag > 1 else notes).append(f"BIST30 endeksinin son verisi geride ({bench.index[-1].date()})")
@@ -591,6 +628,206 @@ def _patch_from_intraday(yf, sym: str, df: pd.DataFrame, upto: pd.Timestamp, t: 
     except Exception as e:  # noqa: BLE001
         print(f"  ! {t}: saatlik veriyle tamamlanamadı ({type(e).__name__})", file=sys.stderr)
     return df
+
+
+# --------------------------------------------------------------------------- #
+#  RESMÎ VE YEDEK KAYNAKLAR (Borsa İstanbul günlük bülteni, İş Yatırım)
+# --------------------------------------------------------------------------- #
+BULLETIN_URL = "https://www.borsaistanbul.com/data/thb/{y}/{m:02d}/thb{y}{m:02d}{d:02d}1.zip"
+ISY_URL = "https://www.isyatirim.com.tr/_layouts/15/IsYatirim.Website/Common/Data.aspx/"
+OFFICIAL: set[str] = set()     # son günü Borsa İstanbul bülteninden tamamlanan/düzeltilen hisseler
+ISY_FILLED: set[str] = set()   # son günü İş Yatırım'dan tamamlanan hisseler
+MISMATCH: list[str] = []       # Yahoo ile resmî kapanışın farklı çıktığı hisseler
+
+
+def _http(url: str, timeout: int = 30) -> bytes | None:
+    import urllib.request
+    for attempt in range(2):
+        try:
+            req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+            with urllib.request.urlopen(req, timeout=timeout) as r:
+                return r.read()
+        except Exception as e:  # noqa: BLE001
+            if getattr(e, "code", None) == 404:
+                return None
+            if attempt == 0:
+                import time
+                time.sleep(2)
+    return None
+
+
+def fetch_bulletin(day: pd.Timestamp) -> pd.DataFrame | None:
+    """Borsa İstanbul Pay Piyasası günlük bülteni (resmî; seans sonrası ~18:25'te yayımlanır).
+    Döndürür: hisse kodu → Open, High, Low, Close, Volume (adet), PrevClose. Tatil/henüz yok → None."""
+    import io
+    import zipfile
+    body = _http(BULLETIN_URL.format(y=day.year, m=day.month, d=day.day))
+    if not body:
+        return None
+    try:
+        with zipfile.ZipFile(io.BytesIO(body)) as z:
+            name = next(n for n in z.namelist() if n.lower().endswith(".csv"))
+            raw = pd.read_csv(z.open(name), sep=";", dtype=str, encoding="latin-1")
+    except Exception as e:  # noqa: BLE001
+        print(f"  ! Bülten okunamadı ({day.date()}): {type(e).__name__}", file=sys.stderr)
+        return None
+    raw.columns = [c.strip() for c in raw.columns]
+    raw = raw[raw["ISLEM  KODU"].str.endswith(".E", na=False)]      # .E = hisse senedi (varant, fon vs. değil)
+    num = lambda c: pd.to_numeric(raw[c], errors="coerce")  # noqa: E731
+    df = pd.DataFrame({"Open": num("ACILIS FIYATI").values, "High": num("EN YUKSEK FIYAT").values,
+                       "Low": num("EN DUSUK FIYAT").values, "Close": num("KAPANIS FIYATI").values,
+                       "Volume": num("TOPLAM ISLEM ADEDI").values, "PrevClose": num("ONCEKI KAPANIS FIYATI").values},
+                      index=raw["ISLEM  KODU"].str[:-2].values)
+    df = df[(df["Close"] > 0) & (df["Volume"] > 0)]
+    df["Open"] = df["Open"].where(df["Open"] > 0, df["PrevClose"])
+    return df[~df.index.duplicated()]
+
+
+def official_fill(data: dict[str, pd.DataFrame], days: int = 6, bulletins: dict | None = None) -> dict:
+    """
+    Son günlerin fiyatını Borsa İstanbul'un resmî bülteniyle tamamlar ve kontrol eder (endeks hariç):
+      • Yahoo'da hiç olmayan ya da saatlik veriden tahmin edilen son gün(ler) → bültendeki resmî değerler.
+      • Yahoo'nun son günü bültenden %0,5'ten fazla farklıysa → resmî değer kullanılır, not düşülür.
+    Son gün henüz geriye dönük düzeltilmediği için Yahoo'nun düzeltilmiş fiyatı resmî kapanışla aynıdır;
+    ertesi gün Yahoo'nun tam verisi gelince bu tamamlama kendiliğinden yerini ona bırakır.
+    """
+    today = pd.Timestamp.now(tz="Europe/Istanbul").tz_localize(None).normalize()
+    if bulletins is None:
+        bulletins = {}
+        for d in pd.bdate_range(today - pd.Timedelta(days=days + 3), today)[-days:]:
+            b = fetch_bulletin(d)
+            if b is not None:
+                bulletins[d] = b
+    for d in sorted(bulletins):
+        b = bulletins[d]
+        for t, df in data.items():
+            if t == BENCHMARK or t not in b.index or not len(df):
+                continue
+            row = b.loc[t, ["Open", "High", "Low", "Close", "Volume"]].astype(float)
+            last = df.index[-1]
+            if d > last:
+                data[t] = df = pd.concat([df, pd.DataFrame([row.values], index=[d], columns=row.index)])
+                OFFICIAL.add(t)
+            elif d == last:
+                diff = df["Close"].iloc[-1] / row["Close"] - 1
+                if t in PATCHED or abs(diff) > 0.005:
+                    if t not in PATCHED:
+                        MISMATCH.append(f"{t} %{diff * 100:+.1f}")
+                    df.iloc[-1] = row.values
+                    PATCHED.discard(t)
+                    OFFICIAL.add(t)
+    return {"bulletins": [str(d.date()) for d in sorted(bulletins)]}
+
+
+def isy_prices(t: str, start: pd.Timestamp, end: pd.Timestamp) -> pd.DataFrame | None:
+    """İş Yatırım günlük fiyat (kapanış, en yüksek/düşük, ağırlıklı ort., TL hacim, piyasa değeri). Açılış yok."""
+    body = _http(f"{ISY_URL}HisseTekil?hisse={t}&startdate={start:%d-%m-%Y}&enddate={end:%d-%m-%Y}", timeout=20)
+    try:
+        v = json.loads(body)["value"] if body else None
+    except (ValueError, KeyError):
+        v = None
+    if not v:
+        return None
+    df = pd.DataFrame({"Close": [x["HGDG_KAPANIS"] for x in v], "High": [x["HGDG_MAX"] for x in v],
+                       "Low": [x["HGDG_MIN"] for x in v], "VWAP": [x["HGDG_AOF"] for x in v],
+                       "TLVolume": [x["HGDG_HACIM"] for x in v], "MCap": [x.get("PD") for x in v]},
+                      index=pd.to_datetime([x["HGDG_TARIH"] for x in v], dayfirst=True)).astype(float)
+    return df.sort_index()
+
+
+def isy_fill(data: dict[str, pd.DataFrame], limit: int = 200) -> None:
+    """Yedek: Borsa İstanbul bülteni alınamadıysa ve İş Yatırım'da daha yeni bir gün varsa, eksik son günü
+    oradan tamamlar (açılış yok → saatlik veriden, o da yoksa önceki kapanış). Seans bitmeden kullanılmaz."""
+    now = pd.Timestamp.now(tz="Europe/Istanbul").tz_localize(None)
+    newest = max((df.index[-1] for t, df in data.items() if t != BENCHMARK and len(df)), default=None)
+    if newest is None:
+        return
+    probe = isy_prices("THYAO", newest - pd.Timedelta(days=10), now.normalize())
+    if probe is None or probe.index[-1] <= newest and not PATCHED:
+        return
+    target = probe.index[-1]
+    if target >= now.normalize() and now.hour * 60 + now.minute < 18 * 60 + 30:
+        return
+    todo = [t for t, df in data.items() if t != BENCHMARK and len(df)
+            and (df.index[-1] < target or (t in PATCHED and df.index[-1] == target))][:limit]
+    for t in todo:
+        p = isy_prices(t, target - pd.Timedelta(days=10), target)
+        if p is None or target not in p.index:
+            continue
+        r, df = p.loc[target], data[t]
+        prev_close = df["Close"][df.index < target].iloc[-1]
+        opn = df["Open"].iloc[-1] if (t in PATCHED and df.index[-1] == target) else prev_close
+        row = [opn, max(r["High"], opn), min(r["Low"], opn), r["Close"], r["TLVolume"] / r["VWAP"] if r["VWAP"] else 0]
+        if df.index[-1] == target:
+            df.iloc[-1] = row
+        else:
+            data[t] = pd.concat([df, pd.DataFrame([row], index=[target], columns=df.columns)])
+        PATCHED.discard(t)
+        ISY_FILLED.add(t)
+
+
+def isy_shares(tickers: list[str]) -> dict[str, float]:
+    """Güncel toplam hisse sayısı = İş Yatırım piyasa değeri / kapanış (bedelsiz sonrası da günceldir)."""
+    end = pd.Timestamp.now(tz="Europe/Istanbul").tz_localize(None).normalize()
+    out = {}
+    for t in tickers:
+        p = isy_prices(t, end - pd.Timedelta(days=12), end)
+        if p is not None and len(p) and p["MCap"].iloc[-1] and p["Close"].iloc[-1]:
+            out[t] = float(p["MCap"].iloc[-1] / p["Close"].iloc[-1])
+    return out
+
+
+def isy_financials(t: str, today: pd.Timestamp, groups=("XI_29", "UFRS_K", "UFRS")) -> dict | None:
+    """
+    İş Yatırım mali tablolarından son 12 ay net kâr (ana ortaklık payı) ve özkaynak, TL.
+    Gelir tablosu yıl başından birikimli: son 12 ay = son çeyrek + önceki yıl sonu − önceki yılın aynı çeyreği.
+    Bankalar UFRS_K (konsolide), diğerleri XI_29 tablosuyla raporlar; sırayla denenir.
+    """
+    y, m = today.year, (today.month - 1) // 3 * 3
+    if m == 0:
+        y, m = y - 1, 12
+    quarters = []
+    for _ in range(8):
+        quarters.append((y, m))
+        y, m = (y - 1, 12) if m == 3 else (y, m - 3)
+
+    def f(row, code):
+        try:
+            v = row.get(code)
+            return float(v) if v not in (None, "") else None
+        except (TypeError, ValueError):
+            return None
+    for group in groups:
+        vals = {}
+        for chunk in (quarters[:4], quarters[4:]):
+            q = "&".join(f"year{i}={yy}&period{i}={mm}" for i, (yy, mm) in enumerate(chunk, 1))
+            body = _http(f"{ISY_URL}MaliTablo?companyCode={t}&exchange=TRY&financialGroup={group}&{q}", timeout=20)
+            try:
+                v = json.loads(body).get("value") if body else None
+            except ValueError:
+                v = None
+            if not v:
+                break
+            for i, p in enumerate(chunk, 1):
+                vals[p] = {x["itemCode"]: x.get(f"value{i}") for x in v}
+        ok = [p for p in quarters if p in vals and (f(vals[p], "2O") or 0) > 0]
+        if not ok:
+            continue
+        # Net kâr (ana ortaklık payı): sanayi tablosunda 3Z; bankalarda 3ZA (grubun kârı); sigortacılarda 3Z
+        net_code = "3ZA" if group != "XI_29" and any(f(vals[p], "3ZA") for p in ok) else "3Z"
+        net = lambda p: f(vals[p], net_code)  # noqa: E731
+        if not any(net(p) for p in ok):
+            continue
+        last = ok[0]
+        if last[1] == 12:
+            ttm = net(last)
+        else:
+            fy, prev = (last[0] - 1, 12), (last[0] - 1, last[1])
+            ttm = net(last) + net(fy) - net(prev) if fy in ok and prev in ok and None not in (
+                net(last), net(fy), net(prev)) else None
+        return {"net_ttm": ttm, "equity": f(vals[last], "2O"), "capital": f(vals[last], "2OA"),
+                "fin_period": f"{last[0]}/{last[1]:02d}", "fin_group": group}
+    return None
 
 
 def fix_jumps(data: dict[str, pd.DataFrame], start: str = "2005-01-04", quiet: bool = True) -> dict[str, pd.DataFrame]:
@@ -1072,6 +1309,11 @@ def run(demo: bool, telegram_test: bool = False) -> None:
         universe = sorted(set(tickers) | set(CANDIDATES))
         print(f"  {len(universe)} hisse + endeks indiriliyor (2004'ten beri)...")
         data = fetch_real(universe + [BENCHMARK], verbose=False)
+        try:
+            official_fill(data)       # son günler: Borsa İstanbul resmî bülteni (tamamla + kontrol et)
+            isy_fill(data)            # bülten yoksa yedek: İş Yatırım
+        except Exception as e:  # noqa: BLE001  (yardımcı kaynak; hata botu durdurmasın)
+            print(f"  ! Resmî/yedek fiyat kontrolü yapılamadı: {type(e).__name__}: {e}", file=sys.stderr)
         print(f"  {len(data)} seri indirildi")
         data = fix_jumps(data)
     usdtry = None
@@ -1299,7 +1541,11 @@ def run(demo: bool, telegram_test: bool = False) -> None:
                                                             auto_adjust=True, threads=False))["Close"].iloc[-1])
                 except Exception:  # noqa: BLE001
                     pass
-            val = valuation(signals, fund, rates)
+            try:
+                shares = isy_shares([x["ticker"] for x in signals])
+            except Exception:  # noqa: BLE001
+                shares = {}
+            val = valuation(signals, fund, rates, shares)
             if val:
                 write("valuation.json", {"generated_at": meta["generated_at"], "data_date": meta["data_date"],
                                          "disclaimer": meta["disclaimer"], **val})

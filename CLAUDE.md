@@ -32,13 +32,22 @@ ve sonuçları statik bir web sayfasında gösteren bir bot. Şu an **Aşama 1**
 - **Sinyal isabeti** (`signal_accuracy`, signals.json `accuracy`): AL'dan 1 ay sonra ort. +%2.3 vs herhangi bir gün +%1.8;
   SAT +%0.9. Son 3 yılda fark ~0. Sinyallerin tek tek tahmin gücü zayıf; modelin değeri risk kontrolü.
 - Paylaşım: og:image `img/og.png` (1200×630), ikonlar `img/`.
+- **Veri kaynakları (10 Kasım 2026)**: geçmiş fiyat Yahoo (düzeltilmiş). Son günler `official_fill()` ile **Borsa İstanbul
+  resmî günlük bülteni** (`thbYYYYMMDD1.zip`, ~18:25'te yayımlanır, `fetch_bulletin`) ile tamamlanır/kontrol edilir: Yahoo'da
+  olmayan ya da saatlikten tahmin edilen (`PATCHED`) gün → resmî OHLCV; Yahoo son günü %0,5'ten farklıysa resmî değer (`MISMATCH`,
+  6+ hissede uyarı). Son gün henüz düzeltilmediği için düzeltilmiş = ham fiyat. Bülten yoksa yedek `isy_fill()` (İş Yatırım
+  `HisseTekil`; açılış yok, 18:30 öncesi bugünü kullanmaz). Endeks (XU030) bültende yok → saatlik tamamlama kalır.
+  İş Yatırım/Borsa İstanbul resmî API değil; adresler değişirse bot Yahoo ile devam eder (hata durdurmaz).
+  `quant-bot` cloud ortamında www.isyatirim.com.tr, www.borsaistanbul.com izinli.
 - **Değerleme kaydı** (`append_valuation_history` → `valuation_history.csv`, 9 Kasım 2026'dan): her veri günü hisse başına
   close, eps, book (TL), pe, pb, div_yield, roe, mcap_bn, sector, score, signal, fund_date. Yalnızca eklenir (aynı/eski gün yazılmaz).
   Amaç: birkaç yıl sonra ucuzluk puanını noktasal veriyle test etmek (Yahoo geçmiş F/K vermiyor).
-- **Ucuzluk endeksi** (bilgi amaçlı, modelden bağımsız, test edilmedi): `fetch_fundamentals` (Yahoo .info; eps, bookValue,
-  currency, dividendYield, ROE, sektör; haftada bir → `fundamentals.json`), `valuation()` → `valuation.json`. F/K ve PD/DD bizim
-  fiyatımızla hesaplanır; Yahoo yabancı para raporlayanlarda tutarsız (THY USD, ENKA TL) → çevrilmiş/çevrilmemiş PD/DD'den
-  0,1–15 aralığında olan seçilir. F/K>100 gösterilmez. Puan 0–100 = sektör içi (≥4 hisse, yoksa tümü) F/K ve PD/DD sıralaması ort.
+- **Ucuzluk endeksi** (bilgi amaçlı, modelden bağımsız, test edilmedi): asıl kaynak **İş Yatırım mali tabloları**
+  (`isy_financials`: `MaliTablo`, exchange=TRY; grup XI_29 sanayi / UFRS_K banka+sigorta / UFRS; son 12 ay net kâr = son çeyrek +
+  önceki yıl sonu − önceki yıl aynı çeyrek; net kâr 3Z ya da bankada 3ZA; özkaynak 2O) + hisse sayısı `isy_shares` (İş Yatırım
+  piyasa değeri / kapanış, her gün). Haftada bir `fetch_fundamentals` → `fundamentals.json` (Yahoo .info da alınır: sektör,
+  temettü verimi; ve İş Yatırım verisi yoksa yedek). `valuation()` → `valuation.json` (`source`: isyatirim|yahoo, `period`).
+  Yahoo yedeğinde yabancı para raporlayanlar için çevrilmiş/çevrilmemiş PD/DD'den 0,1–15 aralığında olan seçilir. F/K>100 gösterilmez. Puan 0–100 = sektör içi (≥4 hisse, yoksa tümü) F/K ve PD/DD sıralaması ort.
 - Workflow zamanlama: GitHub görevleri saatlerce geciktirebiliyor. "Beklenen veri günü" 18:00 (TR) öncesi bir önceki iş günü;
   Yahoo eski veri verirse bot hata vermeden çıkar; son denemede (21:10) veri hâlâ yoksa Telegram'a bilgi mesajı.
 - Modelin değeri getiri değil **düşüş koruması** (2008: endeks −%50, model +%7). Teknik göstergelerle al-bekle'yi getiride
@@ -108,7 +117,7 @@ python3 -m http.server   # http://localhost:8000 — index.html file:// ile aç�
 | Konu | Karar |
 |---|---|
 | Zaman dilimi | Günlük mumlar |
-| Veri kaynağı | yfinance, semboller `XXXXX.IS`, `auto_adjust=True`, 2004'ten (2005 öncesi atılır, `fix_jumps`); benchmark `XU030.IS`; ~157 seri, Actions'ta ~1–2 dk |
+| Veri kaynağı | yfinance (son gün Borsa İstanbul bülteniyle kontrol, yedek İş Yatırım; bilanço İş Yatırım), semboller `XXXXX.IS`, `auto_adjust=True`, 2004'ten (2005 öncesi atılır, `fix_jumps`); benchmark `XU030.IS`; ~157 seri, Actions'ta ~1–2 dk |
 | Strateji tipi | Çoklu indikatör birleşik skoru (tek strateji, parametre optimizasyonu YOK — aşırı uyumdan kaçınmak için) |
 | Yön | Sadece long (açığa satış yok). SAT = çık / uzak dur anlamında |
 | Çıktılar | Python bot + signals.json, backtest raporu, basit web sayfası |

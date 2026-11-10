@@ -9,7 +9,12 @@
    "mcap": 643020029952,
    "sector": "Financial Services",
    "industry": "Banks - Regional",
-   "fetched": "2026-11-10"
+   "fetched": "2026-11-10",
+   "net_ttm": 123021312000.0,
+   "equity": 522661000000.0,
+   "capital": 4200000000.0,
+   "fin_period": "2026/09",
+   "fin_group": "UFRS_K"
   },
   "AKBNK": {
    "eps": 12.36,
@@ -20,7 +25,12 @@
    "mcap": 368939991040,
    "sector": "Financial Services",
    "industry": "Banks - Regional",
-   "fetched": "2026-11-10"
+   "fetched": "2026-11-10",
+   "net_ttm": 64281821000.0,
+   "equity": 330260000000.0,
+   "capital": 5200000000.0,
+   "fin_period": "2026/09",
+   "fin_group": "UFRS_K"
   },
   "THYAO": {
    "eps": -9.37,
@@ -31,7 +41,12 @@
    "mcap": 425407840256,
    "sector": "Industrials",
    "industry": "Airlines",
-   "fetched": "2026-11-10"
+   "fetched": "2026-11-10",
+   "net_ttm": 146218895515.0,
+   "equity": 1135117000000.0,
+   "capital": 1380000000.0,
+   "fin_period": "2026/09",
+   "fin_group": "XI_29"
   },
   "ISCTR": {
    "eps": 2.72,
@@ -42,7 +57,12 @@
    "mcap": 342499983360,
    "sector": "Financial Services",
    "industry": "Banks - Regional",
-   "fetched": "2026-11-10"
+   "fetched": "2026-11-10",
+   "net_ttm": 64183256980.0,
+   "equity": 551629338044.0,
+   "capital": 24999970000.0,
+   "fin_period": "2026/09",
+   "fin_group": "UFRS_K"
   },
   "TAVHL": {
    "eps": 21.37,
@@ -53,7 +73,12 @@
    "mcap": 110346682368,
    "sector": "Industrials",
    "industry": "Airports & Air Services",
-   "fetched": "2026-11-10"
+   "fetched": "2026-11-10",
+   "net_ttm": 9091396642.0,
+   "equity": 96211537000.0,
+   "capital": 363281000.0,
+   "fin_period": "2026/09",
+   "fin_group": "XI_29"
   },
   "YKBNK": {
    "eps": 0.06,
@@ -64,7 +89,12 @@
    "mcap": 327238746112,
    "sector": "Financial Services",
    "industry": "Banks - Regional",
-   "fetched": "2026-11-10"
+   "fetched": "2026-11-10",
+   "net_ttm": 50955151000.0,
+   "equity": 296214000000.0,
+   "capital": 8447000000.0,
+   "fin_period": "2026/09",
+   "fin_group": "UFRS_K"
   },
   "BRSAN": {
    "eps": 17.43,
@@ -75,7 +105,12 @@
    "mcap": 97113538560,
    "sector": "Basic Materials",
    "industry": "Steel",
-   "fetched": "2026-11-10"
+   "fetched": "2026-11-10",
+   "net_ttm": 3962500561.0,
+   "equity": 47723050000.0,
+   "capital": 141772000.0,
+   "fin_period": "2026/09",
+   "fin_group": "XI_29"
   },
   "VAKBN": {
    "eps": 7.86,
@@ -86,7 +121,12 @@
    "mcap": 333373276160,
    "sector": "Financial Services",
    "industry": "Banks - Regional",
-   "fetched": "2026-11-10"
+   "fetched": "2026-11-10",
+   "net_ttm": 80555893000.0,
+   "equity": 394893000000.0,
+   "capital": 9916000000.0,
+   "fin_period": "2026/09",
+   "fin_group": "UFRS_K"
   },
   "KCHOL": {
    "eps": 6.84,
@@ -97,7 +137,12 @@
    "mcap": 538435584000,
    "sector": "Industrials",
    "industry": "Conglomerates",
-   "fetched": "2026-11-10"
+   "fetched": "2026-11-10",
+   "net_ttm": 65107030846.0,
+   "equity": 851790000000.0,
+   "capital": 2536000000.0,
+   "fin_period": "2026/09",
+   "fin_group": "XI_29"
   },
   "PGSUS": {
    "eps": -0.72,
@@ -108,7 +153,12 @@
    "mcap": 73249996800,
    "sector": "Industrials",
    "industry": "Airlines",
-   "fetched": "2026-11-10"
+   "fetched": "2026-11-10",
+   "net_ttm": 2488020367.0,
+   "equity": 131735545000.0,
+   "capital": 500000000.0,
+   "fin_period": "2026/09",
+   "fin_group": "XI_29"
   },
   "FROTO": {
    "eps": 8.8,
@@ -119,7 +169,12 @@
    "mcap": 261252481024,
    "sector": "Consumer Cyclical",
    "industry": "Auto Manufacturers",
-   "fetched": "2026-11-10"
+   "fetched": "2026-11-10",
+   "net_ttm": 32501719096.0,
+   "equity": 195987402000.0,
+   "capital": 3509100000.0,
+   "fin_period": "2026/09",
+   "fin_group": "XI_29"
   },
   "MGROS": {
    "eps": 33.46,
@@ -130,7 +185,12 @@
    "mcap": 85573263360,
    "sector": "Consumer Defensive",
    "industry": "Grocery Stores",
-   "fetched": "2026-11-10"
+   "fetched": "2026-11-10",
+   "net_ttm": 5667138016.0,
+   "equity": 101585623000.0,
+   "capital": 181054000.0,
+   "fin_period": "2026/09",
+   "fin_group": "XI_29"
   },
   "BIMAS": {
    "eps": 21.77,
@@ -141,7 +201,12 @@
    "mcap": 452375052288,
    "sector": "Consumer Defensive",
    "industry": "Grocery Stores",
-   "fetched": "2026-11-10"
+   "fetched": "2026-11-10",
+   "net_ttm": 34716185078.0,
+   "equity": 221686578000.0,
+   "capital": 1200000000.0,
+   "fin_period": "2026/09",
+   "fin_group": "XI_29"
   },
   "OYAKC": {
    "eps": 1.45,
@@ -152,7 +217,12 @@
    "mcap": 96114933760,
    "sector": "Basic Materials",
    "industry": "Building Materials",
-   "fetched": "2026-11-10"
+   "fetched": "2026-11-10",
+   "net_ttm": 6750724879.0,
+   "equity": 83431105000.0,
+   "capital": 4861656000.0,
+   "fin_period": "2026/09",
+   "fin_group": "XI_29"
   },
   "KONTR": {
    "eps": -0.77,
@@ -163,7 +233,12 @@
    "mcap": 3471000064,
    "sector": "Industrials",
    "industry": "Conglomerates",
-   "fetched": "2026-11-10"
+   "fetched": "2026-11-10",
+   "net_ttm": -2970426519.0,
+   "equity": 5262623020.0,
+   "capital": 1300000000.0,
+   "fin_period": "2026/06",
+   "fin_group": "XI_29"
   },
   "TKFEN": {
    "eps": -7.75,
@@ -174,7 +249,12 @@
    "mcap": 71615913984,
    "sector": "Basic Materials",
    "industry": "Agricultural Inputs",
-   "fetched": "2026-11-10"
+   "fetched": "2026-11-10",
+   "net_ttm": -3223779799.0,
+   "equity": 39390888000.0,
+   "capital": 370000000.0,
+   "fin_period": "2026/09",
+   "fin_group": "XI_29"
   },
   "HALKB": {
    "eps": 4.48,
@@ -185,7 +265,12 @@
    "mcap": 307939606528,
    "sector": "Financial Services",
    "industry": "Banks - Regional",
-   "fetched": "2026-11-10"
+   "fetched": "2026-11-10",
+   "net_ttm": 32867696000.0,
+   "equity": 259290000000.0,
+   "capital": 7185000000.0,
+   "fin_period": "2026/09",
+   "fin_group": "UFRS_K"
   },
   "MIATK": {
    "eps": -1634603.5,
@@ -196,7 +281,12 @@
    "mcap": 12191920128,
    "sector": "Technology",
    "industry": "Information Technology Services",
-   "fetched": "2026-11-10"
+   "fetched": "2026-11-10",
+   "net_ttm": -1807116853.0,
+   "equity": 6023478581.0,
+   "capital": 494000000.0,
+   "fin_period": "2026/06",
+   "fin_group": "XI_29"
   },
   "SKBNK": {
    "eps": 1.23,
@@ -207,7 +297,12 @@
    "mcap": 11018372096,
    "sector": "Financial Services",
    "industry": "Banks - Regional",
-   "fetched": "2026-11-10"
+   "fetched": "2026-11-10",
+   "net_ttm": 3853563000.0,
+   "equity": 25849000000.0,
+   "capital": 2500000000.0,
+   "fin_period": "2026/09",
+   "fin_group": "UFRS_K"
   },
   "TRMET": {
    "eps": 5.5,
@@ -218,7 +313,12 @@
    "mcap": 44978470912,
    "sector": "Basic Materials",
    "industry": "Other Industrial Metals & Mining",
-   "fetched": "2026-11-10"
+   "fetched": "2026-11-10",
+   "net_ttm": 1149881853.0,
+   "equity": 30827467000.0,
+   "capital": 388080000.0,
+   "fin_period": "2026/09",
+   "fin_group": "XI_29"
   },
   "EREGL": {
    "eps": 1.39,
@@ -229,18 +329,28 @@
    "mcap": 220208644096,
    "sector": "Basic Materials",
    "industry": "Steel",
-   "fetched": "2026-11-10"
+   "fetched": "2026-11-10",
+   "net_ttm": 9395591758.0,
+   "equity": 336972745000.0,
+   "capital": 7000000000.0,
+   "fin_period": "2026/09",
+   "fin_group": "XI_29"
   },
   "AEFES": {
    "eps": 1.59,
-   "book": 21.218,
+   "book": 18.343,
    "currency": "TRY",
    "div_yield": 2.01,
    "roe": 0.07835,
    "mcap": 100302635008,
    "sector": "Consumer Defensive",
    "industry": "Beverages - Non-Alcoholic",
-   "fetched": "2026-11-10"
+   "fetched": "2026-11-10",
+   "net_ttm": 8154527083.0,
+   "equity": 144087391000.0,
+   "capital": 5921052000.0,
+   "fin_period": "2026/09",
+   "fin_group": "XI_29"
   },
   "TTKOM": {
    "eps": 7.84,
@@ -251,7 +361,12 @@
    "mcap": 172409995264,
    "sector": "Communication Services",
    "industry": "Telecom Services",
-   "fetched": "2026-11-10"
+   "fetched": "2026-11-10",
+   "net_ttm": 26679021765.0,
+   "equity": 287008027000.0,
+   "capital": 3500000000.0,
+   "fin_period": "2026/09",
+   "fin_group": "XI_29"
   },
   "ASELS": {
    "eps": 9.82,
@@ -262,7 +377,12 @@
    "mcap": 1540140040192,
    "sector": "Industrials",
    "industry": "Aerospace & Defense",
-   "fetched": "2026-11-10"
+   "fetched": "2026-11-10",
+   "net_ttm": 48588453949.0,
+   "equity": 334974960000.0,
+   "capital": 4560000000.0,
+   "fin_period": "2026/09",
+   "fin_group": "XI_29"
   },
   "AKSEN": {
    "eps": 2.75,
@@ -273,7 +393,12 @@
    "mcap": 85782347776,
    "sector": "Utilities",
    "industry": "Utilities - Independent Power Producers",
-   "fetched": "2026-11-10"
+   "fetched": "2026-11-10",
+   "net_ttm": 4227956884.0,
+   "equity": 73236686661.0,
+   "capital": 1226338236.0,
+   "fin_period": "2026/09",
+   "fin_group": "XI_29"
   },
   "BTCIM": {
    "eps": -0.78,
@@ -284,7 +409,12 @@
    "mcap": 10713600000,
    "sector": "Basic Materials",
    "industry": "Building Materials",
-   "fetched": "2026-11-10"
+   "fetched": "2026-11-10",
+   "net_ttm": -37797754.0,
+   "equity": 24174032556.0,
+   "capital": 5580000000.0,
+   "fin_period": "2026/06",
+   "fin_group": "XI_29"
   },
   "CANTE": {
    "eps": -0.32,
@@ -295,7 +425,12 @@
    "mcap": 10299999232,
    "sector": "Utilities",
    "industry": "Utilities - Independent Power Producers",
-   "fetched": "2026-11-10"
+   "fetched": "2026-11-10",
+   "net_ttm": -2432550382.0,
+   "equity": 31726421342.0,
+   "capital": 10000000000.0,
+   "fin_period": "2026/06",
+   "fin_group": "XI_29"
   },
   "CWENE": {
    "eps": 2.74,
@@ -306,7 +441,12 @@
    "mcap": 19269044224,
    "sector": "Technology",
    "industry": "Solar",
-   "fetched": "2026-11-10"
+   "fetched": "2026-11-10",
+   "net_ttm": 2110720827.0,
+   "equity": 23524210557.0,
+   "capital": 1078290009.0,
+   "fin_period": "2026/09",
+   "fin_group": "XI_29"
   },
   "ECILC": {
    "eps": -4.35,
@@ -317,7 +457,12 @@
    "mcap": 35290894336,
    "sector": "Healthcare",
    "industry": "Drug Manufacturers - Specialty & Generic",
-   "fetched": "2026-11-10"
+   "fetched": "2026-11-10",
+   "net_ttm": -3238158245.0,
+   "equity": 72093228000.0,
+   "capital": 685260000.0,
+   "fin_period": "2026/09",
+   "fin_group": "XI_29"
   },
   "EKGYO": {
    "eps": -2.45,
@@ -328,7 +473,12 @@
    "mcap": 67071721472,
    "sector": "Real Estate",
    "industry": "REIT - Residential",
-   "fetched": "2026-11-10"
+   "fetched": "2026-11-10",
+   "net_ttm": -1546330990.0,
+   "equity": 164007105000.0,
+   "capital": 3800000000.0,
+   "fin_period": "2026/09",
+   "fin_group": "XI_29"
   },
   "EUPWR": {
    "eps": 1.46,
@@ -339,7 +489,12 @@
    "mcap": 29435998208,
    "sector": "Industrials",
    "industry": "Electrical Equipment & Parts",
-   "fetched": "2026-11-10"
+   "fetched": "2026-11-10",
+   "net_ttm": 792356137.0,
+   "equity": 14054592000.0,
+   "capital": 660000000.0,
+   "fin_period": "2026/09",
+   "fin_group": "XI_29"
   },
   "GESAN": {
    "eps": 3.75,
@@ -350,29 +505,44 @@
    "mcap": 17443198976,
    "sector": "Industrials",
    "industry": "Engineering & Construction",
-   "fetched": "2026-11-10"
+   "fetched": "2026-11-10",
+   "net_ttm": 1180804140.0,
+   "equity": 18145830000.0,
+   "capital": 460000000.0,
+   "fin_period": "2026/09",
+   "fin_group": "XI_29"
   },
   "SAHOL": {
    "eps": 9.4,
-   "book": 174.426,
+   "book": 213.61,
    "currency": "TRY",
    "div_yield": 1.62,
    "roe": 0.06033,
    "mcap": 182796615680,
    "sector": "Financial Services",
    "industry": "Banks - Regional",
-   "fetched": "2026-11-10"
+   "fetched": "2026-11-10",
+   "net_ttm": 25310770760.0,
+   "equity": 442376240000.0,
+   "capital": 2100376000.0,
+   "fin_period": "2026/09",
+   "fin_group": "XI_29"
   },
   "SISE": {
    "eps": 4.11,
-   "book": 110.227,
+   "book": 81.002,
    "currency": "TRY",
    "div_yield": 1.72,
    "roe": 0.025090002,
    "mcap": 106171629568,
    "sector": "Industrials",
    "industry": "Conglomerates",
-   "fetched": "2026-11-10"
+   "fetched": "2026-11-10",
+   "net_ttm": 10198329077.0,
+   "equity": 276393886000.0,
+   "capital": 3063214000.0,
+   "fin_period": "2026/09",
+   "fin_group": "XI_29"
   },
   "TOASO": {
    "eps": 25.84,
@@ -383,7 +553,12 @@
    "mcap": 122800005120,
    "sector": "Consumer Cyclical",
    "industry": "Auto Manufacturers",
-   "fetched": "2026-11-10"
+   "fetched": "2026-11-10",
+   "net_ttm": 17555985990.0,
+   "equity": 72780928000.0,
+   "capital": 500000000.0,
+   "fin_period": "2026/09",
+   "fin_group": "XI_29"
   },
   "TRALT": {
    "eps": 1.6,
@@ -394,7 +569,12 @@
    "mcap": 128868605952,
    "sector": "Basic Materials",
    "industry": "Gold",
-   "fetched": "2026-11-10"
+   "fetched": "2026-11-10",
+   "net_ttm": 4662990361.0,
+   "equity": 55091311000.0,
+   "capital": 3202500000.0,
+   "fin_period": "2026/09",
+   "fin_group": "XI_29"
   },
   "SASA": {
    "eps": -0.27,
@@ -405,7 +585,12 @@
    "mcap": 85578145792,
    "sector": "Consumer Cyclical",
    "industry": "Textile Manufacturing",
-   "fetched": "2026-11-10"
+   "fetched": "2026-11-10",
+   "net_ttm": -15602577295.0,
+   "equity": 215094963000.0,
+   "capital": 52501931000.0,
+   "fin_period": "2026/09",
+   "fin_group": "XI_29"
   },
   "TCELL": {
    "eps": 9.07,
@@ -416,7 +601,12 @@
    "mcap": 200450359296,
    "sector": "Communication Services",
    "industry": "Telecom Services",
-   "fetched": "2026-11-10"
+   "fetched": "2026-11-10",
+   "net_ttm": 21966999530.0,
+   "equity": 333272018000.0,
+   "capital": 2200000000.0,
+   "fin_period": "2026/09",
+   "fin_group": "XI_29"
   },
   "ALARK": {
    "eps": 15.85,
@@ -427,7 +617,12 @@
    "mcap": 41111195648,
    "sector": "Industrials",
    "industry": "Conglomerates",
-   "fetched": "2026-11-10"
+   "fetched": "2026-11-10",
+   "net_ttm": 5789118207.0,
+   "equity": 99688272000.0,
+   "capital": 417000000.0,
+   "fin_period": "2026/09",
+   "fin_group": "XI_29"
   },
   "FENER": {
    "eps": -0.61,
@@ -438,7 +633,12 @@
    "mcap": 13187499008,
    "sector": "Communication Services",
    "industry": "Entertainment",
-   "fetched": "2026-11-10"
+   "fetched": "2026-11-10",
+   "net_ttm": null,
+   "equity": 8515166899.0,
+   "capital": 6250000000.0,
+   "fin_period": "2026/03",
+   "fin_group": "XI_29"
   },
   "GUBRF": {
    "eps": 22.75,
@@ -449,7 +649,12 @@
    "mcap": 102538002432,
    "sector": "Basic Materials",
    "industry": "Agricultural Inputs",
-   "fetched": "2026-11-10"
+   "fetched": "2026-11-10",
+   "net_ttm": 8796387020.0,
+   "equity": 42387992564.0,
+   "capital": 334000000.0,
+   "fin_period": "2026/09",
+   "fin_group": "XI_29"
   },
   "HEKTS": {
    "eps": -0.58,
@@ -460,7 +665,12 @@
    "mcap": 16437715968,
    "sector": "Basic Materials",
    "industry": "Agricultural Inputs",
-   "fetched": "2026-11-10"
+   "fetched": "2026-11-10",
+   "net_ttm": -5044058155.0,
+   "equity": 16408979740.0,
+   "capital": 8430000000.0,
+   "fin_period": "2026/09",
+   "fin_group": "XI_29"
   },
   "KLRHO": {
    "eps": 0.51,
@@ -471,7 +681,12 @@
    "mcap": 30858749952,
    "sector": "Industrials",
    "industry": "Conglomerates",
-   "fetched": "2026-11-10"
+   "fetched": "2026-11-10",
+   "net_ttm": 1157512485.0,
+   "equity": 39804229000.0,
+   "capital": 2925000000.0,
+   "fin_period": "2026/09",
+   "fin_group": "XI_29"
   },
   "TUPRS": {
    "eps": 36.17,
@@ -482,7 +697,12 @@
    "mcap": 640177864704,
    "sector": "Energy",
    "industry": "Oil & Gas Refining & Marketing",
-   "fetched": "2026-11-10"
+   "fetched": "2026-11-10",
+   "net_ttm": 129692301387.0,
+   "equity": 522888885000.0,
+   "capital": 1926796000.0,
+   "fin_period": "2026/09",
+   "fin_group": "XI_29"
   },
   "ENKAI": {
    "eps": 5.2,
@@ -493,7 +713,12 @@
    "mcap": 472537137152,
    "sector": "Industrials",
    "industry": "Engineering & Construction",
-   "fetched": "2026-11-10"
+   "fetched": "2026-11-10",
+   "net_ttm": 40573801956.0,
+   "equity": 431784851000.0,
+   "capital": 6021689000.0,
+   "fin_period": "2026/09",
+   "fin_group": "XI_29"
   },
   "ASTOR": {
    "eps": 10.32,
@@ -504,7 +729,12 @@
    "mcap": 154789806080,
    "sector": "Industrials",
    "industry": "Electrical Equipment & Parts",
-   "fetched": "2026-11-10"
+   "fetched": "2026-11-10",
+   "net_ttm": 11201140606.0,
+   "equity": 43796220222.0,
+   "capital": 998000000.0,
+   "fin_period": "2026/06",
+   "fin_group": "XI_29"
   },
   "KRDMD": {
    "eps": 4.04,
@@ -515,18 +745,28 @@
    "mcap": 42613202944,
    "sector": "Basic Materials",
    "industry": "Steel",
-   "fetched": "2026-11-10"
+   "fetched": "2026-11-10",
+   "net_ttm": 3920901216.0,
+   "equity": 78499778740.0,
+   "capital": 780226002.0,
+   "fin_period": "2026/09",
+   "fin_group": "XI_29"
   },
   "PETKM": {
    "eps": -0.9,
-   "book": 29.686,
+   "book": 25.238,
    "currency": "TRY",
    "div_yield": 0.0,
    "roe": -0.01113,
    "mcap": 42400509952,
    "sector": "Basic Materials",
    "industry": "Chemicals",
-   "fetched": "2026-11-10"
+   "fetched": "2026-11-10",
+   "net_ttm": -2695867153.0,
+   "equity": 78044070000.0,
+   "capital": 2534400000.0,
+   "fin_period": "2026/09",
+   "fin_group": "XI_29"
   },
   "TURSG": {
    "eps": 1.17,
@@ -537,7 +777,12 @@
    "mcap": 69200003072,
    "sector": "Financial Services",
    "industry": "Insurance - Property & Casualty",
-   "fetched": "2026-11-10"
+   "fetched": "2026-11-10",
+   "net_ttm": 13189194582.0,
+   "equity": 53927895905.0,
+   "capital": null,
+   "fin_period": "2026/09",
+   "fin_group": "UFRS_K"
   },
   "ULKER": {
    "eps": 12.0,
@@ -548,7 +793,12 @@
    "mcap": 28932773888,
    "sector": "Consumer Defensive",
    "industry": "Confectioners",
-   "fetched": "2026-11-10"
+   "fetched": "2026-11-10",
+   "net_ttm": 2810061321.0,
+   "equity": 53528264000.0,
+   "capital": 369276000.0,
+   "fin_period": "2026/09",
+   "fin_group": "XI_29"
   }
  },
  "updated": "2026-11-10"

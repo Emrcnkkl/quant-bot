@@ -124,6 +124,43 @@ class TestDegerlemeKaydi(unittest.TestCase):
             self.assertTrue("".join(open(p, encoding="utf-8").read()).startswith(before))
 
 
+class TestResmiKaynak(unittest.TestCase):
+    def _df(self, dates, close):
+        return pd.DataFrame({"Open": close, "High": close, "Low": close, "Close": close, "Volume": 1.0},
+                            index=pd.DatetimeIndex(dates))
+
+    def test_bulten_eksik_gunu_tamamlar_ve_hatayi_duzeltir(self):
+        d1, d2 = pd.Timestamp("2026-11-06"), pd.Timestamp("2026-11-09")
+        data = {"AAA": self._df([d1], [10.0]),               # Yahoo'da son gün yok
+                "BBB": self._df([d1, d2], [20.0, 21.0]),     # Yahoo son gün yanlış (21 ≠ 22)
+                "CCC": self._df([d1, d2], [30.0, 31.0]),     # doğru
+                bot.BENCHMARK: self._df([d1], [100.0])}      # endeks bültende yok, dokunulmaz
+        b = pd.DataFrame({"Open": [10.5, 21.5, 30.5], "High": [11.2, 22.4, 31.5], "Low": [10.1, 21.0, 30.0],
+                          "Close": [11.0, 22.0, 31.0], "Volume": [5.0, 6.0, 7.0], "PrevClose": [10.0, 20.0, 30.0]},
+                         index=["AAA", "BBB", "CCC"])
+        bot.OFFICIAL.clear(); bot.MISMATCH.clear(); bot.PATCHED.clear()
+        bot.official_fill(data, bulletins={d2: b})
+        self.assertEqual(data["AAA"].index[-1], d2)
+        self.assertEqual(data["AAA"]["Close"].iloc[-1], 11.0)
+        self.assertEqual(data["AAA"]["Open"].iloc[-1], 10.5)
+        self.assertEqual(data["BBB"]["Close"].iloc[-1], 22.0)
+        self.assertEqual(len(data["BBB"]), 2)
+        self.assertEqual(data["CCC"]["Volume"].iloc[-1], 1.0)        # fark yoksa Yahoo kalır
+        self.assertEqual(data[bot.BENCHMARK].index[-1], d1)
+        self.assertEqual([m.split()[0] for m in bot.MISMATCH], ["BBB"])
+        self.assertEqual(bot.OFFICIAL, {"AAA", "BBB"})
+
+    def test_bilanco_verisiyle_fk(self):
+        sig = [{"ticker": "AAA", "name": "A", "close": 10.0, "signal": "TUT"}]
+        fund = {"AAA": {"net_ttm": 50.0, "equity": 200.0, "currency": "USD", "eps": 99, "book": 99,
+                        "fin_period": "2026/09"}}
+        it = bot.valuation(sig, fund, {"USD": 40.0}, shares={"AAA": 100.0})["items"][0]
+        self.assertEqual(it["pe"], 20.0)        # 1000 / 50
+        self.assertEqual(it["pb"], 5.0)         # 1000 / 200
+        self.assertEqual(it["source"], "isyatirim")
+        self.assertFalse(it["fx_converted"])
+
+
 class TestCanliPortfoy(unittest.TestCase):
     def test_gecmis_kayitlar_degismez(self):
         with tempfile.TemporaryDirectory() as tmp:
