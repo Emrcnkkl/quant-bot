@@ -141,7 +141,25 @@ nav .help:hover{color:var(--ink)}
 .note{text-align:center;margin:14px 0 0}
 
 /* ---- Bölümler ---- */
-section{padding-top:84px}
+section{padding-top:36px}
+#sss{padding-top:72px}
+[id]{scroll-margin-top:84px}
+main section[hidden],.warn[hidden]{display:none}
+/* İletişim */
+.contact{border-radius:18px;padding:24px;display:grid;gap:16px;max-width:680px}
+.contact label{display:grid;gap:7px;font-size:13.5px;font-weight:600;color:var(--ink2)}
+.contact .row2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:560px){.contact .row2{grid-template-columns:1fr}.contact{padding:18px}}
+.contact input,.contact select,.contact textarea{width:100%;box-sizing:border-box;padding:11px 14px;border-radius:12px;border:1px solid var(--line2);background:var(--surface);color:var(--ink);font:inherit;font-size:14.5px;font-weight:400;outline:none;transition:border-color .15s,box-shadow .15s}
+.contact textarea{resize:vertical;min-height:140px;line-height:1.5}
+.contact select option{background:var(--card);color:var(--ink)}
+.contact input:focus,.contact select:focus,.contact textarea:focus{border-color:color-mix(in srgb,var(--accent) 60%,transparent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 18%,transparent)}
+.contact .hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+.contact .actions{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.contact button{border:0;border-radius:12px;padding:11px 26px;background:var(--grad);color:#fff;font:inherit;font-weight:650;font-size:14.5px;cursor:pointer;box-shadow:0 8px 22px -10px var(--accent);transition:transform .15s,opacity .15s}
+.contact button:hover{transform:translateY(-1px)}
+.contact button:disabled{opacity:.6;cursor:default;transform:none}
+#cstat.ok{color:var(--al)}#cstat.err{color:var(--sat)}
 .kicker{display:inline-flex;align-items:center;gap:10px;font-size:12px;font-weight:650;letter-spacing:.16em;text-transform:uppercase;margin-bottom:10px}
 .kicker::before{content:"";width:22px;height:1px;background:var(--grad)}
 h2{font-size:clamp(26px,3.4vw,34px);font-weight:700;letter-spacing:-.03em;margin:0 0 8px;line-height:1.15}
@@ -333,17 +351,17 @@ footer p{margin:0 0 8px;max-width:860px}
       <span>BIST50 <span class="gtext">Sinyal</span></span>
     </a>
     <div class="links">
-      <a href="#bugun">Bugün</a><a href="#sinyaller">Sinyaller</a><a href="#performans">Performans</a><a href="#ucuzluk">Değerleme</a><a href="#nasil">Nasıl çalışır</a>
+      <a href="#bugun">Bugün</a><a href="#sinyaller">Sinyaller</a><a href="#performans">Performans</a><a href="#degerleme">Değerleme</a><a href="#nasil">Nasıl çalışır</a><a href="#iletisim">İletişim</a>
     </div>
     <span class="live" title="Her iş günü 18:40'ta otomatik güncellenir"><span class="dot"></span><span class="t" id="livetxt">GÜNCEL</span></span>
     <a class="help" href="#sss" title="Sık sorulan sorular">?</a>
   </div>
-  <div class="mnav"><a href="#bugun">Bugün</a><a href="#sinyaller">Sinyaller</a><a href="#performans">Performans</a><a href="#ucuzluk">Değerleme</a><a href="#nasil">Nasıl çalışır</a><a href="#sss">SSS</a></div>
+  <div class="mnav"><a href="#bugun">Bugün</a><a href="#sinyaller">Sinyaller</a><a href="#performans">Performans</a><a href="#degerleme">Değerleme</a><a href="#nasil">Nasıl çalışır</a><a href="#iletisim">İletişim</a></div>
 </nav>
 
 <main class="wrap">
   <div id="demo"></div>
-  <div class="warn">
+  <div class="warn" id="warnbar">
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
     <div><b>Yatırım tavsiyesi değildir.</b> Bu sayfa, kişisel durumunuzu bilmeden çalışan otomatik bir modelin geçmiş fiyatlara dayalı çıktılarını gösterir; kimseye al-sat önerisi değildir. Geçmiş performans geleceğin garantisi değildir.</div>
   </div>
@@ -514,6 +532,24 @@ footer p{margin:0 0 8px;max-width:860px}
     <details><summary>"Canlı model portföy" nedir?</summary><div><p>Sayfadaki diğer performans rakamları geriye dönük testtir: kurallar geçmişe uygulanarak hesaplanır. Canlı portföy ise 9 Kasım 2026'da 100.000 ₺ ile başlatıldı ve her gün yalnızca o günün sonucu eklenir; geçmiş kayıtlar sonradan değiştirilmez. Zamanla modelin gerçek performansının en güvenilir göstergesi olacak. Gerçek para değildir, işlem yapılmaz.</p></div></details>
     <details><summary>Ne sıklıkla güncelleniyor?</summary><div><p>Her iş günü 18:40'ta, borsa kapandıktan sonra otomatik olarak. Sayfanın üstündeki tarih son verinin günüdür.</p></div></details>
     <details><summary>Veriler nereden geliyor?</summary><div><p>Geçmiş fiyatlar Yahoo Finance'ten alınır; son günün fiyatı her akşam Borsa İstanbul'un resmî günlük bülteniyle kontrol edilir ve gerekirse oradan tamamlanır (bülten alınamazsa İş Yatırım verisi kullanılır). Şirket kârı ve özkaynağı İş Yatırım'daki mali tablolardan, politika faizi ve enflasyon TCMB'nin sitesinden gelir. Veri kaynaklarında zaman zaman eksik gün veya hata olabilir.</p></div></details>
+  </section>
+
+  <!-- ===== İLETİŞİM ===== -->
+  <section id="iletisim">
+    <div class="kicker"><span class="gtext">06 · İletişim</span></div>
+    <h2>Bize yazın</h2>
+    <p class="lead">Soru, öneri ya da gördüğünüz bir hata… Mesajınız doğrudan proje sahibine e-posta olarak iletilir.</p>
+    <form class="card contact" id="cform" novalidate>
+      <div class="row2">
+        <label>Adınız<input name="name" autocomplete="name" maxlength="80" placeholder="İsteğe bağlı"></label>
+        <label>E-posta adresiniz<input name="email" type="email" autocomplete="email" maxlength="120" placeholder="Yanıt almak isterseniz"></label>
+      </div>
+      <label>Konu<select name="topic"><option>Soru</option><option>Öneri</option><option>Hata bildirimi</option><option>Diğer</option></select></label>
+      <label>Mesajınız<textarea name="message" rows="6" maxlength="4000" placeholder="Mesajınızı buraya yazın…"></textarea></label>
+      <input type="text" name="_honey" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <div class="actions"><button type="submit">Gönder</button><span id="cstat" class="small" role="status"></span></div>
+    </form>
+    <p class="muted small" style="margin-top:14px">Mesajlar FormSubmit hizmeti aracılığıyla e-postaya iletilir. E-posta adresinizi yazarsanız yalnızca size yanıt vermek için kullanılır.</p>
   </section>
 
   <footer>
@@ -1043,6 +1079,7 @@ document.addEventListener("click", e => {
   if (!w) return;
   const t = w.dataset.t || w.querySelector(".tk")?.textContent;
   if (!t || !S.signals.some(x => x.ticker === t)) return;
+  goTo("sinyaller");
   $("#q").value = ""; openRow = t; setFilter("ALL");
   document.querySelector(`#sig tr.row[data-t="${t}"]`)?.scrollIntoView({behavior: "smooth", block: "start"});
 });
@@ -1069,21 +1106,67 @@ $("#perseg").addEventListener("click", e => {
   document.querySelectorAll("#perseg button").forEach(b => b.classList.toggle("on", b === e.target));
   renderStats();
 });
-// Menüde bulunulan bölümü işaretle
-const secs = [...document.querySelectorAll("main section")];
-const io = new IntersectionObserver(es => es.forEach(en => {
-  if (!en.isIntersecting) return;
-  document.querySelectorAll("nav a[href^='#']").forEach(a => a.classList.toggle("on", a.getAttribute("href") === "#" + en.target.id));
-}), {rootMargin: "-45% 0px -50% 0px"});
-secs.forEach(s => io.observe(s));
+// ---------------- Sekmeler: her seferinde tek sayfa görünür (adres çubuğundaki #… ile) ----------------
+const PAGES = {bugun: ["bugun"], sinyaller: ["sinyaller"], performans: ["performans"], degerleme: ["ucuzluk"],
+               nasil: ["nasil", "sss"], iletisim: ["iletisim"]};
+const ALIAS = {ucuzluk: "degerleme", sss: "nasil"};
+let page = null;
+function pageOf(id) {
+  if (PAGES[id]) return id;
+  if (ALIAS[id]) return ALIAS[id];
+  const sec = document.getElementById(id)?.closest("main section");
+  return (sec && Object.keys(PAGES).find(k => PAGES[k].includes(sec.id))) || "bugun";
+}
+function route() {
+  const id = decodeURIComponent(location.hash.slice(1)) || "bugun", p = pageOf(id), el = document.getElementById(id);
+  const changed = p !== page; page = p;
+  document.querySelectorAll("main section").forEach(s => s.hidden = !PAGES[p].includes(s.id));
+  document.querySelectorAll("nav .links a, nav .mnav a").forEach(a => a.classList.toggle("on", pageOf(a.getAttribute("href").slice(1)) === p));
+  $("#warnbar").hidden = !["bugun", "sinyaller", "performans"].includes(p);
+  if (el?.tagName === "DETAILS") el.open = true;
+  if (el && el.id !== PAGES[p][0]) el.scrollIntoView({block: "start"}); else scrollTo({top: 0});
+  document.querySelector("nav .mnav a.on")?.scrollIntoView({block: "nearest", inline: "center"});
+  if (changed) requestAnimationFrame(redraw);
+}
+function goTo(id) { history.pushState(null, "", "#" + id); route(); }
+addEventListener("hashchange", route);
+route();
+
+// ---------------- İletişim formu ----------------
+const MAIL_TO = "canakkaleemir59@gmail.com";
+$("#cform").addEventListener("submit", async e => {
+  e.preventDefault();
+  const f = e.target, st = $("#cstat"), btn = f.querySelector("button");
+  const d = Object.fromEntries(new FormData(f));
+  st.className = "small";
+  if (d._honey) return;                                  // bot tuzağı
+  if (d.message.trim().length < 5) { st.className = "small err"; st.textContent = "Lütfen bir mesaj yazın."; f.message.focus(); return; }
+  if (d.email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(d.email)) { st.className = "small err"; st.textContent = "E-posta adresi geçerli görünmüyor."; f.email.focus(); return; }
+  btn.disabled = true; st.textContent = "Gönderiliyor…";
+  try {
+    const r = await fetch(`https://formsubmit.co/ajax/${MAIL_TO}`, {
+      method: "POST", headers: {"Content-Type": "application/json", Accept: "application/json"},
+      body: JSON.stringify({Ad: d.name || "-", "E-posta": d.email || "-", Konu: d.topic, Mesaj: d.message,
+                            _subject: `BIST50 Sinyal · ${d.topic}${d.name ? " · " + d.name : ""}`,
+                            _replyto: d.email || undefined, _template: "table", _captcha: "false"})});
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok || String(j.success) !== "true") throw new Error(j.message || r.status);
+    f.reset(); st.className = "small ok"; st.textContent = "Teşekkürler, mesajınız iletildi.";
+  } catch (err) {
+    st.className = "small err";
+    st.innerHTML = `Mesaj gönderilemedi. Doğrudan <a href="mailto:${MAIL_TO}?subject=${encodeURIComponent("BIST50 Sinyal · " + d.topic)}&body=${encodeURIComponent(d.message)}">e-posta ile</a> yazabilirsiniz.`;
+  } finally { btn.disabled = false; }
+});
 // Kaydırınca beliren öğeler
 const rio = new IntersectionObserver(es => es.forEach(en => { if (en.isIntersecting) { en.target.classList.add("in"); rio.unobserve(en.target); } }), {rootMargin: "0px 0px -8% 0px"});
 document.querySelectorAll("main section:not(#bugun) > *, footer > *").forEach(el => { el.classList.add("rv"); rio.observe(el); });
 let rsz;
-addEventListener("resize", () => { clearTimeout(rsz); rsz = setTimeout(() => {
-  if (!B) return; drawChart(B.equity_curve, B.period.oos_start); fitDetail();
-  if (openRow && STOCK[openRow]) drawStock(document.getElementById("sc-" + openRow), STOCK[openRow]);
-}, 150); });
+function redraw() {
+  if (!B) return;
+  if (page === "performans") drawChart(B.equity_curve, B.period.oos_start);
+  if (page === "sinyaller") { fitDetail(); if (openRow && STOCK[openRow]) drawStock(document.getElementById("sc-" + openRow), STOCK[openRow]); }
+}
+addEventListener("resize", () => { clearTimeout(rsz); rsz = setTimeout(redraw, 150); });
 load();
 </script>
 </body>

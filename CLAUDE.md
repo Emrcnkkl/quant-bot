@@ -57,9 +57,12 @@ ve sonuçları statik bir web sayfasında gösteren bir bot. Şu an **Aşama 1**
 - **Telegram**: AL'a giren/çıkan hisseler ve model alım/satımları (`notify`, durum `notify.json`). Token/kanal ID GitHub
   Secrets'ta (`TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`) — depoya ya da sohbete yazılmaz. Elle deneme: Actions → Run workflow →
   "telegram_test" kutusu, ya da `python3 bot.py --telegram-test`.
-- Site: koyu premium tema, genel kitleye sade dil; Bugün (özet kartı, AL/TUT/SAT, faiz ortamı, canlı portföy) · Sinyaller (tablo,
-  hisse grafiği, son sinyal değişiklikleri, faiz filtresi uyarısı) · Performans (TL / enflasyondan arındırılmış / dolar anahtarı,
-  yıl yıl tablo) · Nasıl çalışır · SSS. Tasarım referansı kullanıcının diğer projesi (emrcnkkl.github.io/anlik_bot).
+- Site: koyu premium tema, genel kitleye sade dil. **Sekmeli** (tek index.html, `#…` ile yönlendirme: `route()`, `PAGES`,
+  aynı anda tek sekme görünür; `#ucuzluk`/`#sss` gibi eski bağlantılar `ALIAS` ile çalışır, iç bağlantılar (#gecmis) ilgili sekmeyi açar):
+  Bugün (özet kartı, AL/TUT/SAT, faiz ortamı, canlı portföy) · Sinyaller (tablo, hisse grafiği, son sinyal değişiklikleri, faiz
+  filtresi uyarısı) · Performans (TL / enflasyondan arındırılmış / dolar anahtarı, yıl yıl tablo) · Değerleme · Nasıl çalışır + SSS ·
+  **İletişim** (form → FormSubmit AJAX `formsubmit.co/ajax/<kullanıcının e-postası>`, `MAIL_TO`; ilk mesajda FormSubmit bir kez
+  e-postayla onay ister; başarısızsa mailto bağlantısı). Grafikler sekme açılınca yeniden çizilir (`redraw`). Tasarım referansı kullanıcının diğer projesi (emrcnkkl.github.io/anlik_bot).
 
 ### Araştırma bulguları (ayrıntı `docs/`)
 | Konu | Sonuç | Karar |
