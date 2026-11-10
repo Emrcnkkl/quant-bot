@@ -9,8 +9,13 @@ skor verip **AL / TUT / SAT** sinyali üreten, geriye dönük test (backtest) ra
 ve sonuçları statik bir web sayfasında gösteren bir bot. Şu an **Aşama 1** tamamlandı.
 
 ## Durum (10 Kasım 2026)
-- Bot gerçek veriyle çalışıyor: GitHub Actions hafta içi 18:40 (+ yedek 19:25, 21:10) çalışıp JSON'ları commit ediyor; GitHub Pages
-  açık (https://emrcnkkl.github.io/quant-bot/). Repo: Emrcnkkl/quant-bot, ana dal `claude/laughing-dijkstra-j1eqmj`.
+- Bot gerçek veriyle çalışıyor: GitHub Actions hafta içi 18:40 (+ yedek 19:25, 21:10) çalışıyor; GitHub Pages
+  (https://emrcnkkl.github.io/quant-bot/) **Actions'tan yayınlanır** (Source: GitHub Actions, `upload-pages-artifact` + `deploy-pages`).
+  Depo şişmesin diye her gün yeniden üretilen `signals.json, backtest.json, valuation.json, stocks/` commit edilmez (.gitignore);
+  workflow önce bunları yayındaki siteden indirir (eski veri koruması için), bot çalışır, yalnızca küçük kalıcı kayıtlar
+  (`history.json, live.json, notify.json, names.json, fundamentals.json, valuation_history.csv`) commit edilir, site paketi
+  (`index.html fonts img` + üretilenler + live.json) yayınlanır. `index.html/fonts/img` push'unda bot çalışmadan yeniden yayınlanır.
+  Deploy işi, depoda kalmış eski üretilen dosyaları bir kez `git rm --cached` ile çıkarır. Repo: Emrcnkkl/quant-bot, ana dal `claude/laughing-dijkstra-j1eqmj`.
 - Cloud oturumları için `quant-bot` ortamı Yahoo Finance ve www.tcmb.gov.tr'ye izinli → `python3 bot.py` oturumdan da çalışır (~1 dk).
 - **10 Kasım 2026'da 30 → 50 hisseye geçildi.** Evren = her çeyrek son 12 ayın (252 gün) TL hacmine göre en büyük 50 hisse
   (`universe_size=50`, `universe_window=252`); sinyaller bugünkü üyeler için, liste otomatik — elle BIST listesi tutulmuyor.
@@ -27,6 +32,9 @@ ve sonuçları statik bir web sayfasında gösteren bir bot. Şu an **Aşama 1**
 - **Sinyal isabeti** (`signal_accuracy`, signals.json `accuracy`): AL'dan 1 ay sonra ort. +%2.3 vs herhangi bir gün +%1.8;
   SAT +%0.9. Son 3 yılda fark ~0. Sinyallerin tek tek tahmin gücü zayıf; modelin değeri risk kontrolü.
 - Paylaşım: og:image `img/og.png` (1200×630), ikonlar `img/`.
+- **Değerleme kaydı** (`append_valuation_history` → `valuation_history.csv`, 9 Kasım 2026'dan): her veri günü hisse başına
+  close, eps, book (TL), pe, pb, div_yield, roe, mcap_bn, sector, score, signal, fund_date. Yalnızca eklenir (aynı/eski gün yazılmaz).
+  Amaç: birkaç yıl sonra ucuzluk puanını noktasal veriyle test etmek (Yahoo geçmiş F/K vermiyor).
 - **Ucuzluk endeksi** (bilgi amaçlı, modelden bağımsız, test edilmedi): `fetch_fundamentals` (Yahoo .info; eps, bookValue,
   currency, dividendYield, ROE, sektör; haftada bir → `fundamentals.json`), `valuation()` → `valuation.json`. F/K ve PD/DD bizim
   fiyatımızla hesaplanır; Yahoo yabancı para raporlayanlarda tutarsız (THY USD, ENKA TL) → çevrilmiş/çevrilmemiş PD/DD'den
@@ -70,9 +78,10 @@ YENİ PROJE/
 ├── fonts/             # Inter değişken yazı tipi (woff2, latin + latin-ext; OFL lisansı OFL-Inter.txt)
 ├── requirements.txt   # yfinance, pandas, numpy
 ├── .github/workflows/bot.yml  # GitHub Actions workflow
-├── signals.json       # güncel sinyaller (bot üretir)
-├── backtest.json      # backtest raporu (bot üretir)
-├── stocks/TICKER.json # hisse detay grafiği verisi, son 500 gün (bot üretir)
+├── signals.json       # güncel sinyaller (bot üretir; depoda değil, Pages'e yüklenir)
+├── backtest.json      # backtest raporu (bot üretir; depoda değil)
+├── stocks/TICKER.json # hisse detay grafiği verisi, son 500 gün (bot üretir; depoda değil)
+├── valuation_history.csv # günlük değerleme kaydı (yalnızca eklenir)
 ├── live.json          # canlı model portföy kaydı (yalnızca eklenir, geçmişi değişmez)
 ├── notify.json        # son Telegram bildirimi tarihi
 ├── names.json         # Yahoo'dan alınmış şirket adı önbelleği (NAMES'te olmayanlar için)
@@ -103,7 +112,7 @@ python3 -m http.server   # http://localhost:8000 — index.html file:// ile aç�
 | Strateji tipi | Çoklu indikatör birleşik skoru (tek strateji, parametre optimizasyonu YOK — aşırı uyumdan kaçınmak için) |
 | Yön | Sadece long (açığa satış yok). SAT = çık / uzak dur anlamında |
 | Çıktılar | Python bot + signals.json, backtest raporu, basit web sayfası |
-| Otomasyon | GitHub Actions, hafta içi 18:40 TR (`40 15 * * 1-5` UTC) + yedek 19:25 ve 21:10; o günün verisi varsa yedekler atlanır. JSON'ları repoya commit eder (push öncesi `pull --rebase`) |
+| Otomasyon | GitHub Actions, hafta içi 18:40 TR (`40 15 * * 1-5` UTC) + yedek 19:25 ve 21:10; o günün verisi varsa yedekler atlanır. Kalıcı kayıtları commit eder (push öncesi `pull --rebase --autostash`), siteyi Pages'e yükler |
 | Hukuki | Her çıktıda "yatırım tavsiyesi değildir" uyarısı (SPK); disclaimer metni `bot.py` → `meta["disclaimer"]` |
 
 ### İsim kaynağı — `BIST30` sözlüğü (artık evreni belirlemiyor, yalnızca şirket adları için; Ekim–Aralık 2026 listesi)

@@ -105,6 +105,25 @@ class TestUcuzluk(unittest.TestCase):
         self.assertGreater(items["A"]["score"], items["D"]["score"])   # A en düşük F/K ve PD/DD -> en ucuz
 
 
+class TestDegerlemeKaydi(unittest.TestCase):
+    def test_yalnizca_eklenir(self):
+        items = [{"ticker": "BBB", "close": 10, "pe": 5.0, "pb": None}, {"ticker": "AAA", "close": 2, "pe": None}]
+        with tempfile.TemporaryDirectory() as d:
+            p = os.path.join(d, "v.csv")
+            self.assertTrue(bot.append_valuation_history(items, "2026-11-09", p))
+            before = open(p, encoding="utf-8").read()
+            # Aynı gün ya da daha eski gün tekrar yazılmaz, mevcut satırlar değişmez
+            self.assertFalse(bot.append_valuation_history([{"ticker": "AAA", "close": 99}], "2026-11-09", p))
+            self.assertFalse(bot.append_valuation_history(items, "2026-11-06", p))
+            self.assertEqual(open(p, encoding="utf-8").read(), before)
+            self.assertTrue(bot.append_valuation_history(items, "2026-11-10", p))
+            lines = open(p, encoding="utf-8").read().splitlines()
+            self.assertEqual(lines[0].split(",")[:3], ["date", "ticker", "close"])
+            self.assertEqual(len(lines), 5)
+            self.assertTrue(lines[1].startswith("2026-11-09,AAA,2,"))
+            self.assertTrue("".join(open(p, encoding="utf-8").read()).startswith(before))
+
+
 class TestCanliPortfoy(unittest.TestCase):
     def test_gecmis_kayitlar_degismez(self):
         with tempfile.TemporaryDirectory() as tmp:

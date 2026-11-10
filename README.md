@@ -7,11 +7,13 @@ Borsa İstanbul'un işlem hacmine göre en büyük 50 hissesi için günlük ver
 |---|---|
 | `bot.py` | Veri indirme, indikatörler, skor, backtest, JSON çıktıları |
 | `index.html` | Sinyal ve backtest sayfası (JSON dosyalarını okur) |
-| `signals.json` | Güncel sinyaller |
-| `backtest.json` | Geçmiş performans raporu |
+| `signals.json`, `backtest.json`, `valuation.json`, `stocks/` | Bot her gün yeniden üretir; **depoda tutulmaz**, doğrudan GitHub Pages'e yüklenir |
 | `history.json` | Günlük sinyal geçmişi (gerçek veriyle her çalıştırmada eklenir) |
-| `stocks/` | Hisse başına grafik verisi (sayfada satıra tıklayınca açılan grafik) |
-| `.github/workflows/bot.yml` | GitHub Actions: hafta içi 18:40'ta otomatik çalıştırma (Actions sekmesinden elle de başlatılabilir) |
+| `live.json` | Canlı model portföy kaydı (yalnızca eklenir) |
+| `valuation_history.csv` | Günlük F/K, PD/DD kaydı (yalnızca eklenir; ileride ucuzluk testi için) |
+| `.github/workflows/bot.yml` | GitHub Actions: hafta içi 18:40'ta otomatik çalıştırma ve siteyi yayınlama (Actions sekmesinden elle de başlatılabilir) |
+
+> GitHub Pages ayarı: Settings → Pages → Build and deployment → Source: **GitHub Actions**.
 
 ## Çalıştırma (Mac Terminal)
 ```bash

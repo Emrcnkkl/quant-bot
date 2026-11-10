@@ -3,3 +3,10 @@ __pycache__/
 .venv/
 .DS_Store
 .cache/
+
+# Bot her gün yeniden üretir; depoda değil, GitHub Pages’te yayınlanır
+signals.json
+backtest.json
+valuation.json
+stocks/
+_site/

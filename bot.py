@@ -410,7 +410,8 @@ def valuation(signals: list[dict], fund: dict, fx: float | dict | None) -> dict:
                      "pe": r2(pe), "pb": r2(pb) if pb and pb < 100 else None,
                      "loss": bool(eps is not None and eps <= 0),
                      "div_yield": r2(f.get("div_yield")), "roe": r2(f["roe"] * 100) if f.get("roe") is not None else None,
-                     "mcap_bn": r2(f["mcap"] / 1e9) if f.get("mcap") else None, "fx_converted": k not in (1.0, None)})
+                     "mcap_bn": r2(f["mcap"] / 1e9) if f.get("mcap") else None, "fx_converted": k not in (1.0, None),
+                     "eps": r2(eps), "book": r2(book), "fund_date": f.get("fetched")})
     df = pd.DataFrame(rows)
     if df.empty:
         return {}
@@ -439,6 +440,36 @@ def valuation(signals: list[dict], fund: dict, fx: float | dict | None) -> dict:
     return {"items": sorted(items, key=lambda i: -(i["score"] if i["score"] is not None else -1)),
             "sectors": med, "fx": {k_: r2(v_) for k_, v_ in rates.items() if v_},
             "fundamentals_updated": max((v.get("fetched", "") for v in (fund or {}).values()), default=None)}
+
+
+VAL_HIST_COLS = ["date", "ticker", "close", "eps", "book", "pe", "pb", "div_yield", "roe", "mcap_bn",
+                 "sector", "score", "signal", "fund_date"]
+
+
+def append_valuation_history(items: list[dict], date: str, path: str | None = None) -> bool:
+    """
+    Değerleme kaydı: her veri günü için hisse başına F/K, PD/DD ve temel verileri valuation_history.csv'ye ekler.
+    Amaç, ileride "ucuz hisseler sonra daha iyi getiri verdi mi?" sorusunu o gün bilinen veriyle (noktasal,
+    ileriye bakmadan) test edebilmek. Yalnızca eklenir: o gün zaten yazılmışsa ya da daha yeni bir gün varsa
+    hiçbir şey değişmez. Döndürür: yazıldı mı.
+    """
+    import csv
+    path = path or os.path.join(OUT_DIR, "valuation_history.csv")
+    last = None
+    if os.path.exists(path):
+        with open(path, encoding="utf-8") as f:
+            rows = list(csv.reader(f))
+        last = max((r[0] for r in rows[1:] if r), default=None)
+    if last is not None and last >= date:
+        return False
+    new = not os.path.exists(path) or os.path.getsize(path) == 0
+    with open(path, "a", encoding="utf-8", newline="") as f:
+        w = csv.writer(f, lineterminator="\n")
+        if new:
+            w.writerow(VAL_HIST_COLS)
+        for it in sorted(items, key=lambda i: i["ticker"]):
+            w.writerow([date if c == "date" else "" if it.get(c) is None else it.get(c) for c in VAL_HIST_COLS])
+    return True
 
 
 def data_quality(data: dict, tickers: list[str], bench: pd.DataFrame, usdtry, demo: bool) -> dict:
@@ -1272,6 +1303,7 @@ def run(demo: bool, telegram_test: bool = False) -> None:
             if val:
                 write("valuation.json", {"generated_at": meta["generated_at"], "data_date": meta["data_date"],
                                          "disclaimer": meta["disclaimer"], **val})
+                append_valuation_history(val["items"], meta["data_date"])
         except Exception as e:  # noqa: BLE001  (ucuzluk endeksi bilgi amaçlı; hata botu durdurmasın)
             print(f"  ! Ucuzluk endeksi hesaplanamadı: {type(e).__name__}: {e}", file=sys.stderr)
     write("signals.json", {**meta, "regime": regime, "counts": counts, "signals": signals, "quality": quality,

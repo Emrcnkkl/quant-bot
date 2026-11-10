@@ -7,22 +7,58 @@ on:
     - cron: "40 15 * * 1-5"   # 18:40 TR (asıl)
     - cron: "25 16 * * 1-5"   # 19:25 TR (yedek)
     - cron: "10 18 * * 1-5"   # 21:10 TR (yedek)
+  push:                        # sayfa tasarımı değişince siteyi (botu çalıştırmadan) yeniden yayınla
+    branches: [claude/laughing-dijkstra-j1eqmj]
+    paths: [index.html, "fonts/**", "img/**"]
   workflow_dispatch:           # Actions sekmesinden elle başlatma
     inputs:
       telegram_test:
         description: "Değişiklik olmasa da Telegram'a deneme mesajı gönder"
         type: boolean
         default: false
+# Site GitHub Pages'e doğrudan yüklenir (Settings → Pages → Source: "GitHub Actions").
+# Her gün yeniden üretilen dosyalar (signals.json, backtest.json, valuation.json, stocks/) depoya commit
+# EDİLMEZ; böylece git geçmişi şişmez. Depoda yalnızca küçük, kalıcı kayıtlar tutulur
+# (live.json, history.json, notify.json, names.json, fundamentals.json, valuation_history.csv).
 permissions:
   contents: write
+  pages: write
+  id-token: write
 concurrency:
   group: bist30-bot
   cancel-in-progress: false
 jobs:
   run:
     runs-on: ubuntu-latest
+    outputs:
+      deploy: ${{ steps.site.outputs.ready }}
     steps:
       - uses: actions/checkout@v5
+      - name: Yayındaki veriyi indir
+        # Üretilen dosyalar depoda değil; bir önceki çalıştırmanın çıktısı siteden alınır.
+        # (Eski veri koruması ve "bugünün verisi var mı" kontrolü signals.json'daki tarihe bakar.)
+        env:
+          SITE: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/
+        run: |
+          python3 - <<'EOF'
+          import json, os, time, urllib.request
+          site = os.environ["SITE"].lower()
+          def get(name):
+              try:
+                  with urllib.request.urlopen(f"{site}{name}?v={int(time.time())}", timeout=30) as r:
+                      body = r.read()
+                  json.loads(body)
+              except Exception as e:
+                  print(f"  ! {name} alınamadı ({type(e).__name__})")
+                  return None
+              os.makedirs(os.path.dirname(name) or ".", exist_ok=True)
+              open(name, "wb").write(body)
+              return body
+          s = get("signals.json")
+          get("backtest.json"); get("valuation.json")
+          n = sum(get(f"stocks/{x['ticker']}.json") is not None for x in (json.loads(s)["signals"] if s else []))
+          print(f"Yayındaki veri indirildi: {json.loads(s)['data_date'] if s else 'yok'} · {n} hisse grafiği")
+          EOF
       - name: Bugünün verisi zaten var mı?
         id: check
         run: |
@@ -41,7 +77,10 @@ jobs:
           have=$(python3 -c "import json;print(json.load(open('signals.json'))['data_date'])" 2>/dev/null || echo yok)
           echo "Beklenen veri günü: $expected · yayındaki: $have · tetikleyen: ${{ github.event_name }}"
           echo "expected=$expected" >> "$GITHUB_OUTPUT"
-          if [ "${{ github.event_name }}" = "schedule" ] && [ "$have" \> "$expected" -o "$have" = "$expected" ]; then
+          if [ "${{ github.event_name }}" = "push" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "Sayfa değişikliği: bot çalıştırılmadan site yeniden yayınlanacak."
+          elif [ "${{ github.event_name }}" = "schedule" ] && [ "$have" \> "$expected" -o "$have" = "$expected" ]; then
             echo "skip=true" >> "$GITHUB_OUTPUT"
             echo "Beklenen günün verisi zaten yayında, atlanıyor."
           fi
@@ -66,15 +105,29 @@ jobs:
         run: |
           git config user.name "bist30-bot"
           git config user.email "bot@users.noreply.github.com"
-          # Yalnızca var olan dosyaları ekle (ör. valuation.json ilk başarılı çalıştırmaya kadar yoktur)
-          for f in signals.json backtest.json history.json live.json notify.json valuation.json fundamentals.json names.json stocks; do
+          # Yalnızca küçük, kalıcı kayıtlar depoya yazılır; site dosyaları aşağıda Pages'e yüklenir.
+          for f in history.json live.json notify.json fundamentals.json names.json valuation_history.csv; do
             if [ -e "$f" ]; then git add -A -- "$f"; fi
           done
           if git diff --staged --quiet; then echo "Değişiklik yok"; exit 0; fi
-          git commit -m "Sinyaller güncellendi: $(TZ=Europe/Istanbul date +'%Y-%m-%d %H:%M')"
+          git commit -m "Kayıtlar güncellendi: $(TZ=Europe/Istanbul date +'%Y-%m-%d %H:%M')"
           # Bu sırada depoya başka bir değişiklik gönderildiyse önce onu al
-          for i in 1 2 3; do git pull --rebase -X theirs && git push && exit 0; sleep 5; done
+          for i in 1 2 3; do git pull --rebase --autostash -X theirs && git push && exit 0; sleep 5; done
           exit 1
+      - name: Site paketini hazırla
+        id: site
+        if: (steps.check.outputs.skip != 'true' || github.event_name == 'push') && hashFiles('signals.json') != ''
+        run: |
+          mkdir -p _site
+          cp -r index.html fonts img signals.json backtest.json live.json _site/
+          [ -e valuation.json ] && cp valuation.json _site/
+          [ -d stocks ] && cp -r stocks _site/
+          du -sh _site
+          echo "ready=true" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-pages-artifact@v4
+        if: steps.site.outputs.ready == 'true'
+        with:
+          path: _site
       - name: Arıza uyarısı
         # Son zamanlanmış deneme (21:10) ya da elle çalıştırma başarısız olursa Telegram'a haber ver.
         # Önceki denemeler (18:40, 19:25) başarısız olursa sessiz kalınır; sonraki deneme tekrar dener.
@@ -103,3 +156,38 @@ jobs:
               --data-urlencode "chat_id=$CHAT" \
               --data-urlencode "text=ℹ️ BIST50 Sinyal: $EXPECTED günü verisi henüz alınamadı (Yahoo gecikmesi ya da resmi tatil). Site $have verisini gösteriyor; bir sonraki çalıştırmada yeniden denenecek."
           fi
+  deploy:
+    needs: run
+    if: needs.run.outputs.deploy == 'true'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.pages.outputs.page_url }}
+    steps:
+      - id: pages
+        uses: actions/deploy-pages@v4
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.ref }}
+      - name: Eski site dosyalarını depodan çıkar (bir kerelik)
+        # Pages artık Actions'tan yayınlandığı için üretilen dosyaların depoda durmasına gerek yok.
+        # Dosyalar git geçmişinde kalır ama bundan sonra her gün yeni kopya eklenmez.
+        run: |
+          if [ -z "$(git ls-files signals.json backtest.json valuation.json stocks)" ]; then exit 0; fi
+          git config user.name "bist30-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git rm -r -q --cached signals.json backtest.json valuation.json stocks 2>/dev/null || true
+          git commit -m "Üretilen site dosyaları artık depoda tutulmuyor (Pages'e doğrudan yükleniyor)"
+          for i in 1 2 3; do git pull --rebase --autostash -X theirs && git push && exit 0; sleep 5; done
+          exit 1
+      - name: Arıza uyarısı
+        if: failure() && (github.event_name == 'workflow_dispatch' || github.event.schedule == '10 18 * * 1-5')
+        env:
+          TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          CHAT: ${{ secrets.TELEGRAM_ADMIN_CHAT_ID || secrets.TELEGRAM_CHAT_ID }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          [ -z "$TOKEN" ] && exit 0
+          curl -s -o /dev/null "https://api.telegram.org/bot$TOKEN/sendMessage" \
+            --data-urlencode "chat_id=$CHAT" \
+            --data-urlencode "text=⚠️ BIST50 Sinyal: sinyaller hesaplandı ama site yayınlanamadı (Settings → Pages → Source 'GitHub Actions' olmalı). Ayrıntı: $RUN_URL"
