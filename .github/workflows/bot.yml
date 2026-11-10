@@ -55,7 +55,7 @@ jobs:
               open(name, "wb").write(body)
               return body
           s = get("signals.json")
-          get("backtest.json"); get("valuation.json")
+          get("backtest.json"); get("valuation.json"); get("calendar.json")
           n = sum(get(f"stocks/{x['ticker']}.json") is not None for x in (json.loads(s)["signals"] if s else []))
           print(f"Yayındaki veri indirildi: {json.loads(s)['data_date'] if s else 'yok'} · {n} hisse grafiği")
           EOF
@@ -121,6 +121,7 @@ jobs:
           mkdir -p _site
           cp -r index.html fonts img signals.json backtest.json live.json _site/
           [ -e valuation.json ] && cp valuation.json _site/
+          [ -e calendar.json ] && cp calendar.json _site/
           [ -d stocks ] && cp -r stocks _site/
           du -sh _site
           echo "ready=true" >> "$GITHUB_OUTPUT"

@@ -8,5 +8,6 @@ __pycache__/
 signals.json
 backtest.json
 valuation.json
+calendar.json
 stocks/
 _site/

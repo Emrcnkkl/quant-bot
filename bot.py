@@ -830,6 +830,171 @@ def isy_financials(t: str, today: pd.Timestamp, groups=("XI_29", "UFRS_K", "UFRS
     return None
 
 
+# --------------------------------------------------------------------------- #
+#  EKONOMİK TAKVİM (TCMB faiz kararları, enflasyon açıklamaları, KAP bildirimleri)
+# --------------------------------------------------------------------------- #
+KAP_API = "https://www.kap.org.tr/tr/api/"
+TR_MONTHS = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"]
+# TCMB Para Politikası Kurulu karar tarihleri (yedek; her çalıştırmada tcmb.gov.tr'den güncellenir)
+PPK_DATES = ["2026-01-22", "2026-03-12", "2026-04-22", "2026-06-11", "2026-07-23", "2026-09-10", "2026-10-22",
+             "2026-12-10", "2027-01-21", "2027-03-18", "2027-04-22", "2027-06-10"]
+# Takvimde gösterilen KAP bildirim türleri (rutin raporlar, borçlanma aracı ihraçları vb. hariç)
+KAP_KINDS = [("Kar Payı", "Temettü"), ("Sermaye Artırımı", "Sermaye artırımı"), ("Geri Alın", "Geri alım"),
+             ("Genel Kurul", "Genel kurul"), ("Kredi Derecelendirme", "Derecelendirme"), ("Birleşme", "Birleşme"),
+             ("Bölünme", "Bölünme"), ("Pay Satın Alma Teklifi", "Satın alma teklifi"), ("Yeni İş İlişkisi", "Yeni iş"),
+             ("İhale", "İhale"), ("Geleceğe Dönük", "Beklenti"), ("Özel Durum Açıklaması (Genel)", "Özel durum")]
+
+
+def _kap_post(path: str, body: dict, referer: str) -> list | None:
+    import urllib.request
+    req = urllib.request.Request(KAP_API + path, data=json.dumps(body).encode(), method="POST", headers={
+        "User-Agent": "Mozilla/5.0", "Content-Type": "application/json", "Accept": "application/json",
+        "Origin": "https://www.kap.org.tr", "Referer": "https://www.kap.org.tr/tr/" + referer})
+    for attempt in range(2):
+        try:
+            with urllib.request.urlopen(req, timeout=40) as r:
+                d = json.loads(r.read())
+            return d if isinstance(d, list) else None
+        except Exception:  # noqa: BLE001
+            if attempt == 0:
+                import time
+                time.sleep(2)
+    return None
+
+
+def kap_disclosures(start: pd.Timestamp, end: pd.Timestamp, step: int = 3) -> list[dict]:
+    """KAP'taki tüm şirket bildirimleri (tarih aralığı parça parça; tek sorgu en fazla ~2000 satır döndürür)."""
+    out, d = [], start
+    while d <= end:
+        e = min(d + pd.Timedelta(days=step - 1), end)
+        rows = _kap_post("disclosure/members/byCriteria", {
+            "fromDate": f"{d:%Y-%m-%d}", "toDate": f"{e:%Y-%m-%d}", "memberType": "IGS", "mkkMemberOidList": [],
+            "inactiveMkkMemberOidList": [], "disclosureClass": "", "subjectList": [], "isLate": "", "mainSector": "",
+            "sector": "", "subSector": "", "marketOid": "", "index": "", "bdkReview": "", "bdkMemberOidList": [],
+            "year": "", "term": "", "ruleType": "", "period": "", "fromSrc": False, "srcCategory": "",
+            "disclosureIndexList": []}, "bildirim-sorgu")
+        if rows is None:
+            raise RuntimeError("KAP bildirimleri alınamadı")
+        if len(rows) >= 1990 and step > 1:          # sınıra dayandıysa günü günü sor
+            out += kap_disclosures(d, e, 1)
+        else:
+            out += rows
+        d = e + pd.Timedelta(days=1)
+    return out
+
+
+def kap_expected(start: pd.Timestamp, end: pd.Timestamp) -> list[dict]:
+    """KAP beklenen bildirimler: henüz gönderilmemiş finansal raporlar ve yasal son günleri."""
+    out, d = [], start
+    while d <= end:
+        e = min(d + pd.Timedelta(days=30), end)
+        rows = _kap_post("expected-disclosure-inquiry/company", {
+            "startDate": f"{d:%Y-%m-%d}", "endDate": f"{e:%Y-%m-%d}", "memberTypes": ["IGS"], "mkkMemberOidList": [],
+            "disclosureClass": "FR", "subjects": [], "mainSector": "", "sector": "", "subSector": "", "market": "",
+            "index": "", "year": "", "term": "", "ruleType": ""}, "beklenen-bildirim-sorgu") or []
+        out += [r for r in rows if r.get("subject") == "Finansal Rapor"]
+        d = e + pd.Timedelta(days=1)
+    return out
+
+
+def fetch_ppk_dates(years) -> list[str]:
+    """TCMB Para Politikası Kurulu karar günleri (sayfada karar ve özet tarihleri sırayla; karar = tek sıradakiler)."""
+    import html as html_
+    out = []
+    for y in years:
+        body = _http("https://www.tcmb.gov.tr/wps/wcm/connect/TR/TCMB+TR/Main+Menu/Temel+Faaliyetler/"
+                     f"Para+Politikasi/PPK/{y}", timeout=25)
+        if not body:
+            continue
+        t = html_.unescape(re.sub(r"<[^>]+>", "\n", body.decode("utf-8", "ignore"))).replace("\xa0", " ")
+        found = []
+        for dd, mon, yy in re.findall(r"\b(\d{1,2})\s+(" + "|".join(TR_MONTHS) + r")\s+(20\d\d)\b", t):
+            if int(yy) == y:
+                v = f"{yy}-{TR_MONTHS.index(mon) + 1:02d}-{int(dd):02d}"
+                if v not in found:
+                    found.append(v)
+        out += found[::2]
+    return sorted(set(out)) or PPK_DATES
+
+
+def cpi_release_dates(start: pd.Timestamp, end: pd.Timestamp) -> list[pd.Timestamp]:
+    """TÜİK enflasyonu her ayın 3'ünde 10:00'da açıklar; hafta sonuna denk gelirse pazartesi."""
+    out = []
+    for m in pd.date_range(start.replace(day=1), end, freq="MS"):
+        d = m + pd.Timedelta(days=2)
+        while d.weekday() >= 5:
+            d += pd.Timedelta(days=1)
+        if start <= d <= end:
+            out.append(d)
+    return out
+
+
+def build_calendar(tickers: list[str], today: pd.Timestamp, past_days: int = 30, ahead_days: int = 150,
+                   disclosures: list | None = None, expected: list | None = None, ppk: list | None = None) -> dict:
+    """Takvim: yaklaşan makro tarihler, bilanço durumu ve son günler, son KAP bildirimleri (yalnızca evrendeki hisseler)."""
+    tset = set(tickers)
+    start, end = today - pd.Timedelta(days=past_days), today + pd.Timedelta(days=ahead_days)
+    events = []
+    # --- Makro
+    for d in (ppk if ppk is not None else fetch_ppk_dates(sorted({today.year, today.year + 1}))):
+        ts = pd.Timestamp(d)
+        if start <= ts <= end:
+            events.append({"date": d, "kind": "ppk", "title": "TCMB faiz kararı",
+                           "detail": "Para Politikası Kurulu kararı, 14:00"})
+    for d in cpi_release_dates(start, end):
+        m = (d - pd.DateOffset(months=1))
+        events.append({"date": str(d.date()), "kind": "tufe", "title": "Enflasyon açıklaması",
+                       "detail": f"{TR_MONTHS[m.month - 1]} ayı TÜFE (TÜİK), 10:00"})
+    # --- KAP
+    disc = disclosures if disclosures is not None else kap_disclosures(start, min(today, end))
+    titles, reported = {}, {}
+    for x in disc:
+        codes = [c.strip() for c in (x.get("stockCodes") or "").split(",") if c.strip()]
+        mine = [c for c in codes if c in tset]
+        if not mine:
+            continue
+        t = mine[0]
+        titles.setdefault(x.get("kapTitle"), t)
+        date = pd.to_datetime(x["publishDate"], dayfirst=True)
+        subj = x.get("subject") or ""
+        url = f"https://www.kap.org.tr/tr/Bildirim/{x['disclosureIndex']}"
+        if x.get("disclosureClass") == "FR" and subj == "Finansal Rapor":
+            per = f"{x.get('year')} · {(x.get('ruleType') or '').lower()}".strip(" ·")
+            key = (t, per)
+            if key not in reported:
+                reported[key] = 1
+                events.append({"date": str(date.date()), "time": f"{date:%H:%M}", "kind": "bilanco", "ticker": t,
+                               "title": "Bilanço açıklandı", "detail": per, "url": url})
+            continue
+        if x.get("disclosureClass") != "ODA":
+            continue
+        kind = next((lbl for key_, lbl in KAP_KINDS if key_ in subj), None)
+        summ = (x.get("summary") or "").strip()
+        # Her gün tekrarlanan geri alım işlem raporları gösterilmez; yalnızca programın başlaması/bitmesi
+        if kind == "Geri alım" and "program" not in summ.lower():
+            kind = None
+        if not kind:
+            continue
+        events.append({"date": str(date.date()), "time": f"{date:%H:%M}", "kind": "kap", "ticker": t,
+                       "title": kind, "detail": summ if summ and summ.lower() != "none" else subj, "url": url})
+    # --- Beklenen bilançolar (yasal son gün)
+    exp = expected if expected is not None else kap_expected(today, end)
+    seen = set()
+    for x in exp:
+        t = x.get("stockCode") if x.get("stockCode") in tset else titles.get(x.get("kapTitle"))
+        if not t:
+            continue
+        d = pd.to_datetime(x["endDate"], dayfirst=True)
+        key = (t, x.get("year"), x.get("ruleTypeTerm"))
+        if key in seen or d < today:
+            continue
+        seen.add(key)
+        events.append({"date": str(d.date()), "kind": "sonbilanco", "ticker": t, "title": "Bilanço için son gün",
+                       "detail": f"{x.get('year')} · {(x.get('ruleTypeTerm') or '').lower()}"})
+    events.sort(key=lambda e: (e["date"], e.get("time", "")))
+    return {"today": str(today.date()), "past_days": past_days, "events": events}
+
+
 def fix_jumps(data: dict[str, pd.DataFrame], start: str = "2005-01-04", quiet: bool = True) -> dict[str, pd.DataFrame]:
     """1 Ocak 2005'te TL'den 6 sıfır atıldı: öncesini at. Günlük fiyat sınırının çok üstündeki tek günlük
     sıçramaları (Yahoo'da düzeltilmemiş sermaye artırımı) nötrle: önceki fiyatlar ölçeklenir, o günkü getiri 0 olur."""
@@ -1552,6 +1717,12 @@ def run(demo: bool, telegram_test: bool = False) -> None:
                 append_valuation_history(val["items"], meta["data_date"])
         except Exception as e:  # noqa: BLE001  (ucuzluk endeksi bilgi amaçlı; hata botu durdurmasın)
             print(f"  ! Ucuzluk endeksi hesaplanamadı: {type(e).__name__}: {e}", file=sys.stderr)
+    if not demo:
+        try:
+            cal = build_calendar([x["ticker"] for x in signals], pd.Timestamp(meta["data_date"]))
+            write("calendar.json", {"generated_at": meta["generated_at"], "data_date": meta["data_date"], **cal})
+        except Exception as e:  # noqa: BLE001  (takvim bilgi amaçlı; hata botu durdurmasın)
+            print(f"  ! Takvim hazırlanamadı: {type(e).__name__}: {e}", file=sys.stderr)
     write("signals.json", {**meta, "regime": regime, "counts": counts, "signals": signals, "quality": quality,
                            "accuracy": accuracy,
                            "changes_days": CFG["changes_days"],

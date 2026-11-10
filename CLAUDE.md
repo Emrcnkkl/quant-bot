@@ -38,7 +38,7 @@ ve sonuçları statik bir web sayfasında gösteren bir bot. Şu an **Aşama 1**
   6+ hissede uyarı). Son gün henüz düzeltilmediği için düzeltilmiş = ham fiyat. Bülten yoksa yedek `isy_fill()` (İş Yatırım
   `HisseTekil`; açılış yok, 18:30 öncesi bugünü kullanmaz). Endeks (XU030) bültende yok → saatlik tamamlama kalır.
   İş Yatırım/Borsa İstanbul resmî API değil; adresler değişirse bot Yahoo ile devam eder (hata durdurmaz).
-  `quant-bot` cloud ortamında www.isyatirim.com.tr, www.borsaistanbul.com izinli.
+  `quant-bot` cloud ortamında www.isyatirim.com.tr, www.borsaistanbul.com, www.kap.org.tr izinli.
 - **Değerleme kaydı** (`append_valuation_history` → `valuation_history.csv`, 9 Kasım 2026'dan): her veri günü hisse başına
   close, eps, book (TL), pe, pb, div_yield, roe, mcap_bn, sector, score, signal, fund_date. Yalnızca eklenir (aynı/eski gün yazılmaz).
   Amaç: birkaç yıl sonra ucuzluk puanını noktasal veriyle test etmek (Yahoo geçmiş F/K vermiyor).
@@ -60,7 +60,7 @@ ve sonuçları statik bir web sayfasında gösteren bir bot. Şu an **Aşama 1**
 - Site: koyu premium tema, genel kitleye sade dil. **Sekmeli** (tek index.html, `#…` ile yönlendirme: `route()`, `PAGES`,
   aynı anda tek sekme görünür; `#ucuzluk`/`#sss` gibi eski bağlantılar `ALIAS` ile çalışır, iç bağlantılar (#gecmis) ilgili sekmeyi açar):
   Bugün (özet kartı, AL/TUT/SAT, faiz ortamı, canlı portföy) · Sinyaller (tablo, hisse grafiği, son sinyal değişiklikleri, faiz
-  filtresi uyarısı) · Performans (TL / enflasyondan arındırılmış / dolar anahtarı, yıl yıl tablo) · Değerleme · Nasıl çalışır + SSS · **Sözlük** (`GL.T` terim listesi, kategoriler + arama, örnek grafikler tohumlu sentetik seriyle gerçek EMA/RSI/MACD formülleriyle çizilir; kartlar `#s-<id>` ile bağlanabilir) ·
+  filtresi uyarısı) · Performans (TL / enflasyondan arındırılmış / dolar anahtarı, yıl yıl tablo) · Değerleme · **Takvim** (`calendar.json`: `build_calendar()` — TCMB PPK karar günleri `fetch_ppk_dates` (tcmb.gov.tr PPK/<yıl> sayfası, yedek `PPK_DATES`), TÜFE günü kuralı `cpi_release_dates` (ayın 3'ü, hafta sonu → pazartesi), KAP `kap_disclosures` (POST `api/disclosure/members/byCriteria`, 3 günlük parçalar, evrendeki hisseler, `KAP_KINDS` türleri; günlük geri alım raporları hariç) ve `kap_expected` (POST `api/expected-disclosure-inquiry/company`, yalnızca henüz gönderilmemiş finansal raporların yasal son günü; hisse kodu yoksa şirket adıyla eşlenir); son 30 gün + 150 gün ileri; resmî API değil, hata botu durdurmaz) · Nasıl çalışır + SSS · **Sözlük** (`GL.T` terim listesi, kategoriler + arama, örnek grafikler tohumlu sentetik seriyle gerçek EMA/RSI/MACD formülleriyle çizilir; kartlar `#s-<id>` ile bağlanabilir) ·
   **İletişim** (form → FormSubmit AJAX `formsubmit.co/ajax/<FORM_KEY>`; FORM_KEY FormSubmit'in rastgele anahtarı, form
   etkinleştirildi, e-posta adresi sayfada yazmaz; başarısızsa "tekrar deneyin" mesajı). Grafikler sekme açılınca yeniden çizilir (`redraw`).
   Telegram kanalı davet bağlantısı (herkese açık, t.me/+…) menüde, Bugün kartında, İletişim'de ve altbilgide. Tasarım referansı kullanıcının diğer projesi (emrcnkkl.github.io/anlik_bot).

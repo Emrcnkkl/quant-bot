@@ -155,6 +155,34 @@ nav .help.tg + .help{margin-left:8px}
 .tgcard p{margin:0;color:var(--muted);font-size:14px}
 .btn-tg{display:inline-flex;align-items:center;gap:8px;border-radius:12px;padding:11px 20px;background:linear-gradient(135deg,#2aa3df,#1c7fc0);color:#fff!important;font-weight:650;font-size:14.5px;box-shadow:0 8px 22px -10px #2aa3df;transition:transform .15s}
 .btn-tg:hover{transform:translateY(-1px)}
+/* Takvim */
+.cal-top{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px}
+@media(max-width:820px){.cal-top{grid-template-columns:1fr}}
+.cal-top .card{padding:18px 20px;border-radius:18px}
+.cal-top .lb{font-size:12px;font-weight:650;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.cal-top .bg{font-size:24px;font-weight:720;letter-spacing:-.02em;margin:6px 0 2px}
+.cal-top .sm{font-size:13px;color:var(--muted)}
+.cal-cols{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start}
+@media(max-width:900px){.cal-cols{grid-template-columns:1fr}}
+.cal-day{margin-bottom:14px}
+.cal-day h5{margin:0 0 8px;font-size:13px;font-weight:650;color:var(--ink2);display:flex;gap:8px;align-items:baseline}
+.cal-day h5 span{color:var(--muted);font-weight:500;font-size:12px}
+.cal-it{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:var(--surface);margin-bottom:8px}
+.cal-it .k{flex:none;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:3px 8px;border-radius:7px;white-space:nowrap}
+.cal-it .b{flex:1;min-width:0}
+.cal-it .t{font-weight:620;font-size:14px}
+.cal-it .d{font-size:13px;color:var(--muted);overflow-wrap:anywhere}
+.cal-it .tks{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.cal-it .tks a,.cal-it .tks span{font-size:12px;font-weight:650;padding:2px 8px;border-radius:7px;border:1px solid var(--line2);color:var(--ink2);background:var(--surface2)}
+.cal-it .who{gap:8px}.cal-it .who .av{width:26px;height:26px;font-size:10px}
+.k-ppk{background:color-mix(in srgb,var(--accent) 16%,transparent);color:var(--accent)}
+.k-tufe{background:var(--tut-bg);color:var(--tut)}
+.k-bilanco{background:var(--al-bg);color:var(--al)}
+.k-sonbilanco{background:color-mix(in srgb,var(--uni) 16%,transparent);color:var(--uni)}
+.k-kap{background:var(--surface2);color:var(--ink2);border:1px solid var(--line2)}
+.cal-more{width:100%;border:1px dashed var(--line2);background:transparent;color:var(--muted);padding:9px;border-radius:12px;font:inherit;font-size:13px;cursor:pointer}
+.nextev{margin-top:14px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:13.5px;color:var(--muted)}
+.nextev a.chip{color:var(--ink2)}
 /* Sözlük */
 .gl-bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:18px}
 .gl{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
@@ -374,13 +402,13 @@ footer p{margin:0 0 8px;max-width:860px}
       <span>BIST50 <span class="gtext">Sinyal</span></span>
     </a>
     <div class="links">
-      <a href="#bugun">Bugün</a><a href="#sinyaller">Sinyaller</a><a href="#performans">Performans</a><a href="#degerleme">Değerleme</a><a href="#nasil">Nasıl çalışır</a><a href="#sozluk">Sözlük</a><a href="#iletisim">İletişim</a>
+      <a href="#bugun">Bugün</a><a href="#sinyaller">Sinyaller</a><a href="#performans">Performans</a><a href="#degerleme">Değerleme</a><a href="#takvim">Takvim</a><a href="#nasil">Nasıl çalışır</a><a href="#sozluk">Sözlük</a><a href="#iletisim">İletişim</a>
     </div>
     <span class="live" title="Her iş günü 18:40'ta otomatik güncellenir"><span class="dot"></span><span class="t" id="livetxt">GÜNCEL</span></span>
     <a class="help tg" href="https://t.me/+T8qnrNlgQIwzNTJk" target="_blank" rel="noopener" title="Telegram kanalı: AL/SAT bildirimleri"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21.4 3.6 2.9 10.8c-1.2.5-1.2 1.3-.2 1.6l4.7 1.5 1.8 5.6c.2.6.4.8.9.8.4 0 .6-.2.9-.4l2.3-2.2 4.7 3.5c.9.5 1.5.2 1.7-.8L22.8 5c.3-1.3-.5-1.9-1.4-1.4ZM8.6 13.6l9.6-6.1c.5-.3.9-.1.5.2l-8 7.3-.3 3.3-1.8-4.7Z"/></svg></a>
     <a class="help" href="#sss" title="Sık sorulan sorular">?</a>
   </div>
-  <div class="mnav"><a href="#bugun">Bugün</a><a href="#sinyaller">Sinyaller</a><a href="#performans">Performans</a><a href="#degerleme">Değerleme</a><a href="#nasil">Nasıl çalışır</a><a href="#sozluk">Sözlük</a><a href="#iletisim">İletişim</a></div>
+  <div class="mnav"><a href="#bugun">Bugün</a><a href="#sinyaller">Sinyaller</a><a href="#performans">Performans</a><a href="#degerleme">Değerleme</a><a href="#takvim">Takvim</a><a href="#nasil">Nasıl çalışır</a><a href="#sozluk">Sözlük</a><a href="#iletisim">İletişim</a></div>
 </nav>
 
 <main class="wrap">
@@ -401,6 +429,7 @@ footer p{margin:0 0 8px;max-width:860px}
     </div>
 
     <div class="today" id="today"></div>
+    <div class="nextev" id="nextev"></div>
     <div id="live"></div>
     <div class="card tgcard">
       <div class="ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21.4 3.6 2.9 10.8c-1.2.5-1.2 1.3-.2 1.6l4.7 1.5 1.8 5.6c.2.6.4.8.9.8.4 0 .6-.2.9-.4l2.3-2.2 4.7 3.5c.9.5 1.5.2 1.7-.8L22.8 5c.3-1.3-.5-1.9-1.4-1.4ZM8.6 13.6l9.6-6.1c.5-.3.9-.1.5.2l-8 7.3-.3 3.3-1.8-4.7Z"/></svg></div>
@@ -506,8 +535,22 @@ footer p{margin:0 0 8px;max-width:860px}
     <p class="muted small" id="valnote"></p>
   </section>
 
+  <!-- ===== TAKVİM ===== -->
+  <section id="takvim">
+    <div class="kicker"><span class="gtext">04 · Takvim</span></div>
+    <h2>Ekonomik takvim</h2>
+    <p class="lead">Piyasayı oynatabilecek tarihler: TCMB faiz kararları, enflasyon açıklamaları, 50 şirketin bilançoları ve önemli KAP bildirimleri (temettü, sermaye artırımı, geri alım, genel kurul, yeni iş…).</p>
+    <div class="cal-top" id="caltop"></div>
+    <div class="toolbar"><div class="tabs" id="calf"></div><input type="search" id="calq" placeholder="Hisse ara (ör. ASELS)"></div>
+    <div class="cal-cols">
+      <div><h3 class="sm" style="margin-top:6px">Yaklaşan</h3><div id="calup"></div></div>
+      <div><h3 class="sm" style="margin-top:6px">Son 30 gün</h3><div id="calpast"></div></div>
+    </div>
+    <p class="muted small" id="calnote"></p>
+  </section>
+
   <section id="nasil">
-    <div class="kicker"><span class="gtext">04 · Yöntem</span></div>
+    <div class="kicker"><span class="gtext">05 · Yöntem</span></div>
     <h2>Nasıl çalışır?</h2>
     <p class="lead">Her iş günü borsa kapandıktan sonra (18:40) otomatik çalışır; kimse elle müdahale etmez.</p>
     <div class="steps">
@@ -543,7 +586,7 @@ footer p{margin:0 0 8px;max-width:860px}
 
   <!-- ===== SSS ===== -->
   <section id="sss" class="faq">
-    <div class="kicker"><span class="gtext">05 · SSS</span></div>
+    <div class="kicker"><span class="gtext">06 · SSS</span></div>
     <h2>Sık sorulan sorular</h2>
     <p class="lead"></p>
     <details><summary>Bu bir yatırım tavsiyesi mi?</summary><div><p>Hayır. Sayfa bir hobi/araştırma projesidir; kimsenin kişisel durumunu, risk tercihini ya da vergisini bilmez. Yatırım danışmanlığı yalnızca SPK lisanslı kuruluşlarca kişiye özel verilir.</p></div></details>
@@ -565,7 +608,7 @@ footer p{margin:0 0 8px;max-width:860px}
 
   <!-- ===== SÖZLÜK ===== -->
   <section id="sozluk">
-    <div class="kicker"><span class="gtext">06 · Sözlük</span></div>
+    <div class="kicker"><span class="gtext">07 · Sözlük</span></div>
     <h2>Terimler, örneklerle</h2>
     <p class="lead">Sitede geçen kavramların sade anlatımı. Grafikler örnek veriyle çizildi; gerçek bir hisseyi göstermez.</p>
     <div class="gl-bar"><div class="tabs" id="glcat"></div><input type="search" id="glq" placeholder="Terim ara (ör. RSI)"></div>
@@ -574,7 +617,7 @@ footer p{margin:0 0 8px;max-width:860px}
 
   <!-- ===== İLETİŞİM ===== -->
   <section id="iletisim">
-    <div class="kicker"><span class="gtext">07 · İletişim</span></div>
+    <div class="kicker"><span class="gtext">08 · İletişim</span></div>
     <h2>Bize yazın</h2>
     <p class="lead">Soru, öneri ya da gördüğünüz bir hata… Mesajınız doğrudan proje sahibine e-posta olarak iletilir.</p>
     <form class="card contact" id="cform" novalidate>
@@ -651,7 +694,7 @@ async function load() {
     S = s; B = b;
     LIVE = await fetch("live.json?v=" + Date.now()).then(r => r.ok ? r.json() : null).catch(() => null);
     renderHero(); renderToday(); renderLive(); renderFilter(); renderSignals(); renderHistory(); renderAccuracy(); renderBacktest();
-    loadValuation();
+    loadValuation(); loadCalendar();
   } catch (e) {
     $("#h-sub").textContent = "Veri yüklenemedi. Sayfayı bir web sunucusu üzerinden açın (örn. python3 -m http.server).";
   }
@@ -1146,6 +1189,72 @@ $("#perseg").addEventListener("click", e => {
   document.querySelectorAll("#perseg button").forEach(b => b.classList.toggle("on", b === e.target));
   renderStats();
 });
+
+// ---------------- Takvim ----------------
+let CAL = null, calF = "all", calShowAll = {up: false, past: false};
+const CALK = {ppk: "Faiz", tufe: "Enflasyon", bilanco: "Bilanço", sonbilanco: "Son gün", kap: "KAP"};
+const dayDiff = iso => Math.round((new Date(iso + "T00:00:00") - new Date(CAL.today + "T00:00:00")) / 864e5);
+const relDay = n => n === 0 ? "bugün" : n === 1 ? "yarın" : n === -1 ? "dün" : n > 0 ? `${n} gün sonra` : `${-n} gün önce`;
+const longDay = iso => new Date(iso + "T00:00:00").toLocaleDateString("tr-TR", {day: "numeric", month: "long", weekday: "long"});
+async function loadCalendar() {
+  CAL = await fetch("calendar.json?v=" + Date.now()).then(r => r.ok ? r.json() : null).catch(() => null);
+  if (!CAL || !CAL.events) { $("#calnote").textContent = "Takvim hazırlanıyor; bot bir sonraki çalıştığında burada görünecek."; return; }
+  CAL.today = new Date().toISOString().slice(0, 10) > CAL.today ? new Date().toISOString().slice(0, 10) : CAL.today;
+  renderCalendar(); renderNextEvents();
+}
+function calName(t) { return S?.signals.find(x => x.ticker === t)?.name || t; }
+function renderNextEvents() {
+  const up = CAL.events.filter(e => (e.kind === "ppk" || e.kind === "tufe") && dayDiff(e.date) >= 0).slice(0, 2);
+  if (!up.length) return;
+  $("#nextev").innerHTML = `<span>Yaklaşan:</span>` + up.map(e => `<a class="chip" href="#takvim"><i style="background:${e.kind === "ppk" ? "var(--accent)" : "var(--tut)"};color:${e.kind === "ppk" ? "var(--accent)" : "var(--tut)"}"></i>${e.title} <b>${new Date(e.date + "T00:00:00").toLocaleDateString("tr-TR", {day: "numeric", month: "long"})}</b>&nbsp;(${relDay(dayDiff(e.date))})</a>`).join("");
+}
+function renderCalendar() {
+  const ev = CAL.events, nextOf = k => ev.find(e => e.kind === k && dayDiff(e.date) >= 0);
+  const ppk = nextOf("ppk"), tufe = nextOf("tufe");
+  const rep = new Set(ev.filter(e => e.kind === "bilanco").map(e => e.ticker));
+  const n = S?.signals.length || 50, waiting = ev.filter(e => e.kind === "sonbilanco" && !rep.has(e.ticker) && dayDiff(e.date) <= 60);
+  const card = (lb, bg, sm) => `<div class="card"><div class="lb">${lb}</div><div class="bg">${bg}</div><div class="sm">${sm}</div></div>`;
+  $("#caltop").innerHTML =
+    (ppk ? card("Sıradaki faiz kararı", new Date(ppk.date + "T00:00:00").toLocaleDateString("tr-TR", {day: "numeric", month: "long"}), `${relDay(dayDiff(ppk.date))} · politika faizi şu an %${fmt(S?.regime?.policy_rate, 1)}`) : "") +
+    (tufe ? card("Sıradaki enflasyon verisi", new Date(tufe.date + "T00:00:00").toLocaleDateString("tr-TR", {day: "numeric", month: "long"}), `${relDay(dayDiff(tufe.date))} · ${tufe.detail.split(" (")[0]}`) : "") +
+    card("Bu dönemin bilançoları", `${rep.size} / ${n} açıklandı`, waiting.length ? "Bekleyen: " + waiting.map(e => e.ticker).join(", ") : "Son 30 günde açıklananlar aşağıda");
+  const kinds = [["all", "Tümü"], ["macro", "Faiz ve enflasyon"], ["fin", "Bilançolar"], ["kap", "Şirket bildirimleri"]];
+  $("#calf").innerHTML = kinds.map(([k, l]) => `<button data-k="${k}" class="${k === calF ? "on" : ""}">${l}</button>`).join("");
+  const q = $("#calq").value.trim().toLocaleUpperCase("tr-TR");
+  const ok = e => (calF === "all" || (calF === "macro" && (e.kind === "ppk" || e.kind === "tufe")) ||
+                   (calF === "fin" && (e.kind === "bilanco" || e.kind === "sonbilanco")) || (calF === "kap" && e.kind === "kap"))
+                  && (!q || (e.ticker || "").includes(q) || (!e.ticker && !q));
+  const up = ev.filter(e => dayDiff(e.date) >= 0 && ok(e)), past = ev.filter(e => dayDiff(e.date) < 0 && ok(e)).reverse();
+  $("#calup").innerHTML = calList(up, "up");
+  $("#calpast").innerHTML = calList(past, "past");
+  $("#calnote").innerHTML = `Kaynaklar: TCMB (faiz kararı günleri), TÜİK takvimi (enflasyon her ayın 3'ünde; hafta sonuysa pazartesi), KAP (bildirimler ve bilançoların yasal son günleri). "Son gün" şirketin bilançoyu en geç açıklaması gereken tarihtir; çoğu şirket daha önce açıklar. Her iş günü akşam güncellenir.`;
+}
+function calList(list, side) {
+  if (!list.length) return `<p class="muted small">Bu filtreyle kayıt yok.</p>`;
+  // Aynı gün aynı türdeki bilançoları tek satırda topla
+  const days = [];
+  list.forEach(e => {
+    let d = days.find(x => x.date === e.date); if (!d) days.push(d = {date: e.date, items: []});
+    const grp = (e.kind === "bilanco" || e.kind === "sonbilanco") && d.items.find(x => x.kind === e.kind && x.detail === e.detail);
+    if (grp) grp.many.push(e); else d.items.push({...e, many: [e]});
+  });
+  let limit = days.length, cnt = 0;                // ilk ~20 kayıt; gerisi "Tümünü göster" ile
+  if (!calShowAll[side]) for (let i = 0; i < days.length; i++) { cnt += days[i].items.length; if (cnt >= 20) { limit = i + 1; break; } }
+  const html = days.slice(0, limit).map(d => `<div class="cal-day"><h5>${longDay(d.date)}<span>${relDay(dayDiff(d.date))}</span></h5>` +
+    d.items.map(e => {
+      const body = e.many.length > 1
+        ? `<div class="t">${e.title} <span class="muted" style="font-weight:500">· ${e.detail}</span></div><div class="tks">${e.many.map(m => m.url ? `<a href="${m.url}" target="_blank" rel="noopener" title="${calName(m.ticker)}">${m.ticker}</a>` : `<span title="${calName(m.ticker)}">${m.ticker}</span>`).join("")}</div>`
+        : e.ticker
+          ? `${who(e.ticker, `${e.kind === "kap" ? calName(e.ticker) : e.title}${e.time && e.time !== "00:00" ? " · " + e.time : ""}`)}<div class="d" style="margin-top:4px">${e.detail}${e.url ? ` · <a href="${e.url}" target="_blank" rel="noopener">KAP ↗</a>` : ""}</div>`
+          : `<div class="t">${e.title}</div><div class="d">${e.detail}</div>`;
+      return `<div class="cal-it"><span class="k k-${e.kind}">${e.kind === "kap" ? e.title : CALK[e.kind]}</span><div class="b">${body}</div></div>`;
+    }).join("") + `</div>`).join("");
+  return html + (days.length > limit ? `<button class="cal-more" data-side="${side}">Tümünü göster (${days.slice(limit).reduce((a, d) => a + d.items.length, 0)} kayıt daha)</button>` : "");
+}
+$("#calf").addEventListener("click", e => { if (e.target.dataset.k) { calF = e.target.dataset.k; renderCalendar(); } });
+$("#calq").addEventListener("input", () => CAL && renderCalendar());
+$("#takvim").addEventListener("click", e => { const b = e.target.closest(".cal-more"); if (b) { calShowAll[b.dataset.side] = true; renderCalendar(); } });
+
 // ---------------- Sözlük (örnek veriyle çizilen küçük grafikler) ----------------
 const GL = (() => {
   // Tekrarlanabilir örnek fiyat serisi: önce yükseliş, sonra düşüş (aynı veri her açılışta aynı çizilir)
@@ -1315,7 +1424,7 @@ $("#glq").addEventListener("input", renderGlossary);
 renderGlossary();
 
 // ---------------- Sekmeler: her seferinde tek sayfa görünür (adres çubuğundaki #… ile) ----------------
-const PAGES = {bugun: ["bugun"], sinyaller: ["sinyaller"], performans: ["performans"], degerleme: ["ucuzluk"],
+const PAGES = {bugun: ["bugun"], sinyaller: ["sinyaller"], performans: ["performans"], degerleme: ["ucuzluk"], takvim: ["takvim"],
                nasil: ["nasil", "sss"], sozluk: ["sozluk"], iletisim: ["iletisim"]};
 const ALIAS = {ucuzluk: "degerleme", sss: "nasil"};
 let page = null;

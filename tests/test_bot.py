@@ -161,6 +161,38 @@ class TestResmiKaynak(unittest.TestCase):
         self.assertFalse(it["fx_converted"])
 
 
+class TestTakvim(unittest.TestCase):
+    def test_takvim_suzme_ve_gruplama(self):
+        disc = [
+            {"publishDate": "05.11.2026 18:30:00", "stockCodes": "AAA", "kapTitle": "A A.Ş.", "disclosureClass": "FR",
+             "subject": "Finansal Rapor", "year": 2026, "ruleType": "9 Aylık", "disclosureIndex": 1},
+            {"publishDate": "05.11.2026 18:31:00", "stockCodes": "AAA", "kapTitle": "A A.Ş.", "disclosureClass": "FR",
+             "subject": "Finansal Rapor", "year": 2026, "ruleType": "9 Aylık", "disclosureIndex": 2},   # aynı dönem: tek
+            {"publishDate": "06.11.2026 09:00:00", "stockCodes": "BBB", "kapTitle": "B A.Ş.", "disclosureClass": "ODA",
+             "subject": "Payların Geri Alınmasına İlişkin Bildirim", "summary": "Pay Geri Alım İşlemleri", "disclosureIndex": 3},
+            {"publishDate": "06.11.2026 10:00:00", "stockCodes": "BBB", "kapTitle": "B A.Ş.", "disclosureClass": "ODA",
+             "subject": "Kar Payı Dağıtım İşlemlerine İlişkin Bildirim", "summary": "Kâr payı", "disclosureIndex": 4},
+            {"publishDate": "06.11.2026 11:00:00", "stockCodes": "ZZZ", "kapTitle": "Z A.Ş.", "disclosureClass": "ODA",
+             "subject": "Kar Payı Dağıtım İşlemlerine İlişkin Bildirim", "summary": "evren dışı", "disclosureIndex": 5}]
+        exp = [{"kapTitle": "B A.Ş.", "stockCode": None, "ruleTypeTerm": "9 Aylık", "endDate": "30.11.2026", "year": 2026,
+                "subject": "Finansal Rapor"}]
+        cal = bot.build_calendar(["AAA", "BBB"], pd.Timestamp("2026-11-10"), disclosures=disc, expected=exp,
+                                 ppk=["2026-12-10", "2025-01-01"])
+        kinds = [(e["kind"], e.get("ticker"), e["title"]) for e in cal["events"]]
+        self.assertEqual(sum(k == "bilanco" for k, _, _ in kinds), 1)
+        self.assertIn(("kap", "BBB", "Temettü"), kinds)
+        self.assertNotIn("Geri alım", [t for _, _, t in kinds])          # günlük geri alım raporu gösterilmez
+        self.assertNotIn("ZZZ", [t for _, t, _ in kinds])
+        self.assertIn(("sonbilanco", "BBB", "Bilanço için son gün"), kinds)  # şirket adıyla eşlendi
+        self.assertIn(("ppk", None, "TCMB faiz kararı"), kinds)
+        self.assertEqual([e["date"] for e in cal["events"] if e["kind"] == "tufe"][:3], ["2026-11-03", "2026-12-03", "2027-01-04"])
+        self.assertEqual(cal["events"], sorted(cal["events"], key=lambda e: (e["date"], e.get("time", ""))))
+
+    def test_enflasyon_gunu_hafta_sonu_kayar(self):
+        d = bot.cpi_release_dates(pd.Timestamp("2027-01-01"), pd.Timestamp("2027-01-31"))
+        self.assertEqual([str(x.date()) for x in d], ["2027-01-04"])   # 3 Ocak 2027 pazar → pazartesi
+
+
 class TestCanliPortfoy(unittest.TestCase):
     def test_gecmis_kayitlar_degismez(self):
         with tempfile.TemporaryDirectory() as tmp:
