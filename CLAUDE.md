@@ -148,7 +148,7 @@ exit_rule ("score" varsayılan | ema50 | cross | ema200 | regime), entry_rule ("
 `regime.source` bunu gösterir. Yerleşik tabloları ara ara canlı veriyle eşitle.
 
 ## JSON şemaları (index.html bunlara bağımlı — alan adı değiştirirken sayfayı da güncelle)
-**signals.json**: `generated_at, data_date, demo, universe, thresholds{buy,sell}, disclaimer, quality{ok,warnings[],checked}, accuracy{since,recent_since,horizons,all|recent{AL,SAT,TUM}{5,21,63}{n,avg,median,pos},by_ticker{T:{n,avg21,pos21}}}, regime{policy_rate,cpi_yoy,real_rate,policy_date,cpi_month,source,filter_max,blocking}, counts{AL,TUT,SAT}, signals[], changes_days, changes_dates[], changes[]`
+**signals.json**: `generated_at, data_date, demo, universe, thresholds{buy,sell}, disclaimer, quality{ok,warnings[],notes[],checked}, accuracy{since,recent_since,horizons,all|recent{AL,SAT,TUM}{5,21,63}{n,avg,median,pos},by_ticker{T:{n,avg21,pos21}}}, regime{policy_rate,cpi_yoy,real_rate,policy_date,cpi_month,source,filter_max,blocking}, counts{AL,TUT,SAT}, signals[], changes_days, changes_dates[], changes[]`
 - `changes[]`: `date, ticker, name, from, to, score, close, since_pct` (yeniden eskiye)
 - `signals[]`: `ticker, name, date, close, change_pct, score, signal, state, score_5d_ago, components{ema200,...}, rsi, adx, atr_pct, stop, target, position{entry_date,entry_price,last_price,stop,pnl_pct,days}|null, reasons[]`
 

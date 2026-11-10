@@ -453,23 +453,27 @@ def data_quality(data: dict, tickers: list[str], bench: pd.DataFrame, usdtry, de
              for r in [data[t]["Close"].iloc[-1] / data[t]["Close"].iloc[-2] - 1] if abs(r) > 0.21]
     if jumps:
         warns.append("Günlük fiyat sınırını aşan hareket (veri hatası olabilir): " + ", ".join(jumps))
+    notes = []   # bilgi notları: kayda yazılır, Telegram'a gönderilmez
     patched = sorted(PATCHED & (set(tickers) | {BENCHMARK}))
     if patched:
-        warns.append(f"Son gün kapanışı Yahoo'da eksikti, saatlik veriden tamamlandı ({len(patched)} seri): "
+        notes.append(f"Son gün kapanışı Yahoo'da eksikti, saatlik veriden tamamlandı ({len(patched)} seri): "
                      + ", ".join(patched[:12]) + (" …" if len(patched) > 12 else ""))
     if bench.index[-1] < newest:
-        warns.append(f"BIST30 endeksinin son verisi geride ({bench.index[-1].date()})")
+        lag = len(pd.bdate_range(bench.index[-1], newest)) - 1
+        (warns if lag > 1 else notes).append(f"BIST30 endeksinin son verisi geride ({bench.index[-1].date()})")
     if not demo and MACRO_SOURCE != "TCMB (canlı)":
         warns.append("TCMB'den faiz/enflasyon alınamadı; yerleşik tablo kullanıldı")
     if not demo and usdtry is None:
         warns.append("USD/TRY alınamadı; dolar bazlı getiriler eksik")
     for w in warns:
         print(f"  ⚠ {w}", file=sys.stderr)
+    for n_ in notes:
+        print(f"  · {n_}")
     if len(missing) > len(tickers) * 0.25 and not demo:
         msg = f"Veri çok eksik ({len(missing)}/{len(tickers)} hisse); dosyalar değiştirilmedi."
         telegram_send(f"⚠️ <b>BIST50 Sinyal</b> · {msg}", admin=True)
         sys.exit("  ! " + msg)
-    return {"ok": not warns, "warnings": warns, "checked": str(newest.date())}
+    return {"ok": not warns, "warnings": warns, "notes": notes, "checked": str(newest.date())}
 
 
 def company_name(t: str) -> str:
