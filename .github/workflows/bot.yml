@@ -66,7 +66,10 @@ jobs:
         run: |
           git config user.name "bist30-bot"
           git config user.email "bot@users.noreply.github.com"
-          git add signals.json backtest.json history.json live.json notify.json valuation.json fundamentals.json names.json stocks/
+          # Yalnızca var olan dosyaları ekle (ör. valuation.json ilk başarılı çalıştırmaya kadar yoktur)
+          for f in signals.json backtest.json history.json live.json notify.json valuation.json fundamentals.json names.json stocks; do
+            if [ -e "$f" ]; then git add -A -- "$f"; fi
+          done
           if git diff --staged --quiet; then echo "Değişiklik yok"; exit 0; fi
           git commit -m "Sinyaller güncellendi: $(TZ=Europe/Istanbul date +'%Y-%m-%d %H:%M')"
           # Bu sırada depoya başka bir değişiklik gönderildiyse önce onu al
