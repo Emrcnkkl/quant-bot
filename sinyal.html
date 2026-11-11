@@ -1,0 +1,769 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sinyal botu · Piyasa Pusulası</title>
+<meta name="description" content="Borsa İstanbul'un en büyük 50 hissesi için her iş günü güncellenen teknik analiz sinyalleri, 20 yıllık test ve canlı model portföy. Yatırım tavsiyesi değildir.">
+<!-- Paylaşım önizlemesi (WhatsApp, Telegram, X...) -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Piyasa Pusulası">
+<meta property="og:title" content="Sinyal botu · Piyasa Pusulası">
+<meta property="og:description" content="Borsa İstanbul'un en büyük 50 hissesi için her iş günü güncellenen teknik analiz sinyalleri, 20 yıllık test ve canlı model portföy. Yatırım tavsiyesi değildir.">
+<meta property="og:url" content="https://emrcnkkl.github.io/quant-bot/sinyal.html">
+<meta property="og:image" content="https://emrcnkkl.github.io/quant-bot/img/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="tr_TR">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#06080b">
+<link rel="icon" type="image/png" sizes="512x512" href="img/icon-512.png">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+<link rel="preload" href="fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/app.css">
+</head>
+<body>
+<nav id="top"></nav>
+
+<main class="wrap">
+  <div class="subnav" id="subnav"><a href="#bugun">Bugün</a><a href="#sinyaller">Sinyaller</a><a href="#performans">Performans</a><a href="#degerleme">Değerleme</a><a href="#nasil">Nasıl çalışır</a></div>
+  <div id="demo"></div>
+  <div class="warn" id="warnbar">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+    <div><b>Yatırım tavsiyesi değildir.</b> Bu sayfa, kişisel durumunuzu bilmeden çalışan otomatik bir modelin geçmiş fiyatlara dayalı çıktılarını gösterir; kimseye al-sat önerisi değildir. Geçmiş performans geleceğin garantisi değildir.</div>
+  </div>
+
+  <!-- ===== BUGÜN ===== -->
+  <section id="bugun" style="padding-top:0">
+    <div class="card hero">
+      <div class="top"><span class="eyebrow">Model portföy · geriye dönük test</span></div>
+      <div class="big" id="h-big">—</div>
+      <div class="delta" id="h-delta"></div>
+      <div class="sub" id="h-sub">Yükleniyor…</div>
+      <div class="chips" id="h-chips"></div>
+    </div>
+
+    <div class="today" id="today"></div>
+    <div id="live"></div>
+    <div class="card tgcard">
+      <div class="ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21.4 3.6 2.9 10.8c-1.2.5-1.2 1.3-.2 1.6l4.7 1.5 1.8 5.6c.2.6.4.8.9.8.4 0 .6-.2.9-.4l2.3-2.2 4.7 3.5c.9.5 1.5.2 1.7-.8L22.8 5c.3-1.3-.5-1.9-1.4-1.4ZM8.6 13.6l9.6-6.1c.5-.3.9-.1.5.2l-8 7.3-.3 3.3-1.8-4.7Z"/></svg></div>
+      <div class="tx"><h4>Sinyaller telefonuna gelsin</h4><p>Bir hisse AL'a girdiğinde ya da çıktığında, model portföy alım-satım yaptığında Telegram kanalımız her akşam bildirim gönderir. Ücretsiz.</p></div>
+      <a class="btn-tg" href="https://t.me/+T8qnrNlgQIwzNTJk" target="_blank" rel="noopener"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21.4 3.6 2.9 10.8c-1.2.5-1.2 1.3-.2 1.6l4.7 1.5 1.8 5.6c.2.6.4.8.9.8.4 0 .6-.2.9-.4l2.3-2.2 4.7 3.5c.9.5 1.5.2 1.7-.8L22.8 5c.3-1.3-.5-1.9-1.4-1.4ZM8.6 13.6l9.6-6.1c.5-.3.9-.1.5.2l-8 7.3-.3 3.3-1.8-4.7Z"/></svg> Kanala katıl</a>
+    </div>
+  </section>
+
+  <!-- ===== SİNYALLER ===== -->
+  <section id="sinyaller">
+    <div class="kicker"><span class="gtext">01 · Sinyaller</span></div>
+    <h2>Bugünün sinyalleri</h2>
+    <p class="lead">Borsa İstanbul'un işlem hacmine göre en büyük 50 hissesi (her çeyrek güncellenir). Her hisseye 6 teknik göstergeye bakılarak −100 ile +100 arasında bir puan verilir. Puan yükseldikçe fiyat hareketi o kadar güçlü görünür. <b>Ayrıntı ve grafik için bir hisseye dokunun.</b></p>
+    <div id="filt"></div>
+    <div class="legend-sig">
+      <span><span class="badge AL">AL</span>&nbsp; puan +40 ve üstü: teknik görünüm güçlü</span>
+      <span><span class="badge TUT">TUT</span>&nbsp; arada: belirgin bir yön yok</span>
+      <span><span class="badge SAT">SAT</span>&nbsp; puan −40 ve altı: teknik görünüm zayıf, uzak dur</span>
+    </div>
+    <div class="toolbar">
+      <div class="tabs" id="tabs">
+        <button data-f="ALL" class="on">Tümü</button><button data-f="AL">AL</button><button data-f="TUT">TUT</button><button data-f="SAT">SAT</button><button data-f="POS">Modelde olanlar</button>
+      </div>
+      <input type="search" id="q" placeholder="Hisse ara (ör. THYAO)">
+    </div>
+    <div class="tbl">
+      <table id="sig">
+        <thead><tr>
+          <th data-k="ticker">Hisse</th><th data-k="close">Fiyat</th><th data-k="change_pct">Gün</th>
+          <th data-k="signal">Sinyal</th><th data-k="score" title="−100 (çok zayıf) … +100 (çok güçlü)">Puan</th>
+          <th data-k="rsi" title="Göreceli güç endeksi: 70 üstü aşırı alım, 30 altı aşırı satım">RSI</th>
+          <th data-k="stop" title="Model bu fiyatın altında pozisyonu kapatır (son oynaklığın 2,5 katı)">Zarar-kes</th>
+          <th data-k="target" title="Bilgi amaçlı: son oynaklığın 4 katı yukarısı">Hedef</th>
+        </tr></thead>
+        <tbody><tr><td colspan="8" class="muted">Yükleniyor…</td></tr></tbody>
+      </table>
+    </div>
+    <p class="muted small">Fiyatlar günlük kapanıştır. "Modelde olanlar", geriye dönük test kurallarına göre şu an elde tutulan hisselerdir.</p>
+
+    <h3 class="sm" id="gecmis" style="margin-top:40px">Son sinyal değişiklikleri</h3>
+    <p class="lead" style="margin-bottom:12px">Hangi hisse ne zaman AL'a girdi, ne zaman çıktı? "O günden beri" sütunu, sinyalin değiştiği günkü kapanıştan bugüne fiyat değişimidir.</p>
+    <div class="toolbar">
+      <div class="tabs" id="hfilt"></div>
+      <div class="seg" id="hrange" style="margin-left:auto"><button data-n="5">1 hafta</button><button data-n="10" class="on">2 hafta</button><button data-n="30">1 ay</button></div>
+    </div>
+    <div class="tbl hist" id="hist"></div>
+    <div id="accblock">
+    <h3 class="sm" id="isabet" style="margin-top:40px">Sinyaller ne kadar isabetli?</h3>
+    <p class="lead" style="margin-bottom:12px">Geçmişte bir hisse AL'a ya da SAT'a geçtikten sonra fiyatı ortalama ne yaptı? Kıyas için: aynı dönemde büyük 50 hisseden herhangi birini herhangi bir gün almak.</p>
+    <div class="toolbar"><div class="seg" id="accseg"><button data-a="all" class="on">2006'dan beri</button><button data-a="recent">Son 3 yıl</button></div></div>
+    <div class="tbl"><table class="acc" id="acc"></table></div>
+    <p class="muted small" id="accnote"></p>
+    </div>
+    <p class="muted small">Geçmiş günlerin sinyalleri, o güne kadarki fiyatlarla yeniden hesaplanmıştır (puan geleceği kullanmaz). Bir satıra dokunarak hisseyi tabloda açabilirsiniz.</p>
+  </section>
+
+  <!-- ===== PERFORMANS ===== -->
+  <section id="performans">
+    <div class="kicker"><span class="gtext">02 · Performans</span></div>
+    <h2>Model geçmişte ne yapardı?</h2>
+    <p class="lead" id="btlead">Aynı kurallar 2006'dan bu yana geçmiş fiyatlara uygulanarak 100.000 ₺'lik bir portföy simüle edildi. Her dönemde o zamanın en büyük 50 hissesi kullanıldı; oynak hisselere daha küçük pay ayrıldı, sinyal yokken para faizde bekledi. Komisyon ve kayma maliyeti düşüldü. Gerçek işlem değildir.</p>
+
+    <div class="card">
+      <div class="chart-head">
+        <h3>Portföy eğrisi</h3>
+        <div class="seg units" id="unitseg"><button data-u="tl" class="on">TL</button><button data-u="real" title="Enflasyondan arındırılmış: 2006 fiyatlarıyla alım gücü">Enflasyondan arındırılmış</button><button data-u="usd">Dolar</button></div>
+        <div class="legend tog" id="chartleg" title="Göstermek / gizlemek için dokunun"></div>
+      </div>
+      <div class="chartbox" id="chart"></div>
+      <div class="muted small" id="btmeta" style="margin-top:6px"></div>
+    </div>
+
+    <div class="toolbar" style="margin:22px 0 0">
+      <div class="seg" id="perseg"><button data-p="full" class="on">Tüm dönem</button><button data-p="oos">Son dönem (test)</button></div>
+      <span class="muted small" id="perdesc"></span>
+    </div>
+    <div class="stats" id="stats"></div>
+
+    <h3 class="sm">Yıl yıl getiri</h3>
+    <div class="tbl"><table class="yr" id="yearly"></table></div>
+    <p class="muted small">● o yılın en yüksek getirisi. İlk ve son yıl tam değildir; tarih aralığı yazılıdır.</p>
+
+    <details class="more">
+      <summary>Hisse bazında sonuçlar ve son işlemler</summary>
+      <div>
+        <div class="tbl"><table id="stocks"></table></div>
+        <p class="muted small">"Test" sütunu son dönemi gösterir. Kazanma = kârla kapanan işlemlerin oranı. Kâr faktörü = toplam kâr / toplam zarar (1'in üstü iyi).</p>
+        <h3 class="sm">Son kapanan işlemler</h3>
+        <div class="tbl"><table id="trades"></table></div>
+      </div>
+    </details>
+  </section>
+
+  <!-- ===== NASIL ÇALIŞIR ===== -->
+  <section id="ucuzluk">
+    <div class="kicker"><span class="gtext">03 · Değerleme</span></div>
+    <h2>Ucuzluk endeksi</h2>
+    <p class="lead">Hissenin fiyatı, şirketin kârına ve özsermayesine göre ucuz mu pahalı mı? Her hisse kendi sektöründeki büyük hisselerle karşılaştırılır: <b>100 = sektörünün en ucuzu, 0 = en pahalısı.</b></p>
+    <div class="filt"><span>ℹ️</span><div><b>Bu bölüm bilgi amaçlıdır.</b> AL / TUT / SAT modelinin parçası değildir ve geçmişte test edilmemiştir. Ucuz görünen bir hisse ucuz kalabilir (örneğin kârı düşüyorsa); pahalı görünen bir hisse büyümeye devam edebilir. 2023'ten beri şirketler enflasyon düzeltmeli bilanço yayınladığı için oranlar eski yıllarla doğrudan kıyaslanamaz.</div></div>
+    <div class="cheap" id="cheap"></div>
+    <div class="toolbar"><div class="tabs" id="vsec"></div></div>
+    <div class="tbl"><table id="val"></table></div>
+    <p class="muted small" id="valnote"></p>
+  </section>
+
+  <section id="nasil">
+    <div class="kicker"><span class="gtext">05 · Yöntem</span></div>
+    <h2>Nasıl çalışır?</h2>
+    <p class="lead">Her iş günü borsa kapandıktan sonra (18:40) otomatik çalışır; kimse elle müdahale etmez.</p>
+    <div class="steps">
+      <div class="step"><div class="n">1</div><h4>Veri</h4><p>~150 büyük hissenin 2004'ten beri günlük fiyatları indirilir; işlem hacmine göre en büyük 50'si seçilir. Faiz ve enflasyon TCMB'den alınır.</p></div>
+      <div class="step"><div class="n">2</div><h4>Puan</h4><p>Trend, momentum, hacim ve kırılım gibi 6 gösterge birleştirilip her hisseye −100…+100 puan verilir.</p></div>
+      <div class="step"><div class="n">3</div><h4>Sinyal</h4><p>Puan +40 üstü AL, −40 altı SAT, arası TUT. Model girdiği hissede zarar-kes seviyesi takip eder.</p></div>
+      <div class="step"><div class="n">4</div><h4>Test</h4><p>Aynı kurallar 2006'dan bu yana, her dönemin o zamanki büyük hisselerine uygulanır; sonuç endeks ve faizle kıyaslanır.</p></div>
+    </div>
+
+    <details class="more tech">
+      <summary>Teknik ayrıntılar</summary>
+      <div class="card small">
+        <b>Puanın bileşenleri (toplam ±100)</b>
+        <ul>
+          <li><b>Trend (33):</b> Fiyat 200 günlük ortalamanın üstü/altı ±20 · ADX trend gücü ve yönü ±13</li>
+          <li><b>Momentum (40):</b> RSI 55–78 +20, 45–55 0, 25–45 −20, 78 üstü −7 (aşırı alım), 25 altı +7 (aşırı satım) · MACD histogramı yön ±13, eğim ±7</li>
+          <li><b>Hacim (13):</b> Hacim 20 günlük ortalamanın 1,5 katını aşarsa günün yönünde ±13</li>
+          <li><b>Kırılım (13):</b> 20 günlük zirve üstünde kapanış +13, dip altında −13</li>
+          <li class="muted">Kasım 2026'da her gösterge tek tek test edildi; 20/50 günlük ortalama kesişimi ve endekse göre güç katkı vermediği için çıkarıldı.</li>
+        </ul>
+        <b>Test kuralları</b>
+        <ul>
+          <li>Sadece alış yapılır, açığa satış yok. Sinyal kapanışta oluşur, işlem ertesi gün açılışta yapılır (geleceği bilmeden).</li>
+          <li>Giriş: puan ≥ +40. Çıkış: puan 0'ın altına inerse ertesi açılışta, ya da 2,5×ATR iz süren zarar-kes gün içinde tetiklenirse.</li>
+          <li>Her işlemde %0,10 komisyon + %0,05 kayma düşülür. Her pozisyona temel olarak sermayenin 1/50'si ayrılır; oynak hisselerde bu pay küçülür, sakin hisselerde büyür (en fazla 2 katı, toplam %100'ü geçmez). Boştaki para TCMB politika faizi kazanır.</li>
+          <li>Hisse evreni: her çeyrek başında, son 12 ayın işlem hacmine göre en büyük 50 hisse (BIST 50'ye benzer; resmi liste değildir). Sinyaller de bugünkü 50 hisse için üretilir. Böylece geçmişte büyük olup sonra küçülen şirketler de teste girer.</li>
+          <li>Son %30'luk dönem "test" olarak ayrı raporlanır. Ayarlar bu döneme bakılarak seçilmedi.</li>
+          <li>Bilinen sınırlama: borsadan tamamen çıkmış birkaç şirketin (ör. Finansbank, Petrol Ofisi) verisi bulunamadığı için testte yok; sonuçlar bu yüzden bir miktar iyimser olabilir.</li>
+        </ul>
+      </div>
+    </details>
+  </section>
+
+  <!-- ===== SSS ===== -->
+  <section id="sss" class="faq">
+    <div class="kicker"><span class="gtext">06 · SSS</span></div>
+    <h2>Sık sorulan sorular</h2>
+    <p class="lead"></p>
+    <details><summary>Bu bir yatırım tavsiyesi mi?</summary><div><p>Hayır. Sayfa bir hobi/araştırma projesidir; kimsenin kişisel durumunu, risk tercihini ya da vergisini bilmez. Yatırım danışmanlığı yalnızca SPK lisanslı kuruluşlarca kişiye özel verilir.</p></div></details>
+    <details><summary>AL sinyali gelen hisse kesin yükselir mi?</summary><div><p>Hayır. AL, sadece fiyat hareketinin teknik olarak güçlü göründüğü anlamına gelir. Testte işlemlerin yarısından azı kârla kapandı; model kazancını, kârlı işlemlerin zararlılardan daha büyük olmasından elde ediyor.</p></div></details>
+    <details><summary>Model endeksi geçiyor mu?</summary><div id="faq-perf"><p>Yükleniyor…</p></div></details>
+    <details id="sss-yanlilik"><summary>Test neden bugünkü hisselerle yapılmıyor?</summary><div>
+      <p>Bugün en büyük 50'de olan hisseler, geçmişte değerlendikleri için oradalar. Testi yalnızca onlarla yapmak, geçmişte büyük olup sonra düşen şirketleri dışarıda bırakır ve sonuçları olduğundan çok iyi gösterir ("hayatta kalma yanlılığı"). Bizim ölçümümüzde bu fark yılda ~15 puandı.</p>
+      <p>Bu yüzden test, her çeyrek o zamanın en büyük 50 hissesiyle yapılıyor. Kontrol: bu evrenin al-bekle'si gerçek endekse yakın çıkıyor. Kıyas için BIST 30 endeksi kullanılıyor, çünkü BIST 50 endeksinin uzun geçmiş verisi ücretsiz kaynaklarda yok; iki endeks çok benzer hareket eder. Borsadan tamamen çıkmış birkaç şirketin verisi olmadığı için küçük bir iyimserlik payı hâlâ olabilir.</p>
+    </div></details>
+    <details><summary>"Faiz ortamı" kutusu ne anlatıyor?</summary><div><p>Reel faiz = politika faizi − yıllık enflasyon. Pozitifse paranızı faizde tutmak enflasyonun üstünde getiri sağlar; bu dönemlerde hisseler cazibesini yitirebilir.</p>
+      <p><b>Model bunu kullanıyor:</b> reel faiz %5'in üzerindeyken model portföy yeni hisse almaz, parayı faizde tutar (elindeki hisseleri normal kurallarla satar). 2006'dan beri yapılan testte bu kural hem 2006–2020'de hem 2021–2026'da sonucu iyileştirdi. AL / TUT / SAT etiketleri yine gösterilir; bunlar teknik görünümü anlatır.</p></div></details>
+    <details><summary>F/K ve PD/DD ne demek?</summary><div><p><b>F/K (fiyat / kazanç):</b> Hisse fiyatının, şirketin son 12 aydaki hisse başına kârına oranı. 5 ise, bugünkü kârla şirketin kendi değerini 5 yılda kazandığı anlamına gelir; düşük olan "ucuz" sayılır. Zarar eden şirketin F/K'sı yoktur.</p><p><b>PD/DD (piyasa değeri / defter değeri):</b> Fiyatın, hisse başına özsermayeye oranı. 1'in altı, şirketin borsada özsermayesinden ucuza alınıp satıldığını gösterir. Bankalar ve sanayi şirketleri için "normal" değerler çok farklı olduğundan her hisse kendi sektörüyle kıyaslanır.</p><p>Örnekli anlatım ve diğer terimler: <a href="sozluk.html">Sözlük</a>.</p></div></details>
+    <details><summary>Altın neden bu kadar iyi görünüyor?</summary><div id="faq-gold"><p>Yükleniyor…</p></div></details>
+    <details><summary>Enflasyona göre gerçekte kazandırıyor mu?</summary><div id="faq-real"><p>Yükleniyor…</p></div></details>
+    <details><summary>"Canlı model portföy" nedir?</summary><div><p>Sayfadaki diğer performans rakamları geriye dönük testtir: kurallar geçmişe uygulanarak hesaplanır. Canlı portföy ise 9 Kasım 2026'da 100.000 ₺ ile başlatıldı ve her gün yalnızca o günün sonucu eklenir; geçmiş kayıtlar sonradan değiştirilmez. Zamanla modelin gerçek performansının en güvenilir göstergesi olacak. Gerçek para değildir, işlem yapılmaz.</p></div></details>
+    <details><summary>Ne sıklıkla güncelleniyor?</summary><div><p>Her iş günü 18:40'ta, borsa kapandıktan sonra otomatik olarak. Sayfanın üstündeki tarih son verinin günüdür.</p></div></details>
+    <details><summary>Veriler nereden geliyor?</summary><div><p>Geçmiş fiyatlar Yahoo Finance'ten alınır; son günün fiyatı her akşam Borsa İstanbul'un resmî günlük bülteniyle kontrol edilir ve gerekirse oradan tamamlanır (bülten alınamazsa İş Yatırım verisi kullanılır). Şirket kârı ve özkaynağı İş Yatırım'daki mali tablolardan, politika faizi ve enflasyon TCMB'nin sitesinden gelir. Veri kaynaklarında zaman zaman eksik gün veya hata olabilir.</p></div></details>
+  </section>
+
+  <footer id="foot"></footer>
+</main>
+
+<script src="assets/core.js"></script>
+<script>
+chrome("sinyal");
+let S = null, B = null, filter = "ALL", sortK = null, sortDir = 1, openRow = null, period = "full";
+let hFilter = "inAL", hDays = 10, unit = "tl", LIVE = null;
+// Grafikteki seriler: [anahtar, ad, renk, kesik çizgi, kalınlık]; gizlenenler lejanttan açılır
+const SER = [["strategy", "Model portföy", "var(--strat)", "", 2.6], ["benchmark", "BIST30 endeksi", "var(--bench)", "", 2],
+  ["gold", "Gram altın", "var(--gold)", "", 1.8], ["usd", "Dolar", "var(--usdc)", "4 3", 1.5],
+  ["cash", "Faiz", "var(--cash)", "6 4", 1.8], ["universe", "Büyük 50 al-bekle", "var(--uni)", "2 3", 1.5]];
+const hidden = new Set(["universe", "usd"]);
+// Birimler: TL (nominal), enflasyondan arındırılmış (2006 TL'si) ve dolar
+const UNIT = {tl: "", real: " (enflasyondan arındırılmış)", usd: " (dolar bazında)"};
+const cv = (p, k) => p[k] == null ? null : unit === "real" ? p[k] / p.cpi : unit === "usd" ? (p.usd ? p[k] / p.usd : null) : p[k];
+const money0 = v => unit === "usd" ? "$" + fmt(v * START / (B.fx_start || 1), 0) : tl(v * START);
+
+async function load() {
+  try {
+    const [s, b] = await Promise.all([
+      fetch("signals.json?v=" + Date.now()).then(r => r.json()),
+      fetch("backtest.json?v=" + Date.now()).then(r => r.json()),
+    ]);
+    S = s; B = b;
+    LIVE = await fetch("live.json?v=" + Date.now()).then(r => r.ok ? r.json() : null).catch(() => null);
+    renderHero(); renderToday(); renderLive(); renderFilter(); renderSignals(); renderHistory(); renderAccuracy(); renderBacktest();
+    loadValuation();
+  } catch (e) {
+    $("#h-sub").textContent = "Veri yüklenemedi. Sayfayı bir web sunucusu üzerinden açın (örn. python3 -m http.server).";
+  }
+}
+
+// ---------------- Bugün ----------------
+function renderHero() {
+  const c = B.equity_curve, last = c[c.length - 1];
+  const val = START * last.strategy, gain = val - START, ret = (last.strategy - 1) * 100;
+  const yrs = (new Date(B.period.end) - new Date(B.period.start)) / 3.156e10;
+  countUp($("#h-big"), val, v => fmt(v, 0) + " ₺");
+  const wd = new Date(S.data_date + "T00:00:00").toLocaleDateString("tr-TR", {weekday: "long"});
+  $("#bugun .hero .top").insertAdjacentHTML("beforeend", `<span class="tag" title="Sıradaki güncelleme: ${nextUpdate()}"><span class="dot"></span>${trDate(S.data_date)} ${wd} kapanışı</span>`);
+  $("#livetxt").textContent = new Date(S.data_date + "T00:00:00").toLocaleDateString("tr-TR", {day: "numeric", month: "short"}).toLocaleUpperCase("tr-TR");
+  $("#h-delta").innerHTML = `<span class="${gain >= 0 ? "pos" : "neg"}">${gain >= 0 ? "↗ +" : "↘ "}%${fmt(ret, 0)} (${gain >= 0 ? "+" : ""}${tl(gain)})</span>`;
+  $("#h-sub").innerHTML = `${trDate(B.period.start)} tarihinde 100.000 ₺ ile başlansaydı · yaklaşık ${fmt(yrs, 1)} yıl, yıllık %${fmt(B.portfolio.full.cagr_pct, 0)}<br>Aynı parayla şunlar yapılsaydı:`;
+  $("#h-chips").innerHTML =
+    (last.universe ? `<span class="chip" title="Her dönemin en büyük 50 hissesini eşit ağırlıkla alıp tutmak"><i style="background:var(--uni);color:var(--uni)"></i>Büyük 50 hisse al-bekle <b>${tl(START * last.universe)}</b></span>` : "") +
+    `<span class="chip"><i style="background:var(--bench);color:var(--bench)"></i>BIST30 al-bekle <b>${tl(START * last.benchmark)}</b></span>` +
+    (last.gold ? `<span class="chip"><i style="background:var(--gold);color:var(--gold)"></i>Gram altın <b>${tl(START * last.gold)}</b></span>` : "") +
+    (last.usd ? `<span class="chip"><i style="background:var(--usdc);color:var(--usdc)"></i>Dolar <b>${tl(START * last.usd)}</b></span>` : "") +
+    `<span class="chip"><i style="background:var(--cash);color:var(--cash)"></i>Faiz <b>${tl(START * last.cash)}</b></span>` +
+    `<span class="chip">En büyük düşüş: model <b>${pct(B.portfolio.full.max_drawdown_pct, 0)}</b></span>` +
+    `<span class="chip">endeks <b>${pct(B.portfolio.benchmark_full?.max_drawdown_pct, 0)}</b></span>`;
+  const U = B.units || {};
+  if (U.real) $("#h-chips").insertAdjacentHTML("afterend", `<p class="small" style="margin:16px auto 0;max-width:680px;color:var(--ink2)"><b>Enflasyondan arındırılmış</b> yıllık getiri: model ${pct(U.real.strategy.full.cagr_pct, 1)} · endeks ${pct(U.real.benchmark?.full.cagr_pct, 1)} · faiz ${pct(U.real.cash.full.cagr_pct, 1)}${U.usd ? ` &nbsp;|&nbsp; <b>Dolar bazında:</b> model ${pct(U.usd.strategy.full.cagr_pct, 1)} · endeks ${pct(U.usd.benchmark?.full.cagr_pct, 1)}` : ""} <a href="#sss">Ne demek?</a></p>`);
+  $("#h-chips").insertAdjacentHTML("afterend", `<p class="small muted" style="margin:18px auto 0;max-width:640px">Test her dönemde o zamanın en büyük 50 hissesiyle yapıldı (bugünkü listeyle değil); 2008 ve 2018 krizleri dahil. <a href="#sss-yanlilik">Neden önemli?</a></p>`);
+  if (S.demo) $("#demo").innerHTML = `<div class="warn demo"><div><b>DEMO verisi:</b> Bu sayfa şu an gerçek olmayan, rastgele üretilmiş fiyatlarla çalışıyor.</div></div>`;
+  $("#disc").innerHTML = `<b>Yasal uyarı:</b> ${S.disclaimer} Geçmiş performans gelecekteki sonuçların göstergesi değildir.`;
+  $("#meta").textContent = `Son veri: ${trDate(S.data_date)} kapanışı · sayfa güncellendi ${new Date(S.generated_at).toLocaleString("tr-TR", {dateStyle: "medium", timeStyle: "short"})} · ${S.universe} · Fiyat: Yahoo Finance + Borsa İstanbul bülteni · Faiz ve enflasyon: TCMB`;
+  // SSS: dürüst performans özeti
+  const y = (B.yearly || []).filter(r => !r.partial), beatIdx = y.filter(r => r.strategy > r.benchmark).length;
+  const P0 = B.portfolio, up = P0.full.cagr_pct > (P0.benchmark_full?.cagr_pct ?? 0);
+  if (P0.gold_full) $("#faq-gold").innerHTML = `<p>Çünkü öyleydi: 2006'dan bu yana gram altın TL bazında yılda ortalama ${pct(P0.gold_full.cagr_pct, 1)} kazandırdı; model ${pct(P0.full.cagr_pct, 1)}, BIST30 endeksi ${pct(P0.benchmark_full?.cagr_pct, 1)}. Bu dönemde TL'nin dolara karşı sert değer kaybı ve altının dünya fiyatındaki yükseliş birleşti.</p>
+    <p>Altının da bedeli var: en büyük düşüşü ${pct(P0.gold_full.max_drawdown_pct, 0)}, modelinki ${pct(P0.full.max_drawdown_pct, 0)}. Geçmişte en çok kazandıranın gelecekte de öyle olacağının garantisi yok; bu karşılaştırma modelin neyi iyi yaptığını (riski azaltmak) ve neyi yapamadığını dürüstçe göstermek için var.</p>`;
+  if (U.real) $("#faq-real").innerHTML = `<p>Az. Türkiye'de fiyatlar 2006'dan bu yana ~${fmt(B.equity_curve.at(-1).cpi, 0)} katına çıktı. Enflasyondan arındırınca modelin yıllık getirisi ${pct(U.real.strategy.full.cagr_pct, 1)}, BIST30 endeksinin ${pct(U.real.benchmark?.full.cagr_pct, 1)}, büyük 50 hisseyi al-bekle ${pct(U.real.universe.full.cagr_pct, 1)}, faizin ${pct(U.real.cash.full.cagr_pct, 1)}.${U.usd ? ` Dolar bazında model ${pct(U.usd.strategy.full.cagr_pct, 1)}, endeks ${pct(U.usd.benchmark?.full.cagr_pct, 1)}.` : ""}</p>
+    <p>Yani model 20 yılda alım gücünü koruyup biraz artırdı; endeks ve faiz ise alım gücü kaybettirdi. TL cinsinden büyük görünen rakamların çoğu enflasyondan geliyor. Performans bölümündeki "Enflasyondan arındırılmış" ve "Dolar" düğmeleriyle tüm grafik ve tabloları bu ölçülerle görebilirsiniz.</p>`;
+  $("#faq-perf").innerHTML = `<p>${trDate(B.period.start).split(" ").pop()}'dan bu yana ${up ? "evet, az farkla" : "hayır"}: model yılda ortalama %${fmt(P0.full.cagr_pct, 1)}, BIST30 endeksi %${fmt(P0.benchmark_full?.cagr_pct, 1)}, büyük 50 hisseyi al-bekle %${fmt(P0.universe_full?.cagr_pct, 1)} getirdi. Asıl fark riskte: en büyük düşüş modelde ${pct(P0.full.max_drawdown_pct, 0)}, endekste ${pct(P0.benchmark_full?.max_drawdown_pct, 0)} (2008).</p>
+    <p>Yükselişlerde model genellikle geride kalır (zamanının yarısında piyasa dışında), düşüşlerde ise çok daha az kaybeder. Tam yılların ${y.length}'ünün ${beatIdx}'ünde endeksi geçti. Faizin çok yüksek olduğu son yıllarda hem model hem endeks faizin gerisinde kaldı. Ayrıntılar <a href="#performans">Performans</a> bölümünde.</p>`;
+}
+
+function renderToday() {
+  const inPos = S.signals.filter(x => x.position).length;
+  const tiles = [["AL", "var(--al)", "güçlü görünüm"], ["TUT", "var(--tut)", "belirgin yön yok"], ["SAT", "var(--sat)", "zayıf görünüm"]]
+    .map(([k, c, d]) => `<div class="tile" data-go="${k}" style="--c:${c}"><div class="k">${k}</div><div class="v" style="color:${c}">${S.counts[k]}</div><div class="d">hisse · ${d}</div><div class="go">Listeyi gör →</div></div>`).join("");
+  $("#today").innerHTML = tiles + macroTile(S.regime) ;
+  document.querySelectorAll("#today .tile[data-go]").forEach(t => t.onclick = () => { setFilter(t.dataset.go); location.hash = "#sinyaller"; });
+  const todayCh = (S.changes || []).filter(c => c.date === S.data_date);
+  const nIn = todayCh.filter(c => c.to === "AL").length, nOut = todayCh.filter(c => c.from === "AL").length;
+  $("#today").insertAdjacentHTML("afterend", `<p class="muted small note">${trDate(S.data_date)} kapanışına göre (en son kapanan işlem günü; sıradaki güncelleme ${nextUpdate()}) · ${LIVE ? `model portföyde şu an <b>${LIVE.holdings.length}</b> hisse var` : `modelin şu an elinde <b>${inPos}</b> hisse var`}` +
+    (todayCh.length ? ` · bugün <a href="#gecmis">${todayCh.length} hissenin sinyali değişti</a>${nIn ? ` (${nIn} AL'a girdi${nOut ? `, ${nOut} AL'dan çıktı` : ""})` : nOut ? ` (${nOut} AL'dan çıktı)` : ""}` : "") + `</p>`);
+}
+
+function renderFilter() {
+  const r = S.regime;
+  if (!r || !r.blocking) return;
+  $("#filt").innerHTML = `<div class="filt"><span>⏸</span><div><b>Faiz filtresi devrede.</b> Reel faiz (%${fmt(r.real_rate, 1)}) %${fmt(r.filter_max, 0)} eşiğinin üzerinde olduğu için model portföy şu an yeni hisse almıyor, parayı faizde tutuyor. Aşağıdaki AL / TUT / SAT etiketleri hisselerin teknik görünümünü gösterir. <a href="#sss">Neden?</a></div></div>`;
+}
+
+function renderLive() {
+  if (!LIVE || !LIVE.points || !LIVE.points.length) return;
+  const p0 = LIVE.points[0], p1 = LIVE.points[LIVE.points.length - 1], n = LIVE.points.length;
+  const ret = (p1.value / p0.value - 1) * 100, bret = (p1.bench / p0.bench - 1) * 100;
+  let spark = "";
+  if (n > 2) {
+    const W = 520, H = 70, vals = LIVE.points.flatMap(p => [p.value, p.bench]), lo = Math.min(...vals), hi = Math.max(...vals);
+    const xx = i => i / (n - 1) * W, yy = v => H - 4 - (v - lo) / ((hi - lo) || 1) * (H - 8);
+    const pth = k => LIVE.points.map((p, i) => `${i ? "L" : "M"}${xx(i).toFixed(1)},${yy(p[k]).toFixed(1)}`).join("");
+    spark = `<svg viewBox="0 0 ${W} ${H}" width="100%" height="${H}" preserveAspectRatio="none"><path d="${pth("bench")}" fill="none" stroke="var(--bench)" stroke-width="1.5" vector-effect="non-scaling-stroke"/><path d="${pth("value")}" fill="none" stroke="var(--strat)" stroke-width="2.2" vector-effect="non-scaling-stroke"/></svg>`;
+  }
+  const hold = LIVE.holdings.length
+    ? `<div class="hold">${LIVE.holdings.map(h => `<div class="who"><span class="av" style="--h:${hue(h.ticker)}">${h.ticker.slice(0, 2)}</span><div><span class="tk">${h.ticker}</span><span class="nm">%${fmt(h.weight_pct, 1)}</span></div></div>`).join("")}</div>`
+    : `<p class="muted small" style="margin:8px 0 0">Şu an hisse yok — paranın tamamı faizde${S.regime?.blocking ? " (faiz filtresi devrede)" : ""}.</p>`;
+  const ev = (LIVE.events || []).slice(-5).reverse();
+  $("#live").innerHTML = `<div class="card live-card">
+    <div>
+      <div class="kicker" style="margin-bottom:4px"><span class="gtext">Canlı model portföy</span></div>
+      <div class="lv">${tl(p1.value)}</div>
+      <div class="small">${n > 1 ? `${pct(ret, 2)} · aynı sürede BIST30 ${pct(bret, 2)}` : `<span class="muted">Takip yeni başladı</span>`}</div>
+      <div class="muted small" style="margin-top:6px">${trDate(p0.date)}'de 100.000 ₺ ile başladı · ${n} işlem günü · geçmiş kayıtlar değiştirilmez</div>
+      ${spark}
+    </div>
+    <div>
+      <div class="small" style="color:var(--ink2)">Şu an portföyde: <b>%${fmt(p1.stock_pct ?? 0, 0)}</b> hisse, <b>%${fmt(100 - (p1.stock_pct ?? 0), 0)}</b> faiz</div>
+      ${hold}
+      ${ev.length ? `<ul class="ev">${ev.map(e => `<li>${trDate(e.date)} · <b>${e.ticker}</b> ${e.type === "alış" ? "alındı" : "satıldı"}</li>`).join("")}</ul>` : ""}
+      <p class="muted small" style="margin:10px 0 0">Gerçek para değildir. <a href="#sss">Nasıl çalışır?</a></p>
+    </div>
+  </div>`;
+}
+
+function macroTile(r) {
+  if (!r || r.real_rate == null) return "";
+  const pos = r.real_rate > 0, col = pos ? "var(--tut)" : "var(--al)";
+  return `<div class="tile macro" style="--c:${col}">
+    <div class="row1"><span class="k">Faiz ortamı</span><span class="pill" style="background:${pos ? "var(--tut-bg)" : "var(--al-bg)"};color:${col}">${pos ? "FAİZ CAZİP" : "HİSSE LEHİNE"}</span></div>
+    <div class="row1"><span class="v" style="color:${col}">${r.real_rate > 0 ? "+" : ""}${fmt(r.real_rate, 1)}</span><span class="d muted small">reel faiz = %${fmt(r.policy_rate, 0)} faiz − %${fmt(r.cpi_yoy, 1)} enflasyon</span></div>
+    <p>${pos ? "Faiz enflasyonun üzerinde. Son yıllarda böyle dönemlerde faiz, hisselerden daha çok kazandırdı." : "Faiz enflasyonun altında. Son yıllarda böyle dönemlerde hisseler faizden daha çok kazandırdı."}
+    <span title="Politika faizi ${trDate(r.policy_date)} · TÜFE ${monthName(r.cpi_month)} · kaynak ${r.source}">(TCMB, ${monthName(r.cpi_month)})</span></p>
+    ${r.filter_max != null ? `<p style="color:var(--ink2)">${r.blocking ? `⏸ Reel faiz %${fmt(r.filter_max, 0)} eşiğinin üzerinde: <b>model yeni alım yapmıyor</b>.` : `▶ Reel faiz %${fmt(r.filter_max, 0)} eşiğinin altında: model alım yapabilir.`}</p>` : ""}
+  </div>`;
+}
+
+// ---------------- Sinyal tablosu ----------------
+function scoreBar(v) {
+  const w = Math.min(Math.abs(v), 100) / 2;
+  const col = v >= S.thresholds.buy ? "var(--al)" : v <= S.thresholds.sell ? "var(--sat)" : "var(--tut)";
+  const pos = v >= 0 ? `left:50%;width:${w}%` : `left:${50 - w}%;width:${w}%`;
+  return `<b>${v > 0 ? "+" : ""}${fmt(v, 0)}</b><span class="bar"><i style="${pos};background:${col}"></i></span>`;
+}
+
+function setFilter(f) {
+  filter = f;
+  document.querySelectorAll("#tabs button").forEach(b => b.classList.toggle("on", b.dataset.f === f));
+  renderSignals();
+}
+
+function renderSignals() {
+  const q = $("#q").value.trim().toLocaleUpperCase("tr-TR");
+  let rows = S.signals.filter(x => (filter === "ALL" || x.signal === filter || (filter === "POS" && x.position)) &&
+    (!q || x.ticker.includes(q) || x.name.toLocaleUpperCase("tr-TR").includes(q)));
+  if (sortK) rows = [...rows].sort((a, b) => (a[sortK] > b[sortK] ? 1 : a[sortK] < b[sortK] ? -1 : 0) * sortDir);
+  $("#sig tbody").innerHTML = rows.map(x => {
+    const stop = x.position ? x.position.stop : x.stop;
+    const trend = x.score - x.score_5d_ago;
+    const open = openRow === x.ticker;
+    const main = `<tr class="row${open ? " open" : ""}" data-t="${x.ticker}">
+      <td>${who(x.ticker, x.name, '<span class="chev">▶</span>')}</td>
+      <td>${fmt(x.close)}</td><td>${pct(x.change_pct, 2)}</td>
+      <td><span class="badge ${x.signal}">${x.signal}</span><div class="state">${STATE[x.state] || ""}</div></td>
+      <td>${scoreBar(x.score)}<div class="state">5 günde ${trend >= 0 ? "▲" : "▼"} ${fmt(Math.abs(trend), 0)}</div></td>
+      <td>${fmt(x.rsi, 0)}</td><td>${fmt(stop)}</td><td>${fmt(x.target)}</td></tr>`;
+    if (!open) return main;
+    const p = x.position;
+    return main + `<tr class="detail"><td colspan="8"><div class="dw">
+      <div class="sc" id="sc-${x.ticker}"><div class="muted small">Grafik yükleniyor…</div></div>
+      ${p ? `<div class="posbox">Model bu hisseyi <b>${trDate(p.entry_date)}</b> tarihinde <b>${fmt(p.entry_price)}</b> fiyatından aldı · ${p.days} gündür elde · şu an ${pct(p.pnl_pct, 2)} · zarar-kes ${fmt(p.stop)}</div>` : ""}
+      <h4>Neden ${x.signal}?</h4><ul>${x.reasons.map(r => `<li>${r}</li>`).join("")}</ul>
+      <h4>Puanın dağılımı <span class="muted small" style="font-weight:400">(toplam ${x.score > 0 ? "+" : ""}${fmt(x.score, 0)})</span></h4>
+      <div class="comp">${Object.entries(x.components).map(([k, v]) => `<span>${COMP[k]} <b class="${v > 0 ? "pos" : v < 0 ? "neg" : ""}">${v > 0 ? "+" : ""}${fmt(v, 1)}</b></span>`).join("")}</div>
+      ${S.accuracy?.by_ticker?.[x.ticker] ? (a => `<div class="small" style="margin-top:8px;color:var(--ink2)">Bu hissede 2006'dan beri <b>${a.n}</b> AL sinyali: 1 ay sonra ortalama ${pct(a.avg21, 1)}, %${fmt(a.pos21, 0)}'inde fiyat yükseldi.</div>`)(S.accuracy.by_ticker[x.ticker]) : ""}
+      <div class="small muted" style="margin-top:8px">RSI ${fmt(x.rsi, 0)} · ADX ${fmt(x.adx, 0)} · günlük oynaklık (ATR) %${fmt(x.atr_pct, 1)}${x.target ? ` · hedef ${fmt(x.target)}` : ""}</div>
+    </div></td></tr>`;
+  }).join("") || `<tr><td colspan="8" class="muted">Sonuç yok</td></tr>`;
+  fitDetail();
+  if (openRow) loadStock(openRow);
+}
+
+// ---------------- Ucuzluk endeksi ----------------
+let V = null, vSector = "Tümü", vSort = ["score", -1];
+async function loadValuation() {
+  V = await fetch("valuation.json?v=" + Date.now()).then(r => r.ok ? r.json() : null).catch(() => null);
+  if (!V || !V.items?.length) {               // bölüm her zaman görünür; veri yoksa bilgi notu
+    $("#valnote").textContent = "Değerleme verisi hazırlanıyor; bot bir sonraki çalıştığında burada görünecek.";
+    return;
+  }
+  renderValuation();
+}
+function renderValuation() {
+  const items = V.items, scored = items.filter(i => i.score != null);
+  const chip = i => `<div class="who" data-t="${i.ticker}"><span class="av" style="--h:${hue(i.ticker)}">${i.ticker.slice(0, 2)}</span><div><span class="tk">${i.ticker}</span><span class="nm">${i.sector} · ${i.score}</span></div></div>`;
+  const by = [...scored].sort((a, b) => b.score - a.score);
+  $("#cheap").innerHTML = `<div class="card"><h4>Sektörüne göre en ucuz 5</h4><div class="list">${by.slice(0, 5).map(chip).join("")}</div></div>
+    <div class="card"><h4>Sektörüne göre en pahalı 5</h4><div class="list">${by.slice(-5).reverse().map(chip).join("")}</div></div>`;
+  const secs = ["Tümü", ...[...new Set(items.map(i => i.sector))].sort((a, b) => a.localeCompare(b, "tr"))];
+  $("#vsec").innerHTML = secs.map(x => `<button data-s="${x}" class="${x === vSector ? "on" : ""}">${x}</button>`).join("");
+  const [k, dir] = vSort;
+  const rows = items.filter(i => vSector === "Tümü" || i.sector === vSector)
+    .sort((a, b) => ((a[k] ?? (dir < 0 ? -1e9 : 1e9)) > (b[k] ?? (dir < 0 ? -1e9 : 1e9)) ? 1 : -1) * dir);
+  const med = V.sectors || {};
+  const bar = v => v == null ? "–" : `<b>${v}</b><span class="vbar"><i style="width:${v}%;background:${v >= 67 ? "var(--al)" : v <= 33 ? "var(--sat)" : "var(--tut)"}"></i></span>`;
+  $("#val").innerHTML = `<thead><tr><th data-k="ticker">Hisse</th><th data-k="sector">Sektör</th>
+      <th data-k="pe" title="Fiyat / son 12 ay hisse başına kâr. Düşük = ucuz">F/K</th>
+      <th data-k="pb" title="Fiyat / hisse başına özsermaye. Düşük = ucuz">PD/DD</th>
+      <th data-k="div_yield" title="Son 12 ay temettü / fiyat">Temettü</th>
+      <th data-k="roe" title="Özsermaye kârlılığı: kâr / özsermaye">Kârlılık</th>
+      <th data-k="score" title="0–100: sektörüne göre ucuzluk (F/K ve PD/DD sıralamasının ortalaması)">Ucuzluk</th>
+      <th data-k="signal">Sinyal</th></tr></thead><tbody>` +
+    rows.map(i => `<tr><td>${who(i.ticker, i.name)}</td><td style="text-align:left;white-space:normal">${i.sector}<span class="nm">sektör F/K ${fmt(med[i.sector]?.pe, 1)} · PD/DD ${fmt(med[i.sector]?.pb, 2)}</span></td>
+      <td class="${i.loss ? "loss" : ""}" title="${i.period ? "Bilanço dönemi: " + i.period.replace("/", " / ") + " (son 12 ay kâr)" : "Kaynak: Yahoo Finance"}">${i.pe != null ? fmt(i.pe, 1) : i.loss ? "zarar" : "–"}</td><td>${fmt(i.pb, 2)}</td>
+      <td>${i.div_yield ? "%" + fmt(i.div_yield, 1) : "–"}</td><td>${i.roe != null ? pct(i.roe, 0) : "–"}</td>
+      <td>${bar(i.score)}${i.loss && i.score != null ? `<span class="nm" title="Zarar eden şirketin F/K'sı olmadığı için puan yalnızca PD/DD'den geliyor">yalnızca PD/DD</span>` : i.peer === "tümü" ? `<span class="nm" title="Sektöründe yeterli hisse olmadığı için 50 hissenin tümüyle kıyaslandı">tümüyle kıyas</span>` : ""}</td>
+      <td><span class="badge ${i.signal}">${i.signal}</span></td></tr>`).join("") + `</tbody>`;
+  const fx = V.fx ? Object.entries(V.fx).map(([c, v]) => `${c}/TRY ${fmt(v, 2)}`).join(", ") : "";
+  const nIsy = V.items.filter(i => i.source === "isyatirim").length, nY = V.items.length - nIsy;
+  $("#valnote").innerHTML = `Kaynak: şirketlerin mali tabloları (İş Yatırım; son 12 ay net kâr ve son bilanço özkaynağı, TL) — haftada bir güncellenir, son: ${V.fundamentals_updated ? trDate(V.fundamentals_updated) : "–"}.${nY ? ` ${nY} hissede bu veri alınamadığı için Yahoo Finance kullanıldı${fx ? ` (yabancı parayla raporlayanlar kurla çevrildi: ${fx})` : ""}.` : ""} Oranlar ${trDate(V.data_date)} kapanış fiyatıyla hesaplandı; F/K'nın üzerine gelince hangi bilançonun kullanıldığı görünür. Enflasyon muhasebesi nedeniyle oranlar başka sitelerdekinden biraz farklı olabilir; kararlarınızı şirketin KAP'taki finansal tablolarıyla doğrulayın. Bir hissenin üzerine dokunarak sinyal tablosunda açabilirsiniz.`;
+}
+
+// ---------------- Sinyal isabeti ----------------
+let accMode = "all";
+function renderAccuracy() {
+  const A = S.accuracy; if (!A) { $("#accblock").hidden = true; return; }
+  const D = A[accMode], H = [["5", "1 hafta"], ["21", "1 ay"], ["63", "3 ay"]];
+  const row = (k, lab, ex) => `<tr><td><b>${lab}</b><span class="ex">${ex}</span></td>` + H.map(([h]) => {
+    const v = D[k][h], base = D.TUM[h];
+    const diff = k !== "TUM" && v.avg != null ? v.avg - base.avg : null;
+    return `<td>${pct(v.avg, 1)}${diff != null ? `<span class="ex">${diff >= 0 ? "+" : ""}${fmt(diff, 1)} puan</span>` : ""}</td><td>%${fmt(v.pos, 0)}</td>`;
+  }).join("") + `</tr>`;
+  $("#acc").innerHTML = `<thead><tr><th>Ne zaman alınsaydı?</th>${H.map(([, n]) => `<th title="Ortalama fiyat değişimi">${n} sonra</th><th title="Fiyatı yükselenlerin oranı">yükselen</th>`).join("")}</tr></thead><tbody>` +
+    row("AL", "AL sinyalinden sonra", `${fmt(D.AL["21"].n, 0)} sinyal`) + row("SAT", "SAT sinyalinden sonra", `${fmt(D.SAT["21"].n, 0)} sinyal`) +
+    row("TUM", "Herhangi bir gün (kıyas)", "büyük 50 hissenin tamamı") + `</tbody>`;
+  const d21 = D.AL["21"].avg - D.TUM["21"].avg, s21 = D.SAT["21"].avg - D.TUM["21"].avg;
+  $("#accnote").innerHTML = `Okuma: AL sinyalinden sonraki bir ayda hisseler ortalamadan ${fmt(Math.abs(d21), 1)} puan ${d21 >= 0 ? "daha iyi" : "daha kötü"}, SAT'tan sonra ${fmt(Math.abs(s21), 1)} puan ${s21 <= 0 ? "daha kötü" : "daha iyi"} gitti. Fark küçük: sinyaller tek tek güçlü bir tahmin aracı değil; modelin asıl faydası düşüşlerde riski azaltmak. Rakamlar TL cinsinden, işlem maliyeti hariç, ertesi gün açılış fiyatından hesaplanmıştır.`;
+}
+
+// ---------------- Sinyal geçmişi ----------------
+const HF = [["inAL", "AL'a girenler", c => c.to === "AL"], ["outAL", "AL'dan çıkanlar", c => c.from === "AL"],
+            ["inSAT", "SAT'a düşenler", c => c.to === "SAT"], ["all", "Tümü", () => true]];
+function renderHistory() {
+  const all = S.changes || [];
+  const days = [...new Set(all.map(c => c.date))].sort().reverse();
+  const allDates = S.changes_dates || days.slice().reverse();          // işlem günleri, eskiden yeniye
+  const cutoff = allDates[Math.max(0, allDates.length - hDays)] || "";  // son N işlem günü
+  const inRange = all.filter(c => c.date >= cutoff);
+  $("#hfilt").innerHTML = HF.map(([k, n, f]) => `<button data-h="${k}" class="${k === hFilter ? "on" : ""}">${n} <span class="muted">${inRange.filter(f).length}</span></button>`).join("");
+  const f = HF.find(h => h[0] === hFilter)[2], rows = inRange.filter(f);
+  const byDay = {};
+  rows.forEach(c => (byDay[c.date] = byDay[c.date] || []).push(c));
+  const head = `<div class="ch head"><span>Hisse</span><span>Değişim</span><span>Puan</span><span>O günkü fiyat</span><span>O günden beri</span></div>`;
+  $("#hist").innerHTML = rows.length ? head + Object.keys(byDay).sort().reverse().map(d => {
+    const dt = new Date(d + "T00:00:00");
+    return `<div><div class="day"><span>${dt.toLocaleDateString("tr-TR", {weekday: "long", day: "numeric", month: "long"})}</span><span>${byDay[d].length} hisse</span></div>` +
+      byDay[d].map(c => `<div class="ch" data-t="${c.ticker}">
+        <span>${who(c.ticker, c.name)}</span>
+        <span class="arrow"><span class="badge ${c.from}">${c.from}</span>→<span class="badge ${c.to}">${c.to}</span></span>
+        <span>${c.score > 0 ? "+" : ""}${fmt(c.score, 0)}</span>
+        <span>${fmt(c.close)}</span>
+        <span>${c.date === S.data_date ? '<span class="muted small">bugün</span>' : pct(c.since_pct)}</span>
+      </div>`).join("") + `</div>`;
+  }).join("") : `<div class="empty">Bu dönemde bu türde değişiklik yok.</div>`;
+}
+// Telefonda tablo yana kayabilir; detay alanını görünen genişliğe sabitle
+function fitDetail() {
+  const dw = document.querySelector("#sig .dw");
+  if (dw) dw.style.width = ($("#sig").parentElement.clientWidth - 32) + "px";
+}
+
+// ---------------- Hisse detay grafiği ----------------
+const STOCK = {}, RANGES = [["3A", 63], ["6A", 126], ["1Y", 252], ["2Y", 500]];
+let chartRange = 126;
+
+async function loadStock(t) {
+  const box = document.getElementById("sc-" + t);
+  if (!box) return;
+  try {
+    STOCK[t] = STOCK[t] || await fetch(`stocks/${t}.json?v=${S.generated_at}`).then(r => { if (!r.ok) throw 0; return r.json(); });
+    drawStock(box, STOCK[t]);
+  } catch (e) { box.innerHTML = `<div class="muted small">Grafik verisi bulunamadı.</div>`; }
+}
+
+function drawStock(box, D) {
+  const n = D.dates.length, from = Math.max(0, n - chartRange), idx = [];
+  for (let i = from; i < n; i++) idx.push(i);
+  const W = Math.max(280, box.clientWidth), PH = W < 560 ? 190 : 260, SH = 64, GAP = 20, L = 4, R = 50, T = 8, B = 18;
+  const H = T + PH + GAP + SH + B;
+  const x = k => L + k / (idx.length - 1) * (W - L - R);
+  const series = ["close", "ema20", "ema50", "ema200"];
+  const vals = idx.flatMap(i => series.map(k => D[k][i])).filter(v => v != null);
+  let lo = Math.min(...vals), hi = Math.max(...vals); const pad = (hi - lo) * .06; lo -= pad; hi += pad;
+  const y = v => T + (1 - (v - lo) / (hi - lo)) * PH;
+  const sy = v => T + PH + GAP + (1 - (v + 100) / 200) * SH;
+  const pos = {}; idx.forEach((i, k) => pos[D.dates[i]] = k);
+  const kOf = date => pos[date] ?? (date < D.dates[from] ? 0 : null);
+  const path = key => idx.map((i, k) => D[key][i] == null ? "" : `${k && D[key][idx[k - 1]] != null ? "L" : "M"}${x(k).toFixed(1)},${y(D[key][i]).toFixed(1)}`).join("");
+  const spans = [...D.trades.map(t => [t.entry_date, t.exit_date, t]), ...(D.open ? [[D.open.entry_date, D.dates[n - 1], null]] : [])]
+    .filter(([a, b]) => b >= D.dates[from]);
+  let shade = "", marks = "";
+  for (const [a, b, t] of spans) {
+    const ka = kOf(a), kb = pos[b] ?? idx.length - 1;
+    shade += `<rect x="${x(ka)}" y="${T}" width="${Math.max(1, x(kb) - x(ka))}" height="${PH}" fill="var(--al)" opacity=".09"/>`;
+    if (pos[a] != null) marks += `<path d="M${x(ka)},${y(D.close[idx[ka]]) + 14}l-5,8h10z" fill="var(--al)"><title>Alış ${a}</title></path>`;
+    if (t && pos[b] != null) marks += `<path d="M${x(kb)},${y(D.close[idx[kb]]) - 14}l-5,-8h10z" fill="var(--sat)"><title>Satış ${b} (${t.exit_reason}) ${t.ret_pct > 0 ? "+" : ""}${fmt(t.ret_pct, 1)}%</title></path>`;
+  }
+  let grid = "";
+  const step = niceStep((hi - lo) / 4);
+  for (let v = Math.ceil(lo / step) * step; v <= hi; v += step)
+    grid += `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/><text x="${W - R + 6}" y="${y(v) + 4}">${fmt(v, v < 10 ? 2 : 0)}</text>`;
+  let dates = ""; const every = Math.ceil(idx.length / (W < 560 ? 3 : 6));
+  for (let k = every; k < idx.length - every / 3; k += every) {
+    const d = new Date(D.dates[idx[k]] + "T00:00:00");
+    dates += `<text x="${x(k)}" y="${H - 4}" text-anchor="middle">${d.toLocaleDateString("tr-TR", {month: "short", year: "2-digit"})}</text>`;
+  }
+  const sPath = idx.map((i, k) => `${k ? "L" : "M"}${x(k).toFixed(1)},${sy(D.score[i]).toFixed(1)}`).join("");
+  const thr = [S.thresholds.buy, 0, S.thresholds.sell].map(v =>
+    `<line x1="${L}" x2="${W - R}" y1="${sy(v)}" y2="${sy(v)}" stroke="${v ? (v > 0 ? "var(--al)" : "var(--sat)") : "var(--line2)"}" stroke-dasharray="${v ? "3 3" : ""}" opacity="${v ? .7 : 1}"/><text x="${W - R + 6}" y="${sy(v) + 4}">${v > 0 ? "+" : ""}${v}</text>`).join("");
+  const lg = [["Fiyat", "var(--ink)"], ["20g ort.", "var(--e20)"], ["50g ort.", "var(--e50)"], ["200g ort.", "var(--e200)"]]
+    .map(([nm, c]) => `<span><i class="ln" style="background:${c}"></i>${nm}</span>`).join("");
+  box.innerHTML = `<div class="rng"><div class="seg">${RANGES.map(([l, v]) => `<button data-r="${v}" class="${v === chartRange ? "on" : ""}">${l}</button>`).join("")}</div>
+      <div class="legend">${lg}<span><i style="background:var(--al);opacity:.4;border-radius:2px"></i>modelde</span></div></div>
+    <svg width="${W}" height="${H}" style="display:block;max-width:100%">
+      ${shade}${grid}
+      <path d="${path("ema200")}" fill="none" stroke="var(--e200)" stroke-width="1.3"/>
+      <path d="${path("ema50")}" fill="none" stroke="var(--e50)" stroke-width="1.3"/>
+      <path d="${path("ema20")}" fill="none" stroke="var(--e20)" stroke-width="1.3"/>
+      <path d="${path("close")}" fill="none" stroke="var(--ink)" stroke-width="1.8"/>
+      ${marks}
+      <text x="${L}" y="${T + PH + GAP - 5}">Puan</text>${thr}
+      <path d="${sPath}" fill="none" stroke="var(--accent)" stroke-width="1.4"/>
+      ${dates}
+      <line class="cur" x1="0" x2="0" y1="${T}" y2="${T + PH + GAP + SH}" stroke="var(--muted)" stroke-dasharray="2 3" visibility="hidden"/>
+      <rect class="hit" x="${L}" y="${T}" width="${W - L - R}" height="${PH + GAP + SH}" fill="transparent"/>
+    </svg><div class="tip"></div>`;
+  box.querySelectorAll(".rng button").forEach(b => b.onclick = e => { e.stopPropagation(); chartRange = +b.dataset.r; drawStock(box, D); });
+  hover(box, x, idx.length, (k, tip) => {
+    const i = idx[k];
+    tip.innerHTML = `<b>${trDate(D.dates[i])}</b><br>Fiyat <b>${fmt(D.close[i])}</b><br><i style="background:var(--e20)"></i>20g ${fmt(D.ema20[i])} · <i style="background:var(--e50)"></i>50g ${fmt(D.ema50[i])}<br><i style="background:var(--e200)"></i>200g ${fmt(D.ema200[i])}<br>Puan <b>${D.score[i] > 0 ? "+" : ""}${fmt(D.score[i], 0)}</b>`;
+  }, W);
+  box.onclick = e => e.stopPropagation();
+}
+
+// Grafiklerde fare / parmakla gezinme
+function hover(box, x, n, fill, W) {
+  const tip = box.querySelector(".tip"), cur = box.querySelector(".cur"), hit = box.querySelector(".hit");
+  const move = ev => {
+    const r = hit.getBoundingClientRect(), px = (ev.touches ? ev.touches[0].clientX : ev.clientX) - r.left;
+    const k = Math.max(0, Math.min(n - 1, Math.round(px / r.width * (n - 1))));
+    cur.setAttribute("x1", x(k)); cur.setAttribute("x2", x(k)); cur.setAttribute("visibility", "visible");
+    tip.style.display = "block"; fill(k, tip);
+    const sx = box.querySelector("svg").getBoundingClientRect().width / W;
+    const left = x(k) * sx, tx = left + 14 + tip.offsetWidth > box.clientWidth ? left - tip.offsetWidth - 14 : left + 14;
+    tip.style.left = Math.max(0, tx) + "px"; tip.style.top = "36px";
+  };
+  const leave = () => { tip.style.display = "none"; cur.setAttribute("visibility", "hidden"); };
+  hit.addEventListener("mousemove", move); hit.addEventListener("touchmove", move, {passive: true}); hit.addEventListener("touchstart", move, {passive: true});
+  hit.addEventListener("mouseleave", leave); hit.addEventListener("touchend", leave);
+}
+
+function niceStep(raw) {
+  const p = Math.pow(10, Math.floor(Math.log10(raw))), f = raw / p;
+  return (f < 1.5 ? 1 : f < 3.5 ? 2 : f < 7.5 ? 5 : 10) * p;
+}
+
+// ---------------- Performans ----------------
+function renderBacktest() {
+  $("#btmeta").textContent = `${trDate(B.period.start)} – ${trDate(B.period.end)} · gölgeli alan: ${trDate(B.period.oos_start)} sonrası test dönemi (ayarlar bu döneme bakılmadan seçildi)`;
+  drawChart(B.equity_curve, B.period.oos_start);
+  renderStats();
+  renderYearly(B.yearly || []);
+  $("#stocks").innerHTML = `<thead><tr><th>Hisse</th><th>Model</th><th>Al-bekle</th><th>Test</th><th>İşlem</th><th>Kazanma</th><th>Kâr faktörü</th><th>En büyük düşüş</th></tr></thead><tbody>` +
+    B.stocks.map(s => `<tr><td>${who(s.ticker, s.name)}</td>
+      <td>${pct(s.strategy.total_return_pct, 0)}</td><td>${pct(s.buy_hold_pct, 0)}</td><td>${pct(s.oos.total_return_pct, 0)}</td>
+      <td>${s.strategy.trades}</td><td>${fmt(s.strategy.win_rate_pct, 0)}%</td><td>${fmt(s.strategy.profit_factor)}</td>
+      <td>${pct(s.strategy.max_drawdown_pct, 0)}</td></tr>`).join("") + "</tbody>";
+  const short = iso => new Date(iso + "T00:00:00").toLocaleDateString("tr-TR", {day: "numeric", month: "short", year: "2-digit"});
+  $("#trades").innerHTML = `<thead><tr><th>Hisse</th><th>Alış</th><th>Satış</th><th>Getiri</th><th>Neden</th></tr></thead><tbody>` +
+    B.recent_trades.slice(0, 12).map(t => `<tr><td class="tk">${t.ticker}</td><td>${short(t.entry_date)}</td><td>${short(t.exit_date)}</td><td>${pct(t.ret_pct)}</td><td>${t.exit_reason === "stop" ? "zarar-kes" : "puan düştü"}</td></tr>`).join("") + "</tbody>";
+}
+
+function renderStats() {
+  const P = B.portfolio, oos = period === "oos", Ux = unit === "tl" ? null : B.units?.[unit];
+  const pick = (k, nom) => Ux ? (Ux[k] ? Ux[k][oos ? "oos" : "full"] : null) : nom;
+  const sets = [["Model portföy", "var(--strat)", pick("strategy", oos ? P.oos : P.full)], ["BIST30 al-bekle", "var(--bench)", pick("benchmark", oos ? P.benchmark_oos : P.benchmark_full)], ["Büyük 50 hisse al-bekle", "var(--uni)", pick("universe", oos ? P.universe_oos : P.universe_full)], ["Gram altın", "var(--gold)", pick("gold", oos ? P.gold_oos : P.gold_full)], ["Dolar", "var(--usdc)", pick("dollar", oos ? P.dollar_oos : P.dollar_full)], ["Faiz", "var(--cash)", pick("cash", oos ? P.cash_oos : P.cash_full)]];
+  $("#perdesc").textContent = (oos ? `${trDate(B.period.oos_start)} – ${trDate(B.period.end)}` : `${trDate(B.period.start)} – ${trDate(B.period.end)}`) + UNIT[unit];
+  $("#stats").innerHTML = sets.map(([n, c, m]) => !m ? "" : `<div class="stat" style="--c:${c}">
+    <div class="k"><i style="background:${c};color:${c}"></i>${n}</div>
+    <div class="v">${pct(m.total_return_pct, 0)}</div>
+    <dl>${unit === "tl" ? `<dt>100.000 ₺ →</dt><dd>${tl(START * (1 + m.total_return_pct / 100))}</dd>` : ""}
+      <dt>Yıllık ortalama</dt><dd>${pct(m.cagr_pct, 1)}</dd>
+      <dt title="Zirveden en derin düşüş">En büyük düşüş</dt><dd>${pct(m.max_drawdown_pct, 1)}</dd>
+      ${m.sharpe != null && unit === "tl" ? `<dt title="Faizin üzerinde, alınan risk başına getiri. 0'ın altı: faizden kötü">Risk/getiri (Sharpe)</dt><dd>${fmt(m.sharpe)}</dd>` : ""}</dl>
+  </div>`).join("");
+}
+
+function renderYearly(rows0) {
+  // Seçili birime göre: (1 + nominal) / (1 + TÜFE ya da kur değişimi) − 1
+  const rows = rows0.map(r0 => {
+    const r = {...r0, gold: r0.gold_pct, dollar: r0.usd_pct};
+    if (unit === "tl") return r;
+    const d = unit === "real" ? r.cpi_pct : r.usd_pct, o = {...r};
+    for (const k of ["strategy", "benchmark", "universe", "cash", "gold", "dollar"])
+      o[k] = r[k] == null || d == null ? null : Math.round(((1 + r[k] / 100) / (1 + d / 100) - 1) * 1000) / 10;
+    return o;
+  });
+  const short = iso => new Date(iso + "T00:00:00").toLocaleDateString("tr-TR", {day: "numeric", month: "short"});
+  const cols = [["strategy", "Model"], ["benchmark", "BIST30 endeksi"], ["universe", "Büyük 50 al-bekle"], ["gold", "Altın"], ["dollar", "Dolar"], ["cash", "Faiz"]].filter(([k]) => rows.some(r => r[k] != null));
+  const wins = Object.fromEntries(cols.map(([k]) => [k, 0]));
+  const body = rows.map(r => {
+    const best = cols.map(([k]) => r[k]).filter(v => v != null).reduce((a, b) => Math.max(a, b), -Infinity);
+    if (!r.partial) cols.forEach(([k]) => { if (r[k] === best) wins[k]++; });
+    return `<tr><td><b>${r.year}</b>${r.partial ? `<span class="nm">${short(r.from)} – ${short(r.to)}</span>` : ""}</td>` +
+      cols.map(([k]) => `<td class="${r[k] === best ? "best" : ""}">${pct(r[k])}</td>`).join("") +
+      `<td>${r.strategy != null && r.benchmark != null ? pct(r.strategy - r.benchmark) : "–"}</td></tr>`;
+  }).join("");
+  $("#yearly").innerHTML = `<thead><tr><th>Yıl</th>${cols.map(([, n]) => `<th>${n}</th>`).join("")}<th title="Modelin endekse göre farkı (puan)">Model − BIST30</th></tr></thead><tbody>${body}</tbody>` +
+    `<tfoot><tr><td class="muted small" colspan="${cols.length + 2}" style="text-align:left;white-space:normal">Tam yıllarda birinci: ` +
+    cols.map(([k, n]) => `${n} <b>${wins[k]}</b>`).join(" · ") + `</td></tr></tfoot>`;
+}
+
+function drawChart(c, oos) {
+  const box = $("#chart");
+  const W = Math.max(300, box.clientWidth), H = W < 560 ? 240 : 320, L = 62, R = 10, T = 12, Bm = 26;
+  const shown = SER.filter(([k]) => !hidden.has(k) && c.some(p => p[k] != null));
+  $("#chartleg").innerHTML = SER.filter(([k]) => c.some(p => p[k] != null)).map(([k, n, col]) =>
+    `<span data-k="${k}" class="${hidden.has(k) ? "off" : ""}"><i style="background:${col};color:${col}"></i>${n}</span>`).join("");
+  const vals = c.flatMap(p => shown.map(([k]) => cv(p, k))).filter(v => v != null && v > 0);
+  const lo = Math.log(Math.min(...vals) * .95), hi = Math.log(Math.max(...vals) * 1.05);
+  const x = i => L + i / (c.length - 1) * (W - L - R), y = v => T + (1 - (Math.log(v) - lo) / (hi - lo)) * (H - T - Bm);
+  const path = k => c.map((p, i) => cv(p, k) == null ? "" : `${i ? "L" : "M"}${x(i).toFixed(1)},${y(cv(p, k)).toFixed(1)}`).join("");
+  const oi = c.findIndex(p => p.date >= oos);
+  const money = v => { const t = v * START / (unit === "usd" ? (B.fx_start || 1) : 1), cur = unit === "usd" ? " $" : " ₺";
+    return t >= 1e6 ? `${fmt(t / 1e6, t >= 1e7 ? 0 : 1)} mn${cur}` : `${fmt(t / 1e3, 0)} bin${cur}`; };
+  let ticks = "";
+  const tickVals = [0.5, 0.75, 1, 1.5, 2, 3, 5, 7.5, 10, 15, 20, 30, 50, 75, 100, 150, 200];
+  const span = (hi - lo) / Math.LN10, every = span > 1.6 ? [1, 2, 5, 10, 20, 50, 100, 200] : tickVals;
+  for (const v of every) {
+    if (Math.log(v) < lo || Math.log(v) > hi) continue;
+    ticks += `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)" stroke-dasharray="3 4"/><text x="${L - 8}" y="${y(v) + 4}" text-anchor="end">${money(v)}</text>`;
+  }
+  const years = [...new Set(c.map(p => p.date.slice(0, 4)))].map(yr => {
+    const i = c.findIndex(p => p.date.startsWith(yr));
+    return i < c.length * 0.04 ? "" : `<text x="${x(i)}" y="${H - 6}" text-anchor="middle">${yr}</text>`;
+  }).join("");
+  const area = hidden.has("strategy") ? "" : path("strategy") + `L${x(c.length - 1).toFixed(1)},${H - Bm}L${x(0).toFixed(1)},${H - Bm}Z`;
+  const base = unit === "tl" ? "" : `<line x1="${L}" x2="${W - R}" y1="${y(1)}" y2="${y(1)}" stroke="var(--muted)" stroke-width="1"/><text x="${W - R - 4}" y="${y(1) - 6}" text-anchor="end">başlangıç alım gücü</text>`;
+  box.innerHTML = `<svg width="${W}" height="${H}" style="display:block" role="img" aria-label="Portföy eğrisi">
+    <defs>
+      <linearGradient id="ga" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--strat)" stop-opacity=".28"/><stop offset="1" stop-color="var(--strat)" stop-opacity="0"/></linearGradient>
+      <filter id="gl" x="-5%" y="-20%" width="110%" height="140%"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    </defs>
+    ${ticks}${years}${Math.log(1) >= lo && Math.log(1) <= hi ? base : ""}
+    <path d="${area}" fill="url(#ga)"/>
+    ${oi > 0 ? `<rect x="${x(oi)}" y="${T}" width="${W - R - x(oi)}" height="${H - T - Bm}" fill="var(--accent)" opacity=".06"/><text x="${x(oi) + 8}" y="${T + 14}">test dönemi</text>` : ""}
+    ${shown.slice().reverse().map(([k, , col, dash, w]) => `<path d="${path(k)}" fill="none" stroke="${col}" stroke-width="${w}"${dash ? ` stroke-dasharray="${dash}"` : ""}${k === "strategy" ? ' filter="url(#gl)"' : ""}/>`).join("")}
+    <line class="cur" x1="0" x2="0" y1="${T}" y2="${H - Bm}" stroke="var(--muted)" stroke-dasharray="2 3" visibility="hidden"/>
+    <rect class="hit" x="${L}" y="${T}" width="${W - L - R}" height="${H - T - Bm}" fill="transparent"/>
+  </svg><div class="tip"></div>`;
+  hover(box, x, c.length, (k, tip) => {
+    const p = c[k];
+    const m = k => cv(p, k) == null ? "–" : money0(cv(p, k));
+    tip.innerHTML = `<b>${trDate(p.date)}</b>${UNIT[unit] ? `<br><span class="muted">${UNIT[unit].trim()}</span>` : ""}` +
+      shown.map(([k, n, col]) => `<br><i style="background:${col}"></i>${n} <b>${m(k)}</b>`).join("");
+  }, W);
+}
+
+// ---------------- Olaylar ----------------
+$("#tabs").addEventListener("click", e => { if (e.target.dataset.f) setFilter(e.target.dataset.f); });
+$("#q").addEventListener("input", renderSignals);
+$("#sig thead").addEventListener("click", e => {
+  const k = e.target.dataset.k; if (!k) return;
+  sortDir = sortK === k ? -sortDir : (k === "ticker" ? 1 : -1); sortK = k; renderSignals();
+});
+$("#sig tbody").addEventListener("click", e => {
+  const tr = e.target.closest("tr.row"); if (!tr) return;
+  openRow = openRow === tr.dataset.t ? null : tr.dataset.t; renderSignals();
+});
+$("#hfilt").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; hFilter = b.dataset.h; renderHistory(); });
+$("#hrange").addEventListener("click", e => {
+  if (!e.target.dataset.n) return; hDays = +e.target.dataset.n;
+  document.querySelectorAll("#hrange button").forEach(b => b.classList.toggle("on", b === e.target)); renderHistory();
+});
+$("#hist").addEventListener("click", e => {
+  const r = e.target.closest(".ch[data-t]"); if (!r) return;
+  $("#q").value = ""; openRow = r.dataset.t; setFilter("ALL");
+  document.querySelector(`#sig tr.row[data-t="${openRow}"]`)?.scrollIntoView({behavior: "smooth", block: "start"});
+});
+$("#vsec").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return; vSector = b.dataset.s; renderValuation();
+});
+$("#val").addEventListener("click", e => {
+  const th = e.target.closest("th[data-k]");
+  if (th) { const k = th.dataset.k; vSort = [k, vSort[0] === k ? -vSort[1] : (["ticker", "sector", "pe", "pb"].includes(k) ? 1 : -1)]; renderValuation(); return; }
+});
+document.addEventListener("click", e => {
+  const w = e.target.closest("#cheap .who[data-t], #val .who");
+  if (!w) return;
+  const t = w.dataset.t || w.querySelector(".tk")?.textContent;
+  if (!t || !S.signals.some(x => x.ticker === t)) return;
+  goTo("sinyaller");
+  $("#q").value = ""; openRow = t; setFilter("ALL");
+  document.querySelector(`#sig tr.row[data-t="${t}"]`)?.scrollIntoView({behavior: "smooth", block: "start"});
+});
+$("#accseg").addEventListener("click", e => {
+  if (!e.target.dataset.a) return; accMode = e.target.dataset.a;
+  document.querySelectorAll("#accseg button").forEach(b => b.classList.toggle("on", b === e.target)); renderAccuracy();
+});
+$("#chartleg").addEventListener("click", e => {
+  const sp = e.target.closest("span[data-k]"); if (!sp) return;
+  const k = sp.dataset.k;
+  hidden.has(k) ? hidden.delete(k) : hidden.add(k);
+  if (hidden.size >= SER.length) hidden.delete(k);
+  drawChart(B.equity_curve, B.period.oos_start);
+});
+$("#unitseg").addEventListener("click", e => {
+  if (!e.target.dataset.u) return;
+  unit = e.target.dataset.u;
+  document.querySelectorAll("#unitseg button").forEach(b => b.classList.toggle("on", b === e.target));
+  drawChart(B.equity_curve, B.period.oos_start); renderStats(); renderYearly(B.yearly || []);
+});
+$("#perseg").addEventListener("click", e => {
+  if (!e.target.dataset.p) return;
+  period = e.target.dataset.p;
+  document.querySelectorAll("#perseg button").forEach(b => b.classList.toggle("on", b === e.target));
+  renderStats();
+});
+
+// ---------------- Sekmeler: her seferinde tek sayfa görünür (adres çubuğundaki #… ile) ----------------
+const PAGES = {bugun: ["bugun"], sinyaller: ["sinyaller"], performans: ["performans"], degerleme: ["ucuzluk"],
+               nasil: ["nasil", "sss"]};
+const ALIAS = {ucuzluk: "degerleme", sss: "nasil"};
+let page = null;
+function pageOf(id) {
+  if (PAGES[id]) return id;
+  if (ALIAS[id]) return ALIAS[id];
+  const sec = document.getElementById(id)?.closest("main section");
+  return (sec && Object.keys(PAGES).find(k => PAGES[k].includes(sec.id))) || "bugun";
+}
+function route() {
+  const id = decodeURIComponent(location.hash.slice(1)) || "bugun", p = pageOf(id), el = document.getElementById(id);
+  const changed = p !== page; page = p;
+  document.querySelectorAll("main section").forEach(s => s.hidden = !PAGES[p].includes(s.id));
+  document.querySelectorAll("#subnav a").forEach(a => a.classList.toggle("on", pageOf(a.getAttribute("href").slice(1)) === p));
+  $("#warnbar").hidden = !["bugun", "sinyaller", "performans"].includes(p);
+  if (el?.tagName === "DETAILS") el.open = true;
+  if (el && el.id !== PAGES[p][0]) el.scrollIntoView({block: "start"}); else scrollTo({top: 0});
+  document.querySelector("#subnav a.on")?.scrollIntoView({block: "nearest", inline: "center"});
+  if (changed) requestAnimationFrame(redraw);
+}
+function goTo(id) { history.pushState(null, "", "#" + id); route(); }
+addEventListener("hashchange", route);
+route();
+
+reveal("main section:not(#bugun) > *, footer > *");
+let rsz;
+function redraw() {
+  if (!B) return;
+  if (page === "performans") drawChart(B.equity_curve, B.period.oos_start);
+  if (page === "sinyaller") { fitDetail(); if (openRow && STOCK[openRow]) drawStock(document.getElementById("sc-" + openRow), STOCK[openRow]); }
+}
+addEventListener("resize", () => { clearTimeout(rsz); rsz = setTimeout(redraw, 150); });
+load();
+</script>
+</body>
+</html>

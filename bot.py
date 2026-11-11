@@ -676,7 +676,8 @@ def fetch_bulletin(day: pd.Timestamp) -> pd.DataFrame | None:
     num = lambda c: pd.to_numeric(raw[c], errors="coerce")  # noqa: E731
     df = pd.DataFrame({"Open": num("ACILIS FIYATI").values, "High": num("EN YUKSEK FIYAT").values,
                        "Low": num("EN DUSUK FIYAT").values, "Close": num("KAPANIS FIYATI").values,
-                       "Volume": num("TOPLAM ISLEM ADEDI").values, "PrevClose": num("ONCEKI KAPANIS FIYATI").values},
+                       "Volume": num("TOPLAM ISLEM ADEDI").values, "PrevClose": num("ONCEKI KAPANIS FIYATI").values,
+                       "TLVolume": num("TOPLAM ISLEM HACMI").values, "Name": raw["BULTEN ADI"].values},
                       index=raw["ISLEM  KODU"].str[:-2].values)
     df = df[(df["Close"] > 0) & (df["Volume"] > 0)]
     df["Open"] = df["Open"].where(df["Open"] > 0, df["PrevClose"])
@@ -1911,7 +1912,7 @@ def notify(meta: dict, regime: dict, counts: dict, changes: list[dict], live: di
         p0, p1 = live["points"][0], live["points"][-1]
         lines.append(f"Canlı portföy ({p0['date']}'den beri): %{(p1['value'] / p0['value'] - 1) * 100:+.1f} · "
                      f"BIST30 %{(p1['bench'] / p0['bench'] - 1) * 100:+.1f}")
-    lines.append(f'<a href="{SITE_URL}">Siteye git</a> · <i>Yatırım tavsiyesi değildir.</i>')
+    lines.append(f'<a href="{SITE_URL}sinyal.html">Siteye git</a> · <i>Yatırım tavsiyesi değildir.</i>')
     if telegram_send("\n".join(lines)) or not test:
         write("notify.json", {**_notify_state(), "last_date": today})
 

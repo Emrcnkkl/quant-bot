@@ -1,4 +1,4 @@
-# CLAUDE.md — BIST50 Teknik Sinyal Botu
+# CLAUDE.md — Piyasa Pusulası (ekonomi ve finans paneli) + BIST50 Teknik Sinyal Botu
 
 Bu dosya, projeye Claude Code ile devam ederken bağlam sağlamak içindir.
 Kullanıcıyla iletişim, arayüz metinleri ve kod yorumları **Türkçe**dir.
@@ -7,6 +7,22 @@ Kullanıcıyla iletişim, arayüz metinleri ve kod yorumları **Türkçe**dir.
 Borsa İstanbul'un en büyük 50 hissesi (işlem hacmine göre, "BIST50 benzeri") için günlük veriyle teknik analiz yapan, her hisseye −100…+100 arası
 skor verip **AL / TUT / SAT** sinyali üreten, geriye dönük test (backtest) raporu çıkaran
 ve sonuçları statik bir web sayfasında gösteren bir bot. Şu an **Aşama 1** tamamlandı.
+
+## Panel (11 Kasım 2026'dan) — site artık bir ekonomi/finans paneli, sinyal botu onun bir bölümü
+- Ad: **Piyasa Pusulası** (geçici; kullanıcı kısa, "finansal.org" tarzı bir isim arıyor). Ad `assets/core.js` → `SITE.name` ve sayfa
+  `<title>`/og etiketlerinde.
+- Çok sayfalı statik site: `index.html` (panel ana sayfası; eski `#sinyaller`, `#takvim`, `#s-…` bağlantılarını yeni sayfalara yönlendirir),
+  `piyasalar.html`, `takvim.html`, `sinyal.html` (eski tek sayfa: Bugün/Sinyaller/Performans/Değerleme/Nasıl çalışır+SSS, `#subnav` alt menü,
+  `route()`), `sozluk.html`, `iletisim.html`. Ortak tasarım `assets/app.css`, ortak kod `assets/core.js` (`chrome(aktif)` menü+altbilgi, `NAV`,
+  biçim yardımcıları, `sparkSvg`, `areaChart`, `mkVal/mkChg`, `loadJSON`, `reveal`). Kütüphane yok.
+- `panel.py` → `markets.json` (Yahoo: `GROUPS` — BIST100/30/Banka/Sınai, döviz, gram altın (GC=F×USDTRY÷31,1035), ons altın/gümüş, emtia,
+  dünya borsaları, ABD 10Y (`kind:"bp"` puan farkı), VIX, kripto; son/gün/1h/1a/yıl başı/1y, 66 günlük `spark`, 1y günlük `hist`,
+  5y haftalık `long` (tarihler 2000-01-01'den gün sayısı); `bist`: Borsa İstanbul bülteninden tüm hisseler — yükselen/düşen sayısı, hacim,
+  ilk 10 yükselen/düşen (5 mn ₺ altı hacim hariç) ve en çok işlem görenler). Kompakt JSON (~200 KB).
+- Workflow: seans boyunca `15,45 6-15 * * 1-5` ve hafta sonu `20 9 * * 0,6` yalnızca panel (`check.outputs.panel`), akşam bot çalışmasında
+  da `panel.py` koşar (hata botu durdurmaz). Site paketi `*.html assets fonts img` + üretilen JSON'lar.
+- Fazlar: 1 iskelet + ana sayfa + piyasalar (**yapıldı**) · 2 Haberler (RSS başlıkları, yalnızca başlık+bağlantı) + Halka arz ·
+  3 Fonlar (TEFAS) + Ekonomi göstergeleri · 4 eski fikir listesi (piyasa hava durumu, konuşan Telegram botu, strateji laboratuvarı…).
 
 ## Durum (10 Kasım 2026)
 - Bot gerçek veriyle çalışıyor: GitHub Actions hafta içi 18:40 (+ yedek 19:25, 21:10) çalışıyor; GitHub Pages
@@ -87,7 +103,9 @@ YENİ PROJE/
 ├── CLAUDE.md          # bu dosya
 ├── README.md          # kullanıcıya yönelik kurulum/çalıştırma
 ├── bot.py             # tüm mantık: veri, indikatörler, skor, backtest, JSON yazımı (tek dosya)
-├── index.html         # tek dosyalık statik sayfa (inline CSS/JS, kütüphane yok); JSON'ları fetch eder
+├── index.html, piyasalar.html, takvim.html, sinyal.html, sozluk.html, iletisim.html  # panel sayfaları (sayfa JS'i içinde)
+├── assets/app.css, assets/core.js  # ortak tasarım ve kod
+├── panel.py           # piyasa verisi → markets.json (depoda değil)
 ├── fonts/             # Inter değişken yazı tipi (woff2, latin + latin-ext; OFL lisansı OFL-Inter.txt)
 ├── requirements.txt   # yfinance, pandas, numpy
 ├── .github/workflows/bot.yml  # GitHub Actions workflow
@@ -186,7 +204,7 @@ exit_rule ("score" varsayılan | ema50 | cross | ema200 | regime), entry_rule ("
 ## Kod kuralları
 - `bot.py` tek dosya kalsın, ta ki belirgin şekilde büyüyene kadar; Python 3.10 uyumlu olmalı (kullanıcının makinesi 3.10).
 - JSON `allow_nan=False` ile yazılır → NaN değerleri `r2()` ile `None`'a çevir.
-- `index.html` dışa bağımlılık içermez (yazı tipi `fonts/` altında, depodan yüklenir); koyu tema `:root`'ta, açık tema `@media (prefers-color-scheme: light)` içinde.
+- Sayfalar dışa bağımlılık içermez (yazı tipi `fonts/`, CSS'te `../fonts/`); koyu tema `:root`'ta, açık tema `@media (prefers-color-scheme: light)` içinde. Yeni sayfa: başlığı diğer sayfalardan kopyala, `<nav id="top">` + `<footer id="foot">`, `assets/core.js`, `chrome("anahtar")`, `NAV`'a ekle. Saatleri `timeZone: "Europe/Istanbul"` ile göster.
 - "Premium" tema: arka planda ışık + ızgara, yarı saydam kart yüzeyleri (`--surface`), gradyan kenarlı hero, sayaç animasyonu,
   hisse simgeleri (`who()` / `.av`, renk `hue(ticker)`), kaydırınca belirme (`.rv`), `prefers-reduced-motion` destekli.
 - Mobilde (≤520px) sinyal tablosunda simge ve puan çubuğu gizlenir, şirket adı kısaltılır — tablo 360px'e sığmalı.

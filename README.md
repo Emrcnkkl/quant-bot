@@ -1,4 +1,8 @@
-# BIST50 Teknik Sinyal Botu (Aşama 1)
+# Piyasa Pusulası — ekonomi ve finans paneli
+
+Piyasalar (döviz, altın, emtia, borsalar), ekonomik takvim ve BIST50 sinyal botu tek sitede: https://emrcnkkl.github.io/quant-bot/
+
+## BIST50 Teknik Sinyal Botu
 
 Borsa İstanbul'un işlem hacmine göre en büyük 50 hissesi için günlük veriyle çoklu indikatör skoru hesaplar, AL / TUT / SAT sinyali üretir ve geriye dönük test raporu çıkarır.
 
@@ -6,7 +10,8 @@ Borsa İstanbul'un işlem hacmine göre en büyük 50 hissesi için günlük ver
 | Dosya | Açıklama |
 |---|---|
 | `bot.py` | Veri indirme, indikatörler, skor, backtest, JSON çıktıları |
-| `index.html` | Sinyal ve backtest sayfası (JSON dosyalarını okur) |
+| `index.html` … `sinyal.html` | Panel sayfaları (ana sayfa, piyasalar, takvim, sinyal botu, sözlük, iletişim); ortak dosyalar `assets/` |
+| `panel.py` | Piyasa verisi toplayıcı (`markets.json`) |
 | `signals.json`, `backtest.json`, `valuation.json`, `stocks/` | Bot her gün yeniden üretir; **depoda tutulmaz**, doğrudan GitHub Pages'e yüklenir |
 | `history.json` | Günlük sinyal geçmişi (gerçek veriyle her çalıştırmada eklenir) |
 | `live.json` | Canlı model portföy kaydı (yalnızca eklenir) |

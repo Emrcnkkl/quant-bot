@@ -193,6 +193,22 @@ class TestTakvim(unittest.TestCase):
         self.assertEqual([str(x.date()) for x in d], ["2027-01-04"])   # 3 Ocak 2027 pazar → pazartesi
 
 
+class TestPanel(unittest.TestCase):
+    def test_piyasa_degisimleri(self):
+        import panel
+        idx = pd.bdate_range("2025-01-01", "2026-11-11")
+        c = pd.Series(np.linspace(100, 200, len(idx)), index=idx)
+        st = panel.series_stats(c, 2, "pct")
+        self.assertEqual(st["last"], 200.0)
+        self.assertAlmostEqual(st["chg"], (200 / c.iloc[-2] - 1) * 100, places=2)
+        ref = c[c.index <= pd.Timestamp("2025-12-31")].iloc[-1]
+        self.assertAlmostEqual(st["chgytd"], (200 / ref - 1) * 100, places=2)   # yıl başı = önceki yılın son kapanışı
+        self.assertEqual(len(st["spark"]), 66)
+        self.assertEqual(len(st["hist"]["d"]), len(st["hist"]["c"]))
+        t = panel.series_stats(pd.Series([4.0, 4.5], index=idx[-2:]).reindex(idx).bfill(), 2, "bp")
+        self.assertEqual(t["chg"], 0.5)                                           # faizde puan farkı
+
+
 class TestCanliPortfoy(unittest.TestCase):
     def test_gecmis_kayitlar_degismez(self):
         with tempfile.TemporaryDirectory() as tmp:

@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Piyasalar · Piyasa Pusulası</title>
+<meta name="description" content="Endeksler, döviz, altın, emtia, dünya borsaları, kripto ve Borsa İstanbul'da günün yükselen ve düşen hisseleri.">
+<!-- Paylaşım önizlemesi (WhatsApp, Telegram, X...) -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Piyasa Pusulası">
+<meta property="og:title" content="Piyasalar · Piyasa Pusulası">
+<meta property="og:description" content="Endeksler, döviz, altın, emtia, dünya borsaları, kripto ve Borsa İstanbul'da günün yükselen ve düşen hisseleri.">
+<meta property="og:url" content="https://emrcnkkl.github.io/quant-bot/piyasalar.html">
+<meta property="og:image" content="https://emrcnkkl.github.io/quant-bot/img/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="tr_TR">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#06080b">
+<link rel="icon" type="image/png" sizes="512x512" href="img/icon-512.png">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+<link rel="preload" href="fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/app.css">
+</head>
+<body>
+<nav id="top"></nav>
+
+<main class="wrap">
+  <div class="ph"><div><h1>Piyasalar</h1><div class="sub" id="asof">Yükleniyor…</div></div></div>
+  <div class="card detail" id="detail"></div>
+  <div id="groups"></div>
+  <section id="bist" style="padding-top:20px">
+    <h2>Borsa İstanbul'da gün</h2>
+    <p class="lead" id="bistlead">Tüm hisseler, Borsa İstanbul'un resmî günlük bülteninden.</p>
+    <div id="bistall"></div>
+  </section>
+
+  <footer id="foot"></footer>
+</main>
+
+<script src="assets/core.js"></script>
+<script>
+chrome("piyasalar");
+let M = null, sel = "XU100.IS", range = "1y";
+const RANGES = [["3m", "3 ay"], ["1y", "1 yıl"], ["5y", "5 yıl"]];
+function series(it) {
+  if (range === "5y") return [it.long.d, it.long.c];
+  const n = range === "3m" ? 66 : it.hist.c.length;
+  return [it.hist.d.slice(-n), it.hist.c.slice(-n)];
+}
+function renderDetail() {
+  const it = mkFind(M, sel) || M.groups[0].items[0]; sel = it.sym;
+  $("#detail").innerHTML = `<div class="top"><div><div class="small muted">${it.name}</div><div class="v">${mkVal(it)}</div>
+      <div class="small">${mkChg(it, it.chg)} bugün · 1 hafta ${mkChg(it, it.chg1w)} · 1 ay ${mkChg(it, it.chg1m)} · yıl başı ${mkChg(it, it.chgytd)} · 1 yıl ${mkChg(it, it.chg1y)}</div>
+      <div class="small muted">1 yıllık aralık: ${mkVal(it, it.lo1y)} – ${mkVal(it, it.hi1y)} · son veri ${trDate(it.date)}</div></div>
+      <div class="seg" id="rng">${RANGES.map(([k, l]) => `<button data-r="${k}" class="${k === range ? "on" : ""}">${l}</button>`).join("")}</div></div>
+    <div class="ch" id="dch"></div>`;
+  const [d, c] = series(it); areaChart($("#dch"), d, c, it);
+  document.querySelectorAll("tr.mrow").forEach(r => r.classList.toggle("sel", r.dataset.s === sel));
+}
+function renderGroups() {
+  $("#groups").innerHTML = M.groups.map(g => `<h3 class="sm">${g.title}</h3><div class="tbl" style="margin-bottom:8px"><table class="mtbl">
+    <thead><tr><th style="text-align:left">Gösterge</th><th>Son</th><th>Gün</th><th class="h-sm">1 hafta</th><th class="h-sm">1 ay</th><th>Yıl başı</th><th class="h-sm">1 yıl</th><th class="h-sm">3 ay</th></tr></thead>
+    <tbody>${g.items.map(it => `<tr class="mrow" data-s="${it.sym}"><td style="text-align:left;font-weight:600">${it.name}</td><td>${mkVal(it)}</td><td>${mkChg(it, it.chg)}</td>
+      <td class="h-sm">${mkChg(it, it.chg1w)}</td><td class="h-sm">${mkChg(it, it.chg1m)}</td><td>${mkChg(it, it.chgytd)}</td><td class="h-sm">${mkChg(it, it.chg1y)}</td>
+      <td class="sp h-sm">${sparkSvg(it.spark, 110, 28)}</td></tr>`).join("")}</tbody></table></div>`).join("");
+}
+function renderBist() {
+  const b = M.bist; if (!b) { $("#bistall").innerHTML = `<p class="muted">Günün kapanış bülteni henüz yayımlanmadı.</p>`; return; }
+  const tot = b.adv + b.dec + b.unch;
+  $("#bistlead").textContent = `${trDate(b.date)} kapanışı · ${b.total} hisse · toplam işlem hacmi ${fmt(b.vol_bn, 1)} milyar ₺ · kaynak: Borsa İstanbul günlük bülteni. Sıralamalarda günlük işlem hacmi 5 milyon ₺'nin altındaki hisseler yok.`;
+  const row = x => `<tr><td>${x.t}</td><td class="n">${x.name}</td><td class="r">${fmt(x.close, 2)}</td><td class="r">${pct(x.chg, 2)}</td></tr>`;
+  const rowv = x => `<tr><td>${x.t}</td><td class="n">${x.name}</td><td class="r">${fmt(x.vol_tl / 1000, 1)} mr ₺</td><td class="r">${pct(x.chg, 2)}</td></tr>`;
+  $("#bistall").innerHTML = `<div class="card" style="padding:18px 20px;margin-bottom:14px"><div class="small"><span class="pos">▲ ${b.adv} yükselen</span> · <span class="neg">▼ ${b.dec} düşen</span> · ${b.unch} değişmeyen</div>
+      <div class="breadth"><i style="width:${b.adv / tot * 100}%;background:var(--al)"></i><i style="width:${b.unch / tot * 100}%;background:var(--muted);opacity:.4"></i><i style="width:${b.dec / tot * 100}%;background:var(--sat)"></i></div></div>
+    <div class="cols3">
+      <div class="card" style="padding:18px 20px"><h3 class="t">En çok yükselenler</h3><table class="mini">${b.gainers.map(row).join("")}</table></div>
+      <div class="card" style="padding:18px 20px"><h3 class="t">En çok düşenler</h3><table class="mini">${b.losers.map(row).join("")}</table></div>
+      <div class="card" style="padding:18px 20px"><h3 class="t">En çok işlem görenler</h3><table class="mini">${b.active.map(rowv).join("")}</table></div></div>`;
+}
+(async () => {
+  M = await loadJSON("markets.json");
+  if (!M) { $("#asof").textContent = "Piyasa verisi hazırlanıyor; birkaç dakika içinde burada görünecek."; return; }
+  const g = new Date(M.generated_at.replace(/(\+\d\d)(\d\d)$/, "$1:$2"));
+  $("#asof").textContent = `Son güncelleme ${g.toLocaleString("tr-TR", {day: "numeric", month: "long", hour: "2-digit", minute: "2-digit", timeZone: "Europe/Istanbul"})} · gün içinde yarım saatte bir yenilenir · fiyatlar 15 dakikaya kadar gecikmeli olabilir`;
+  $("#livetxt").textContent = g.toLocaleTimeString("tr-TR", {hour: "2-digit", minute: "2-digit", timeZone: "Europe/Istanbul"});
+  const h = decodeURIComponent(location.hash.slice(1));
+  if (h && mkFind(M, h)) sel = h;
+  renderGroups(); renderDetail(); renderBist();
+  if (h === "bist") $("#bist").scrollIntoView();
+  reveal("#groups > *, #bist > *, footer > *");
+})();
+document.addEventListener("click", e => {
+  const r = e.target.closest("tr.mrow");
+  if (r) { sel = r.dataset.s; history.replaceState(null, "", "#" + encodeURIComponent(sel)); renderDetail(); $("#detail").scrollIntoView({behavior: "smooth", block: "center"}); return; }
+  const b = e.target.closest("#rng button");
+  if (b) { range = b.dataset.r; renderDetail(); }
+});
+let rz; addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(() => M && renderDetail(), 150); });
+</script>
+</body>
+</html>

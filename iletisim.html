@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>İletişim · Piyasa Pusulası</title>
+<meta name="description" content="Soru, öneri ve hata bildirimi.">
+<!-- Paylaşım önizlemesi (WhatsApp, Telegram, X...) -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Piyasa Pusulası">
+<meta property="og:title" content="İletişim · Piyasa Pusulası">
+<meta property="og:description" content="Soru, öneri ve hata bildirimi.">
+<meta property="og:url" content="https://emrcnkkl.github.io/quant-bot/iletisim.html">
+<meta property="og:image" content="https://emrcnkkl.github.io/quant-bot/img/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="tr_TR">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#06080b">
+<link rel="icon" type="image/png" sizes="512x512" href="img/icon-512.png">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+<link rel="preload" href="fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/app.css">
+</head>
+<body>
+<nav id="top"></nav>
+
+<main class="wrap">
+  <!-- ===== İLETİŞİM ===== -->
+  <section id="iletisim">
+    <div class="kicker"><span class="gtext">İletişim</span></div>
+    <h2>Bize yazın</h2>
+    <p class="lead">Soru, öneri ya da gördüğünüz bir hata… Mesajınız doğrudan proje sahibine e-posta olarak iletilir.</p>
+    <form class="card contact" id="cform" novalidate>
+      <div class="row2">
+        <label>Adınız<input name="name" autocomplete="name" maxlength="80" placeholder="İsteğe bağlı"></label>
+        <label>E-posta adresiniz<input name="email" type="email" autocomplete="email" maxlength="120" placeholder="Yanıt almak isterseniz"></label>
+      </div>
+      <label>Konu<select name="topic"><option>Soru</option><option>Öneri</option><option>Hata bildirimi</option><option>Diğer</option></select></label>
+      <label>Mesajınız<textarea name="message" rows="6" maxlength="4000" placeholder="Mesajınızı buraya yazın…"></textarea></label>
+      <input type="text" name="_honey" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <div class="actions"><button type="submit">Gönder</button><span id="cstat" class="small" role="status"></span></div>
+    </form>
+    <p class="small" style="margin-top:18px">Sinyal bildirimleri için <a href="https://t.me/+T8qnrNlgQIwzNTJk" target="_blank" rel="noopener">Telegram kanalımıza</a> katılabilirsiniz.</p>
+    <p class="muted small" style="margin-top:6px">Mesajlar FormSubmit hizmeti aracılığıyla e-postaya iletilir. E-posta adresinizi yazarsanız yalnızca size yanıt vermek için kullanılır.</p>
+  </section>
+
+  <footer id="foot"></footer>
+</main>
+
+<script src="assets/core.js"></script>
+<script>
+chrome("iletisim");
+// ---------------- İletişim formu ----------------
+const FORM_KEY = "3e7bf7d5b6955fd0cf54b436ca9a33c0";   // FormSubmit rastgele anahtarı (e-posta adresi sayfada görünmez)
+$("#cform").addEventListener("submit", async e => {
+  e.preventDefault();
+  const f = e.target, st = $("#cstat"), btn = f.querySelector("button");
+  const d = Object.fromEntries(new FormData(f));
+  st.className = "small";
+  if (d._honey) return;                                  // bot tuzağı
+  if (d.message.trim().length < 5) { st.className = "small err"; st.textContent = "Lütfen bir mesaj yazın."; f.message.focus(); return; }
+  if (d.email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(d.email)) { st.className = "small err"; st.textContent = "E-posta adresi geçerli görünmüyor."; f.email.focus(); return; }
+  btn.disabled = true; st.textContent = "Gönderiliyor…";
+  try {
+    const r = await fetch(`https://formsubmit.co/ajax/${FORM_KEY}`, {
+      method: "POST", headers: {"Content-Type": "application/json", Accept: "application/json"},
+      body: JSON.stringify({Ad: d.name || "-", "E-posta": d.email || "-", Konu: d.topic, Mesaj: d.message,
+                            _subject: `BIST50 Sinyal · ${d.topic}${d.name ? " · " + d.name : ""}`,
+                            _replyto: d.email || undefined, _template: "table", _captcha: "false"})});
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok || String(j.success) !== "true") throw new Error(j.message || r.status);
+    f.reset(); st.className = "small ok"; st.textContent = "Teşekkürler, mesajınız iletildi.";
+  } catch (err) {
+    st.className = "small err";
+    st.textContent = "Mesaj gönderilemedi. İnternet bağlantınızı kontrol edip biraz sonra tekrar deneyin.";
+  } finally { btn.disabled = false; }
+});
+
+reveal();
+</script>
+</body>
+</html>

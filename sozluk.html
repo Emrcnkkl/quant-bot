@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sözlük · Piyasa Pusulası</title>
+<meta name="description" content="Borsa ve ekonomi terimleri, örnek grafiklerle sade anlatım.">
+<!-- Paylaşım önizlemesi (WhatsApp, Telegram, X...) -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Piyasa Pusulası">
+<meta property="og:title" content="Sözlük · Piyasa Pusulası">
+<meta property="og:description" content="Borsa ve ekonomi terimleri, örnek grafiklerle sade anlatım.">
+<meta property="og:url" content="https://emrcnkkl.github.io/quant-bot/sozluk.html">
+<meta property="og:image" content="https://emrcnkkl.github.io/quant-bot/img/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="tr_TR">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#06080b">
+<link rel="icon" type="image/png" sizes="512x512" href="img/icon-512.png">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+<link rel="preload" href="fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/app.css">
+</head>
+<body>
+<nav id="top"></nav>
+
+<main class="wrap">
+  <!-- ===== SÖZLÜK ===== -->
+  <section id="sozluk">
+    <div class="kicker"><span class="gtext">Sözlük</span></div>
+    <h2>Terimler, örneklerle</h2>
+    <p class="lead">Sitede geçen kavramların sade anlatımı. Grafikler örnek veriyle çizildi; gerçek bir hisseyi göstermez.</p>
+    <div class="gl-bar"><div class="tabs" id="glcat"></div><input type="search" id="glq" placeholder="Terim ara (ör. RSI)"></div>
+    <div class="gl" id="glist"></div>
+  </section>
+
+  <footer id="foot"></footer>
+</main>
+
+<script src="assets/core.js"></script>
+<script>
+chrome("sozluk");
+// ---------------- Sözlük (örnek veriyle çizilen küçük grafikler) ----------------
+const GL = (() => {
+  // Tekrarlanabilir örnek fiyat serisi: önce yükseliş, sonra düşüş (aynı veri her açılışta aynı çizilir)
+  let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const P = []; let p = 100;
+  for (let i = 0; i < 260; i++) { const drift = i < 150 ? .0022 : i < 185 ? -.001 : -.0042; p *= 1 + drift + (rnd() - .5) * .028; P.push(p); }
+  const ema = (a, n) => { const k = 2 / (n + 1), o = []; a.forEach((v, i) => o.push(i ? v * k + o[i - 1] * (1 - k) : v)); return o; };
+  const rsi = (a, n = 14) => { let g = 0, l = 0; const o = [null];
+    for (let i = 1; i < a.length; i++) { const d = a[i] - a[i - 1];
+      g = (g * (n - 1) + Math.max(d, 0)) / n; l = (l * (n - 1) + Math.max(-d, 0)) / n; o.push(i < n ? null : 100 - 100 / (1 + g / (l || 1e-9))); }
+    return o; };
+  const W = 320, H = 120, pad = 6;
+  // Çizgi grafiği: series = [[dizi, renk, kalınlık, kesikli?]], opts = {lo, hi, bands:[[a,b,renk]], hlines:[[v,renk,etiket]], marks:[[i,v,renk,etiket]], from}
+  function line(series, o = {}) {
+    const from = o.from || 0, n = series[0][0].length - from;
+    const all = series.flatMap(s => s[0].slice(from)).filter(v => v != null);
+    const lo = o.lo ?? Math.min(...all), hi = o.hi ?? Math.max(...all);
+    const x = i => pad + (i - from) / (n - 1) * (W - 2 * pad), y = v => pad + (1 - (v - lo) / (hi - lo)) * (H - 2 * pad);
+    let g = "";
+    (o.bands || []).forEach(([a, b, c]) => g += `<rect x="${pad}" y="${y(b)}" width="${W - 2 * pad}" height="${y(a) - y(b)}" fill="${c}" opacity=".13"/>`);
+    (o.hlines || []).forEach(([v, c, t]) => g += `<line x1="${pad}" x2="${W - pad}" y1="${y(v)}" y2="${y(v)}" stroke="${c}" stroke-dasharray="3 3" opacity=".7"/>${t ? `<text x="${W - pad - 2}" y="${y(v) - 3}" text-anchor="end">${t}</text>` : ""}`);
+    series.forEach(([a, c, w = 1.6, dash]) => {
+      const d = a.slice(from).map((v, i) => v == null ? null : `${x(i + from).toFixed(1)},${y(v).toFixed(1)}`).filter(Boolean).join(" L");
+      g += `<path d="M${d}" fill="none" stroke="${c}" stroke-width="${w}" ${dash ? 'stroke-dasharray="4 3"' : ""} stroke-linejoin="round"/>`;
+    });
+    (o.marks || []).forEach(([i, v, c, t]) => { const r_ = x(i) > W * .55;   // sağ yarıdaysa etiket noktanın soluna
+      g += `<circle cx="${x(i)}" cy="${y(v)}" r="4" fill="${c}"/>${t ? `<text x="${x(i) + (r_ ? -7 : 7)}" y="${y(v) + (y(v) < 20 ? 14 : -7)}" text-anchor="${r_ ? "end" : "start"}">${t}</text>` : ""}`; });
+    return `<svg viewBox="0 0 ${W} ${H}" role="img">${g}</svg>`;
+  }
+  function bars(vals, colorOf, o = {}) {
+    const n = vals.length, mx = Math.max(...vals.map(Math.abs)), bw = (W - 2 * pad) / n;
+    const mid = o.signed ? H / 2 : H - pad, sc = (o.signed ? H / 2 - pad : H - 2 * pad) / mx;
+    let g = o.signed ? `<line x1="${pad}" x2="${W - pad}" y1="${mid}" y2="${mid}" stroke="var(--line2)"/>` : "";
+    vals.forEach((v, i) => { const h = Math.abs(v) * sc;
+      g += `<rect x="${(pad + i * bw + bw * .12).toFixed(1)}" y="${(v >= 0 ? mid - h : mid).toFixed(1)}" width="${(bw * .76).toFixed(1)}" height="${h.toFixed(1)}" rx="1" fill="${colorOf(v, i)}"/>`; });
+    if (o.line) g += `<line x1="${pad}" x2="${W - pad}" y1="${mid - o.line[0] * sc}" y2="${mid - o.line[0] * sc}" stroke="var(--muted)" stroke-dasharray="3 3"/><text x="${W - pad}" y="${mid - o.line[0] * sc - 4}" text-anchor="end">${o.line[1]}</text>`;
+    return `<svg viewBox="0 0 ${W} ${H}" role="img">${g}</svg>`;
+  }
+  // Basit kutu karşılaştırması: [[etiket, değer, renk]]
+  function compare(items, note) {
+    const mx = Math.max(...items.map(i => i[1])), bh = 26, gap = 12, top = 10;
+    let g = items.map(([t, v, c], k) => { const w = v / mx * (W - 150), yy = top + k * (bh + gap);
+      return `<text x="0" y="${yy + 17}" style="fill:var(--ink2)">${t}</text><rect x="110" y="${yy}" width="${w.toFixed(1)}" height="${bh}" rx="6" fill="${c}" opacity=".85"/><text x="${116 + w}" y="${yy + 17}" style="fill:var(--ink2)">${v.toLocaleString("tr-TR")}</text>`; }).join("");
+    if (note) g += `<text x="0" y="${H - 4}">${note}</text>`;
+    return `<svg viewBox="0 0 ${W} ${H}" role="img">${g}</svg>`;
+  }
+  const C = {up: "var(--al)", dn: "var(--sat)", acc: "var(--accent)", e200: "var(--e200)", e50: "var(--e50)", mut: "var(--muted)", gold: "var(--gold)", bench: "var(--bench)"};
+  const e200 = ema(P, 120), R = rsi(P), m12 = ema(P, 12), m26 = ema(P, 26), macd = m12.map((v, i) => v - m26[i]);
+  const sig = ema(macd, 9), hist = macd.map((v, i) => v - sig[i]);
+  // 20 günlük zirve ve kırılım
+  const hi20 = P.map((_, i) => i < 20 ? null : Math.max(...P.slice(i - 20, i)));
+  const brk = P.findIndex((v, i) => i > 60 && hi20[i] && v > hi20[i]);
+  // İz süren stop (fiyatın en yükseğinin %9 altı) ve tetiklendiği gün
+  const stop = []; let peak = 0, hit = -1;
+  P.forEach((v, i) => { if (i < 120) { stop.push(null); return; } peak = Math.max(peak, v); const s_ = peak * .91; stop.push(hit < 0 ? s_ : null); if (hit < 0 && v < s_) hit = i; });
+  // Düşüş grafiği
+  const eq = []; let q = 100; seed = 11;
+  for (let i = 0; i < 200; i++) { q *= 1 + (i > 70 && i < 110 ? -.009 : .004) + (rnd() - .5) * .02; eq.push(q); }
+  let pk = 0, mdd = 0, pki = 0, ddi = 0, ddpk = 0;
+  eq.forEach((v, i) => { if (v > pk) { pk = v; pki = i; } if (v / pk - 1 < mdd) { mdd = v / pk - 1; ddi = i; ddpk = pki; } });
+  // Aynı getiri, farklı oynaklık (Sharpe)
+  const smooth = [], bumpy = []; let a1 = 100, a2 = 100; seed = 5;
+  for (let i = 0; i < 200; i++) { a1 *= 1.002 + (rnd() - .5) * .006; a2 *= 1.002 + (rnd() - .5) * .05; smooth.push(a1); bumpy.push(a2); }
+  const s0 = smooth.at(-1), b0 = bumpy.at(-1); bumpy.forEach((v, i) => bumpy[i] = v * Math.pow(s0 / b0, i / 199));
+  // Hacim
+  seed = 3; const vol = Array.from({length: 40}, (_, i) => i === 30 ? 3.1 : .7 + rnd() * .7);
+
+  const T = [
+    // ---- Teknik
+    {id: "puan", cat: "Teknik", t: "Puan ve AL / TUT / SAT", k: "Altı göstergenin birleştirilmiş notu: −100 (çok zayıf) … +100 (çok güçlü).",
+     p: "Her gösterge hisseye artı ya da eksi puan verir; toplam +40'ın üstündeyse AL, −40'ın altındaysa SAT, arasında TUT denir. Puan bir kehanet değil, fiyat hareketinin o günkü özetidir.",
+     use: "Sinyaller tablosundaki çubuk bu puandır.",
+     svg: () => bars(Array.from({length: 21}, (_, i) => -100 + i * 10), v => v >= 40 ? C.up : v <= -40 ? C.dn : "var(--tut)", {signed: true})},
+    {id: "ema", cat: "Teknik", t: "Hareketli ortalama", s: "EMA200", k: "Son 200 günün ortalama fiyatı; uzun vadeli yönü gösterir.",
+     p: "Günlük iniş çıkışları yumuşatır. Fiyat ortalamanın üstündeyse hisse uzun vadeli yükseliş eğiliminde, altındaysa düşüş eğiliminde sayılır. Son günlere daha çok ağırlık verildiği için \"üssel\" (E) denir.",
+     use: "Puanın ±15'i buradan gelir. Hisse grafiğindeki mor çizgi.",
+     svg: () => line([[P, C.acc, 1.3], [e200, C.e200, 2]], {from: 40, marks: [[203, P[203], C.dn, "ortalamanın altına indi"]]})},
+    {id: "rsi", cat: "Teknik", t: "RSI", s: "göreli güç endeksi", k: "Son 14 günde yükselişlerin mi düşüşlerin mi ağır bastığını 0–100 arası ölçer.",
+     p: "50'nin üstü alıcıların, altı satıcıların güçlü olduğunu gösterir. 70–80 üstü \"aşırı alım\" (fazla hızlı yükseldi, soluklanabilir), 25–30 altı \"aşırı satım\" sayılır.",
+     use: "55–78 arası +15 puan, 25–45 arası −15 puan; aşırı uçlarda puan tersine döner.",
+     svg: () => line([[R, C.acc, 1.5]], {from: 40, lo: 0, hi: 100, bands: [[55, 78, C.up], [25, 45, C.dn]], hlines: [[78, C.mut, "78"], [55, C.mut, "55"], [45, C.mut, "45"], [25, C.mut, "25"]]})},
+    {id: "macd", cat: "Teknik", t: "MACD", k: "Kısa ve uzun vadeli ortalamalar arasındaki farkın yönü: momentum hızlanıyor mu yavaşlıyor mu?",
+     p: "Çubuklar sıfırın üstündeyse yükseliş hız kazanıyor, altındaysa düşüş ağır basıyor demektir. Çubukların büyüyüp küçülmesi ivmenin değiştiğini gösterir.",
+     use: "Çubuğun işareti ±10, büyüyüp küçülmesi ±5 puan.",
+     svg: () => bars(hist.slice(120, 220), v => v >= 0 ? C.up : C.dn, {signed: true})},
+    {id: "adx", cat: "Teknik", t: "ADX", s: "trend gücü", k: "Fiyat belirgin bir yöne mi gidiyor, yoksa yatay mı sallanıyor?",
+     p: "ADX yönü değil gücü ölçer: 15'in altı yönsüz piyasa, 25–30 üstü güçlü trend. Yön, yükseliş ve düşüş baskısını ayrı ölçen iki yardımcı çizgiden (DI+ / DI−) gelir.",
+     use: "Güçlü trend yukarıysa +10, aşağıysa −10 puana kadar; yönsüz piyasada 0.",
+     svg: () => line([[P.map((v, i) => i < 30 ? null : 12 + Math.min(30, Math.abs(P[i] / P[i - 30] - 1) * 160)), C.gold, 1.8]], {from: 30, lo: 0, hi: 45, hlines: [[30, C.mut, "güçlü trend"], [15, C.mut, "yönsüz"]]})},
+    {id: "hacim", cat: "Teknik", t: "İşlem hacmi", k: "Bir günde el değiştiren hisse miktarı.",
+     p: "Yüksek hacimli hareketler daha anlamlıdır: çok sayıda yatırımcı aynı yöne gidiyor demektir. Düşük hacimli yükselişler daha kolay geri döner.",
+     use: "Hacim 20 günlük ortalamanın 1,5 katını aşarsa o günün yönünde ±10 puan.",
+     svg: () => bars(vol, (v, i) => i === 30 ? C.up : "var(--line2)", {line: [1.5, "1,5 × ortalama"]})},
+    {id: "kirilim", cat: "Teknik", t: "Kırılım", k: "Fiyatın son 20 günün en yüksek seviyesini aşması.",
+     p: "Uzun süre aşılamayan bir tavanın geçilmesi alıcıların güçlendiği şeklinde yorumlanır. Tersi, 20 günlük dibin altına inmek, satış baskısının arttığını gösterir.",
+     use: "20 günlük zirve üstünde kapanış +10, dip altında −10 puan.",
+     svg: () => line([[P, C.acc, 1.4], [hi20, C.mut, 1.2, true]], {from: brk - 40, marks: [[brk, P[brk], C.up, "zirve aşıldı"]]})},
+    {id: "atr", cat: "Teknik", t: "ATR ve iz süren zarar-kes", k: "ATR bir hissenin günlük ortalama oynama payıdır; zarar-kes bunun katlarıyla belirlenir.",
+     p: "Model bir hisseye girince, fiyatın ulaştığı en yüksek seviyenin 2,5 ATR altına bir \"zarar-kes\" çizgisi koyar. Fiyat yükseldikçe çizgi de yükselir, hiç inmez; fiyat çizginin altına düşerse hisse satılır. Böylece kâr korunur, büyük kayıp önlenir.",
+     use: "Sinyaller tablosunda pozisyondaki hisselerde \"stop\" olarak görünür.",
+     svg: () => line([[P, C.acc, 1.4], [stop, C.dn, 1.6, true]], {from: 110, marks: hit > 0 ? [[hit, P[hit], C.dn, "zarar-kes: sat"]] : []})},
+    // ---- Değerleme
+    {id: "fk", cat: "Değerleme", t: "F/K", s: "fiyat / kazanç", k: "Şirketin piyasa değeri, yıllık kârının kaç katı?",
+     p: "F/K 10 ise, kâr aynı kalırsa şirket bugünkü değerini 10 yılda kazanır. Düşük F/K \"ucuz\" sayılır ama kârın düşmesi bekleniyorsa ucuz kalabilir. Zarar eden şirketin F/K'sı yoktur.",
+     use: "Değerleme sekmesinde; sektör ortalamasıyla kıyaslanır.",
+     svg: () => compare([["Piyasa değeri", 1000, C.acc], ["Yıllık kâr", 100, C.up]], "1.000 / 100 → F/K = 10")},
+    {id: "pddd", cat: "Değerleme", t: "PD/DD", s: "piyasa değeri / defter değeri", k: "Borsadaki değer, şirketin özkaynağının (varlıklar − borçlar) kaç katı?",
+     p: "1'in altı, şirketin borsada kendi özkaynağından ucuza işlem gördüğünü gösterir. Bankalar genelde düşük, teknoloji şirketleri yüksek PD/DD ile işlem görür; bu yüzden aynı sektörle kıyaslamak gerekir.",
+     use: "Değerleme sekmesinde; ucuzluk puanının yarısı.",
+     svg: () => compare([["Piyasa değeri", 800, C.acc], ["Özkaynak", 1000, C.gold]], "800 / 1.000 → PD/DD = 0,8")},
+    {id: "temettu", cat: "Değerleme", t: "Temettü verimi", k: "Şirketin dağıttığı yıllık kâr payının hisse fiyatına oranı.",
+     p: "100 ₺'lik hisse yılda 5 ₺ temettü ödüyorsa verim %5'tir. Düzenli temettü ödeyen şirketler genelde daha olgun ve istikrarlıdır.",
+     use: "Değerleme tablosunda \"Temettü\" sütunu."},
+    {id: "roe", cat: "Değerleme", t: "Özkaynak kârlılığı", s: "ROE", k: "Şirket, ortaklarının koyduğu her 100 ₺ ile yılda kaç ₺ kâr ediyor?",
+     p: "Yüksek ROE, sermayenin verimli kullanıldığını gösterir. Enflasyonun yüksek olduğu dönemlerde enflasyonla birlikte değerlendirilmelidir.",
+     use: "Değerleme tablosunda \"Kârlılık\" sütunu."},
+    // ---- Performans
+    {id: "albekle", cat: "Performans", t: "Al-bekle", k: "Hisseyi alıp hiç satmadan tutmak.",
+     p: "Bir stratejinin gerçekten işe yarayıp yaramadığını görmek için en basit kıyas ölçüsüdür: hiçbir şey yapmasaydık ne olurdu?",
+     use: "Performans sekmesinde \"BIST30 endeksi\" ve \"Büyük 50 al-bekle\" çizgileri.",
+     svg: () => line([[P, C.bench, 1.5], [P.map((v, i) => i < 185 ? v : P[185] * (1 + (v / P[185] - 1) * .15)), C.up, 1.8]], {marks: [[185, P[185], C.up, "model nakde geçti"]]})},
+    {id: "dusus", cat: "Performans", t: "Maksimum düşüş", k: "Bir zirveden sonraki en derin kayıp.",
+     p: "Getiri kadar önemlidir: %50 düşen bir yatırımın başa dönmesi için %100 kazanması gerekir. Modelin asıl amacı bu düşüşleri küçültmektir.",
+     use: "Performans sekmesinde \"En büyük düşüş\".",
+     svg: () => line([[eq, C.up, 1.7]], {marks: [[ddpk, eq[ddpk], C.mut, "zirve"], [ddi, eq[ddi], C.dn, `dip: %${(mdd * 100).toFixed(0)}`]]})},
+    {id: "sharpe", cat: "Performans", t: "Sharpe oranı", k: "Alınan her birim risk (dalgalanma) başına, faizin üstünde ne kadar getiri kazanıldı?",
+     p: "Aynı sonuca daha az sarsıntıyla ulaşan yatırımın Sharpe'ı daha yüksektir. 0'ın altı faizden kötü, 0,5 üstü iyi, 1 üstü çok iyi sayılır.",
+     use: "Performans sekmesindeki istatistik kartlarında.",
+     svg: () => line([[bumpy, C.dn, 1.3], [smooth, C.up, 1.9]], {marks: [[199, smooth[199], C.mut, "aynı sonuç"]]})},
+    {id: "test", cat: "Performans", t: "Test dönemi", s: "örneklem dışı", k: "Kuralları belirlerken hiç bakılmayan, sonradan sınama için ayrılan dönem.",
+     p: "Bir stratejiyi geçmişe uydurmak kolaydır; asıl soru, görmediği yıllarda da çalışıp çalışmadığıdır. Bu sitede 2020 ortasından sonrası test dönemidir.",
+     use: "Performans grafiğindeki gölgeli alan."},
+    {id: "yanlilik", cat: "Performans", t: "Hayatta kalma yanlılığı", k: "Yalnızca bugün ayakta olan şirketlerle geçmişi test edip sonuçları olduğundan iyi göstermek.",
+     p: "Bugünün büyük şirketleri geçmişte iyi gittikleri için büyük. Test bu yüzden her dönemin o zamanki en büyük 50 hissesiyle yapılıyor.",
+     use: "Nasıl çalışır → SSS'de ayrıntısı var."},
+    {id: "reelgetiri", cat: "Performans", t: "Enflasyondan arındırılmış getiri", s: "reel getiri", k: "Getiriden enflasyonun etkisi çıkarılınca kalan, gerçek alım gücü artışı.",
+     p: "Paranız %40 arttı ama fiyatlar %50 arttıysa, aslında daha az şey alabilirsiniz. Reel getiri bunu ölçer.",
+     use: "Performans sekmesinde \"Enflasyondan arındırılmış\" düğmesi."},
+    // ---- Ekonomi
+    {id: "politika", cat: "Ekonomi", t: "Politika faizi", k: "Merkez Bankası'nın (TCMB) belirlediği temel faiz oranı.",
+     p: "Mevduat ve kredi faizlerine yön verir. Model, hisse tutmadığı zamanlarda boştaki paranın bu faizi kazandığını varsayar.",
+     use: "Bugün sekmesindeki \"Faiz ortamı\" kutusu."},
+    {id: "enflasyon", cat: "Ekonomi", t: "Enflasyon", s: "TÜFE", k: "Fiyatların bir yılda ortalama ne kadar arttığı.",
+     p: "TÜİK'in tüketici fiyat endeksiyle ölçülür. Yatırımın enflasyonun üstünde getiri sağlayıp sağlamadığı en önemli sorudur.",
+     use: "Reel getiri ve reel faiz hesaplarında."},
+    {id: "reelfaiz", cat: "Ekonomi", t: "Reel faiz", k: "Politika faizi eksi enflasyon.",
+     p: "Pozitif ve yüksekse paranızı faizde tutmak enflasyonun üstünde kazandırır; hisseler cazibesini yitirebilir. Negatifse faizdeki para eriyor demektir.",
+     use: "Reel faiz %5'in üstündeyken model yeni hisse almaz (faiz filtresi).",
+     svg: () => compare([["Politika faizi", 40, C.acc], ["Enflasyon", 32, C.dn], ["Reel faiz", 8, C.up]], "%40 − %32 = %8 reel faiz → filtre devrede")},
+  ];
+  return {T, cats: ["Tümü", ...new Set(T.map(x => x.cat))]};
+})();
+let glCat = "Tümü";
+function renderGlossary() {
+  const fold = t => t.toLocaleLowerCase("tr-TR").replace(/ı/g, "i").replace(/İ/g, "i");
+  const q = fold($("#glq").value.trim());
+  const list = GL.T.filter(x => (glCat === "Tümü" || x.cat === glCat) &&
+    (!q || fold(x.t + " " + (x.s || "") + " " + x.k).includes(q)));
+  $("#glcat").innerHTML = GL.cats.map(c => `<button data-c="${c}" class="${c === glCat ? "on" : ""}">${c}</button>`).join("");
+  $("#glist").innerHTML = list.length ? list.map(x => `<article class="card term" id="s-${x.id}">
+      <h4>${x.t}${x.s ? `<small>${x.s}</small>` : ""}</h4><p class="k">${x.k}</p><p>${x.p}</p>
+      ${x.svg ? x.svg() : ""}<div class="use"><b>Bu sitede:</b> ${x.use}</div></article>`).join("")
+    : `<p class="gl-empty">Bu aramayla eşleşen terim yok.</p>`;
+}
+$("#glcat").addEventListener("click", e => { if (e.target.dataset.c) { glCat = e.target.dataset.c; renderGlossary(); } });
+$("#glq").addEventListener("input", renderGlossary);
+renderGlossary();
+
+
+if (location.hash) document.getElementById(decodeURIComponent(location.hash.slice(1)))?.scrollIntoView({block: "start"});
+reveal();
+</script>
+</body>
+</html>

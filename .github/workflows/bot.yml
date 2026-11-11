@@ -7,9 +7,12 @@ on:
     - cron: "40 15 * * 1-5"   # 18:40 TR (asıl)
     - cron: "25 16 * * 1-5"   # 19:25 TR (yedek)
     - cron: "10 18 * * 1-5"   # 21:10 TR (yedek)
+    # Panelin piyasa verisi (döviz, altın, borsalar…): seans boyunca yarım saatte bir, hafta sonu günde bir
+    - cron: "15,45 6-15 * * 1-5"   # 09:15–18:45 TR
+    - cron: "20 9 * * 0,6"         # hafta sonu 12:20 TR
   push:                        # sayfa tasarımı değişince siteyi (botu çalıştırmadan) yeniden yayınla
     branches: [claude/laughing-dijkstra-j1eqmj]
-    paths: [index.html, "fonts/**", "img/**"]
+    paths: ["*.html", "assets/**", "fonts/**", "img/**"]
   workflow_dispatch:           # Actions sekmesinden elle başlatma
     inputs:
       telegram_test:
@@ -55,7 +58,7 @@ jobs:
               open(name, "wb").write(body)
               return body
           s = get("signals.json")
-          get("backtest.json"); get("valuation.json"); get("calendar.json")
+          get("backtest.json"); get("valuation.json"); get("calendar.json"); get("markets.json")
           n = sum(get(f"stocks/{x['ticker']}.json") is not None for x in (json.loads(s)["signals"] if s else []))
           print(f"Yayındaki veri indirildi: {json.loads(s)['data_date'] if s else 'yok'} · {n} hisse grafiği")
           EOF
@@ -80,15 +83,19 @@ jobs:
           if [ "${{ github.event_name }}" = "push" ]; then
             echo "skip=true" >> "$GITHUB_OUTPUT"
             echo "Sayfa değişikliği: bot çalıştırılmadan site yeniden yayınlanacak."
+          elif [ "${{ github.event.schedule }}" = "15,45 6-15 * * 1-5" ] || [ "${{ github.event.schedule }}" = "20 9 * * 0,6" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "panel=true" >> "$GITHUB_OUTPUT"
+            echo "Yalnızca panelin piyasa verisi yenilenecek."
           elif [ "${{ github.event_name }}" = "schedule" ] && [ "$have" \> "$expected" -o "$have" = "$expected" ]; then
             echo "skip=true" >> "$GITHUB_OUTPUT"
             echo "Beklenen günün verisi zaten yayında, atlanıyor."
           fi
       - uses: actions/setup-python@v6
-        if: steps.check.outputs.skip != 'true'
+        if: steps.check.outputs.skip != 'true' || steps.check.outputs.panel == 'true'
         with:
           python-version: "3.11"
-      - if: steps.check.outputs.skip != 'true'
+      - if: steps.check.outputs.skip != 'true' || steps.check.outputs.panel == 'true'
         run: pip install -r requirements.txt
       - name: Testler
         if: steps.check.outputs.skip != 'true'
@@ -100,6 +107,10 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           TELEGRAM_ADMIN_CHAT_ID: ${{ secrets.TELEGRAM_ADMIN_CHAT_ID }}
         run: python bot.py ${{ inputs.telegram_test && '--telegram-test' || '' }}
+      - name: Piyasa verisi (panel)
+        if: steps.check.outputs.skip != 'true' || steps.check.outputs.panel == 'true'
+        # Panel bilgi amaçlı: alınamazsa bot sonuçları yine de yayınlansın
+        run: python panel.py || echo "::warning::Piyasa verisi alınamadı; sitede bir önceki veri kalır"
       - name: Sonuçları kaydet
         if: steps.check.outputs.skip != 'true'
         run: |
@@ -116,12 +127,11 @@ jobs:
           exit 1
       - name: Site paketini hazırla
         id: site
-        if: (steps.check.outputs.skip != 'true' || github.event_name == 'push') && hashFiles('signals.json') != ''
+        if: (steps.check.outputs.skip != 'true' || steps.check.outputs.panel == 'true' || github.event_name == 'push') && hashFiles('signals.json') != ''
         run: |
           mkdir -p _site
-          cp -r index.html fonts img signals.json backtest.json live.json _site/
-          [ -e valuation.json ] && cp valuation.json _site/
-          [ -e calendar.json ] && cp calendar.json _site/
+          cp -r *.html assets fonts img signals.json backtest.json live.json _site/
+          for f in valuation.json calendar.json markets.json; do if [ -e "$f" ]; then cp "$f" _site/; fi; done
           [ -d stocks ] && cp -r stocks _site/
           du -sh _site
           echo "ready=true" >> "$GITHUB_OUTPUT"

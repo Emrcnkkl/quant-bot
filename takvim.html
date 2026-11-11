@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ekonomik takvim · Piyasa Pusulası</title>
+<meta name="description" content="TCMB faiz kararları, enflasyon açıklamaları, büyük şirketlerin bilançoları ve önemli KAP bildirimleri.">
+<!-- Paylaşım önizlemesi (WhatsApp, Telegram, X...) -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Piyasa Pusulası">
+<meta property="og:title" content="Ekonomik takvim · Piyasa Pusulası">
+<meta property="og:description" content="TCMB faiz kararları, enflasyon açıklamaları, büyük şirketlerin bilançoları ve önemli KAP bildirimleri.">
+<meta property="og:url" content="https://emrcnkkl.github.io/quant-bot/takvim.html">
+<meta property="og:image" content="https://emrcnkkl.github.io/quant-bot/img/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="tr_TR">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#06080b">
+<link rel="icon" type="image/png" sizes="512x512" href="img/icon-512.png">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+<link rel="preload" href="fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/app.css">
+</head>
+<body>
+<nav id="top"></nav>
+
+<main class="wrap">
+  <!-- ===== TAKVİM ===== -->
+  <section id="takvim">
+    <div class="kicker"><span class="gtext">Takvim</span></div>
+    <h2>Ekonomik takvim</h2>
+    <p class="lead">Piyasayı oynatabilecek tarihler: TCMB faiz kararları, enflasyon açıklamaları, 50 şirketin bilançoları ve önemli KAP bildirimleri (temettü, sermaye artırımı, geri alım, genel kurul, yeni iş…).</p>
+    <div class="cal-top" id="caltop"></div>
+    <div class="toolbar"><div class="tabs" id="calf"></div><input type="search" id="calq" placeholder="Hisse ara (ör. ASELS)"></div>
+    <div class="cal-cols">
+      <div><h3 class="sm" style="margin-top:6px">Yaklaşan</h3><div id="calup"></div></div>
+      <div><h3 class="sm" style="margin-top:6px">Son 30 gün</h3><div id="calpast"></div></div>
+    </div>
+    <p class="muted small" id="calnote"></p>
+  </section>
+
+  <footer id="foot"></footer>
+</main>
+
+<script src="assets/core.js"></script>
+<script>
+chrome("takvim");
+let S = null;
+// ---------------- Takvim ----------------
+let CAL = null, calF = "all", calShowAll = {up: false, past: false};
+const CALK = {ppk: "Faiz", tufe: "Enflasyon", bilanco: "Bilanço", sonbilanco: "Son gün", kap: "KAP"};
+const dayDiff = iso => Math.round((new Date(iso + "T00:00:00") - new Date(CAL.today + "T00:00:00")) / 864e5);
+const relDay = n => n === 0 ? "bugün" : n === 1 ? "yarın" : n === -1 ? "dün" : n > 0 ? `${n} gün sonra` : `${-n} gün önce`;
+const longDay = iso => new Date(iso + "T00:00:00").toLocaleDateString("tr-TR", {day: "numeric", month: "long", weekday: "long"});
+async function loadCalendar() {
+  CAL = await fetch("calendar.json?v=" + Date.now()).then(r => r.ok ? r.json() : null).catch(() => null);
+  if (!CAL || !CAL.events) { $("#calnote").textContent = "Takvim hazırlanıyor; bot bir sonraki çalıştığında burada görünecek."; return; }
+  CAL.today = new Date().toISOString().slice(0, 10) > CAL.today ? new Date().toISOString().slice(0, 10) : CAL.today;
+  renderCalendar();
+}
+function calName(t) { return S?.signals.find(x => x.ticker === t)?.name || t; }
+function renderNextEvents() {
+  const up = CAL.events.filter(e => (e.kind === "ppk" || e.kind === "tufe") && dayDiff(e.date) >= 0).slice(0, 2);
+  if (!up.length) return;
+  $("#nextev").innerHTML = `<span>Yaklaşan:</span>` + up.map(e => `<a class="chip" href="#takvim"><i style="background:${e.kind === "ppk" ? "var(--accent)" : "var(--tut)"};color:${e.kind === "ppk" ? "var(--accent)" : "var(--tut)"}"></i>${e.title} <b>${new Date(e.date + "T00:00:00").toLocaleDateString("tr-TR", {day: "numeric", month: "long"})}</b>&nbsp;(${relDay(dayDiff(e.date))})</a>`).join("");
+}
+function renderCalendar() {
+  const ev = CAL.events, nextOf = k => ev.find(e => e.kind === k && dayDiff(e.date) >= 0);
+  const ppk = nextOf("ppk"), tufe = nextOf("tufe");
+  const rep = new Set(ev.filter(e => e.kind === "bilanco").map(e => e.ticker));
+  const n = S?.signals.length || 50, waiting = ev.filter(e => e.kind === "sonbilanco" && !rep.has(e.ticker) && dayDiff(e.date) <= 60);
+  const card = (lb, bg, sm) => `<div class="card"><div class="lb">${lb}</div><div class="bg">${bg}</div><div class="sm">${sm}</div></div>`;
+  $("#caltop").innerHTML =
+    (ppk ? card("Sıradaki faiz kararı", new Date(ppk.date + "T00:00:00").toLocaleDateString("tr-TR", {day: "numeric", month: "long"}), `${relDay(dayDiff(ppk.date))} · politika faizi şu an %${fmt(S?.regime?.policy_rate, 1)}`) : "") +
+    (tufe ? card("Sıradaki enflasyon verisi", new Date(tufe.date + "T00:00:00").toLocaleDateString("tr-TR", {day: "numeric", month: "long"}), `${relDay(dayDiff(tufe.date))} · ${tufe.detail.split(" (")[0]}`) : "") +
+    card("Bu dönemin bilançoları", `${rep.size} / ${n} açıklandı`, waiting.length ? "Bekleyen: " + waiting.map(e => e.ticker).join(", ") : "Son 30 günde açıklananlar aşağıda");
+  const kinds = [["all", "Tümü"], ["macro", "Faiz ve enflasyon"], ["fin", "Bilançolar"], ["kap", "Şirket bildirimleri"]];
+  $("#calf").innerHTML = kinds.map(([k, l]) => `<button data-k="${k}" class="${k === calF ? "on" : ""}">${l}</button>`).join("");
+  const q = $("#calq").value.trim().toLocaleUpperCase("tr-TR");
+  const ok = e => (calF === "all" || (calF === "macro" && (e.kind === "ppk" || e.kind === "tufe")) ||
+                   (calF === "fin" && (e.kind === "bilanco" || e.kind === "sonbilanco")) || (calF === "kap" && e.kind === "kap"))
+                  && (!q || (e.ticker || "").includes(q) || (!e.ticker && !q));
+  const up = ev.filter(e => dayDiff(e.date) >= 0 && ok(e)), past = ev.filter(e => dayDiff(e.date) < 0 && ok(e)).reverse();
+  $("#calup").innerHTML = calList(up, "up");
+  $("#calpast").innerHTML = calList(past, "past");
+  $("#calnote").innerHTML = `Kaynaklar: TCMB (faiz kararı günleri), TÜİK takvimi (enflasyon her ayın 3'ünde; hafta sonuysa pazartesi), KAP (bildirimler ve bilançoların yasal son günleri). "Son gün" şirketin bilançoyu en geç açıklaması gereken tarihtir; çoğu şirket daha önce açıklar. Her iş günü akşam güncellenir.`;
+}
+function calList(list, side) {
+  if (!list.length) return `<p class="muted small">Bu filtreyle kayıt yok.</p>`;
+  // Aynı gün aynı türdeki bilançoları tek satırda topla
+  const days = [];
+  list.forEach(e => {
+    let d = days.find(x => x.date === e.date); if (!d) days.push(d = {date: e.date, items: []});
+    const grp = (e.kind === "bilanco" || e.kind === "sonbilanco") && d.items.find(x => x.kind === e.kind && x.detail === e.detail);
+    if (grp) grp.many.push(e); else d.items.push({...e, many: [e]});
+  });
+  let limit = days.length, cnt = 0;                // ilk ~20 kayıt; gerisi "Tümünü göster" ile
+  if (!calShowAll[side]) for (let i = 0; i < days.length; i++) { cnt += days[i].items.length; if (cnt >= 20) { limit = i + 1; break; } }
+  const html = days.slice(0, limit).map(d => `<div class="cal-day"><h5>${longDay(d.date)}<span>${relDay(dayDiff(d.date))}</span></h5>` +
+    d.items.map(e => {
+      const body = e.many.length > 1
+        ? `<div class="t">${e.title} <span class="muted" style="font-weight:500">· ${e.detail}</span></div><div class="tks">${e.many.map(m => m.url ? `<a href="${m.url}" target="_blank" rel="noopener" title="${calName(m.ticker)}">${m.ticker}</a>` : `<span title="${calName(m.ticker)}">${m.ticker}</span>`).join("")}</div>`
+        : e.ticker
+          ? `${who(e.ticker, `${e.kind === "kap" ? calName(e.ticker) : e.title}${e.time && e.time !== "00:00" ? " · " + e.time : ""}`)}<div class="d" style="margin-top:4px">${e.detail}${e.url ? ` · <a href="${e.url}" target="_blank" rel="noopener">KAP ↗</a>` : ""}</div>`
+          : `<div class="t">${e.title}</div><div class="d">${e.detail}</div>`;
+      return `<div class="cal-it"><span class="k k-${e.kind}">${e.kind === "kap" ? e.title : CALK[e.kind]}</span><div class="b">${body}</div></div>`;
+    }).join("") + `</div>`).join("");
+  return html + (days.length > limit ? `<button class="cal-more" data-side="${side}">Tümünü göster (${days.slice(limit).reduce((a, d) => a + d.items.length, 0)} kayıt daha)</button>` : "");
+}
+$("#calf").addEventListener("click", e => { if (e.target.dataset.k) { calF = e.target.dataset.k; renderCalendar(); } });
+$("#calq").addEventListener("input", () => CAL && renderCalendar());
+$("#takvim").addEventListener("click", e => { const b = e.target.closest(".cal-more"); if (b) { calShowAll[b.dataset.side] = true; renderCalendar(); } });
+
+
+(async () => {
+  S = await fetch("signals.json?v=" + Date.now()).then(r => r.ok ? r.json() : null).catch(() => null);
+  await loadCalendar(); reveal();
+})();
+</script>
+</body>
+</html>
