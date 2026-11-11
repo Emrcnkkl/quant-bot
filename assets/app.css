@@ -511,3 +511,9 @@ nav .help.th{margin-left:12px;cursor:pointer;font:inherit}
 nav .help.th svg{display:block}
 nav .help.th + .help{margin-left:8px}
 .wm{font-weight:760;letter-spacing:-.035em;font-size:22px}.wm .gtext{font-weight:800}
+/* Öne çıkan sekme (BIST50 Sinyal): çerçeveli */
+nav .links a.hl{align-self:center;height:34px;margin:0 4px 0 8px;padding:0 13px;border:1px solid color-mix(in srgb,var(--accent) 55%,transparent);border-radius:10px;color:var(--ink);background:color-mix(in srgb,var(--accent) 9%,transparent);font-weight:640}
+nav .links a.hl:hover{background:color-mix(in srgb,var(--accent) 16%,transparent)}
+nav .links a.hl.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 20%,transparent);border-bottom-width:1px}
+.mnav a.hl{border:1px solid color-mix(in srgb,var(--accent) 55%,transparent);border-radius:9px;color:var(--ink);background:color-mix(in srgb,var(--accent) 9%,transparent);font-weight:640}
+.mnav a.hl.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 20%,transparent)}

@@ -34,7 +34,7 @@ ve sonuçları statik bir web sayfasında gösteren bir bot. Şu an **Aşama 1**
 - **Ekonomi** (`ekonomi.html`, `economy.json`): `panel.economy_data()` — `bot.fetch_macro()` (TCMB canlı) + Yahoo aylık; 2005'ten aylık
   politika faizi, yıllık/aylık TÜFE, TÜFE endeksi, reel faiz, dolar, euro, gram altın, BIST100 (TL ve dolar); son 24 faiz kararı.
   Sayfada özet kartları, `lineChart` (core.js, çok çizgili, log seçeneği) grafikler, enflasyon hesaplayıcı (enflasyon / dolar / euro /
-  altın / BIST100 temettüsüz / politika faizi aylık bileşik). Menü: 9 sekme, kutusuz düz yazı (seçili sekmede alt çizgi); NAV 4. alan "alt" verilirse yalnızca alt bilgi/mobil menüde görünür (şu an kullanılmıyor).
+  altın / BIST100 temettüsüz / politika faizi aylık bileşik). Menü: 9 sekme, kutusuz düz yazı (seçili sekmede alt çizgi); NAV 4. alan "alt" verilirse yalnızca alt bilgi/mobil menüde görünür (şu an kullanılmıyor). Sinyal botunun adı **BIST50 Sinyal** (Telegram mesajlarıyla aynı); menüde `"vurgu"` ile çerçeveli öne çıkan sekme (`a.hl`).
 - **Fonlar yapılamadı**: TEFAS eski API'leri (`/api/DB/BindHistoryInfo`, `BindComparisonFundReturns`) "Method not found or disabled"
   döndürüyor, site F5 bot koruması (TSPD JS testi) arkasında — korumayı aşmaya çalışma. Başka ücretsiz kaynak bulunursa eklenir.
 - Önbellek: workflow site paketinde `assets/*.css|js` adreslerine içerik özetinden `?v=` ekler (eski menü sorunu).
