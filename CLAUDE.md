@@ -31,7 +31,14 @@ ve sonuçları statik bir web sayfasında gösteren bir bot. Şu an **Aşama 1**
   tavan serisi (ilk gün kapanış ≥ açılış×1.095 ve sonraki günler ≥ %9.5), BIST100 farkı, zirve/zirveden, Yahoo fiyatı ilk gün kapanışına
   ölçeklenir. Pazar/kod değiştiren birkaç hisse de girebilir. Yaklaşan halka arzlar: güvenilir ücretsiz kaynak bulunamadı
   (SPK bülteni PDF'i seyrek ve kişisel veri içeriyor — KULLANMA; KAP'ta yalnızca tahvil/kira sertifikası izahnameleri çıkıyor).
-- Fazlar: 1 iskelet + ana sayfa + piyasalar (**yapıldı**) · 2 Haberler + Halka arz (**yapıldı**) ·
+- **Ekonomi** (`ekonomi.html`, `economy.json`): `panel.economy_data()` — `bot.fetch_macro()` (TCMB canlı) + Yahoo aylık; 2005'ten aylık
+  politika faizi, yıllık/aylık TÜFE, TÜFE endeksi, reel faiz, dolar, euro, gram altın, BIST100 (TL ve dolar); son 24 faiz kararı.
+  Sayfada özet kartları, `lineChart` (core.js, çok çizgili, log seçeneği) grafikler, enflasyon hesaplayıcı (enflasyon / dolar / euro /
+  altın / BIST100 temettüsüz / politika faizi aylık bileşik). Menüde Sözlük ve İletişim masaüstünde üstte değil (`NAV` 4. alan "alt").
+- **Fonlar yapılamadı**: TEFAS eski API'leri (`/api/DB/BindHistoryInfo`, `BindComparisonFundReturns`) "Method not found or disabled"
+  döndürüyor, site F5 bot koruması (TSPD JS testi) arkasında — korumayı aşmaya çalışma. Başka ücretsiz kaynak bulunursa eklenir.
+- Önbellek: workflow site paketinde `assets/*.css|js` adreslerine içerik özetinden `?v=` ekler (eski menü sorunu).
+- Fazlar: 1 iskelet + ana sayfa + piyasalar (**yapıldı**) · 2 Haberler + Halka arz (**yapıldı**) · 3 Ekonomi (**yapıldı**; Fonlar kaynak yok) ·
   3 Fonlar (TEFAS) + Ekonomi göstergeleri · 4 eski fikir listesi (piyasa hava durumu, konuşan Telegram botu, strateji laboratuvarı…).
 
 ## Durum (10 Kasım 2026)
@@ -116,7 +123,7 @@ YENİ PROJE/
 ├── index.html, piyasalar.html, takvim.html, sinyal.html, sozluk.html, iletisim.html  # panel sayfaları (sayfa JS'i içinde)
 ├── assets/app.css, assets/core.js  # ortak tasarım ve kod
 ├── panel.py           # piyasa verisi → markets.json, haberler → news.json, halka arzlar → ipos.json (depoda değil) + ipo_state.json (depoda)
-├── haberler.html, halkaarz.html
+├── haberler.html, halkaarz.html, ekonomi.html
 ├── fonts/             # Inter değişken yazı tipi (woff2, latin + latin-ext; OFL lisansı OFL-Inter.txt)
 ├── requirements.txt   # yfinance, pandas, numpy
 ├── .github/workflows/bot.yml  # GitHub Actions workflow

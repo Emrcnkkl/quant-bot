@@ -399,6 +399,50 @@ def run_ipos() -> dict | None:
     return ipo_report(new_state) if new_state else None
 
 
+# --------------------------------------------------------------------------- #
+#  EKONOMİ GÖSTERGELERİ (TCMB faiz ve enflasyon + Yahoo kurlar, altın, BIST 100)
+# --------------------------------------------------------------------------- #
+def economy_data(start: str = "2005-01") -> dict:
+    """Aylık seri: politika faizi, yıllık/aylık enflasyon, reel faiz, TÜFE endeksi (2005-01 = 100), dolar, euro,
+    gram altın, BIST 100 (TL ve dolar bazında). Son faiz kararları ve özet."""
+    import yfinance as yf
+    try:
+        bot.fetch_macro()                          # TCMB'den canlı güncelle (başarısızsa yerleşik tablo)
+    except Exception as e:  # noqa: BLE001
+        print(f"  ! TCMB: {type(e).__name__}", file=sys.stderr)
+    months = pd.period_range(start, pd.Timestamp.today().to_period("M"), freq="M")
+    pol = pd.Series({pd.Timestamp(d): r for d, r in bot.POLICY_RATES}).sort_index()
+    pol_m = pd.Series([pol[pol.index <= m.end_time].iloc[-1] if (pol.index <= m.end_time).any() else None for m in months],
+                      index=months)
+    yoy = pd.Series({pd.Period(k, "M"): v for k, v in bot.CPI_YOY.items()}).reindex(months)
+    mom = pd.Series({pd.Period(k, "M"): v for k, v in bot.CPI_MOM.items()}).reindex(months)
+    idx = (1 + mom.fillna(0) / 100).cumprod()
+    idx = idx / idx.iloc[0] * 100
+    idx[mom.isna() & (months > mom.dropna().index.max())] = None      # açıklanmamış aylar boş
+    raw = yf.download(["USDTRY=X", "EURTRY=X", "GC=F", "XU100.IS"], start=f"{start}-01", interval="1mo",
+                      auto_adjust=True, progress=False, threads=True, group_by="column")["Close"]
+    raw.index = pd.to_datetime(raw.index).tz_localize(None).to_period("M")
+    raw = raw.groupby(level=0).last().reindex(months)
+    usd, eur, gc, xu = (raw[c] for c in ["USDTRY=X", "EURTRY=X", "GC=F", "XU100.IS"])
+    gram = gc * usd / 31.1035
+    rows = {"m": [str(m) for m in months], "policy": [rnd(v, 2) for v in pol_m], "cpi": [rnd(v, 2) for v in yoy],
+            "mom": [rnd(v, 2) for v in mom], "cpi_idx": [rnd(v, 3) for v in idx],
+            "real": [rnd(p - c, 2) if p is not None and c == c else None for p, c in zip(pol_m, yoy)],
+            "usd": [rnd(v, 4) for v in usd], "eur": [rnd(v, 4) for v in eur], "gold": [rnd(v, 2) for v in gram],
+            "xu100": [rnd(v, 0) for v in xu], "xu100_usd": [rnd(a / b, 2) if a == a and b == b else None for a, b in zip(xu, usd)]}
+    dec = []
+    prev = None
+    for d, r in bot.POLICY_RATES:
+        if prev is not None and r != prev:
+            dec.append({"date": d, "rate": r, "chg": round(r - prev, 2)})
+        prev = r
+    last_cpi = yoy.dropna().index.max()
+    return {"monthly": rows, "decisions": dec[-24:][::-1], "source": bot.MACRO_SOURCE,
+            "summary": {"policy": bot.POLICY_RATES[-1][1], "policy_date": bot.POLICY_RATES[-1][0],
+                        "cpi": rnd(yoy[last_cpi], 2), "cpi_mom": rnd(mom[last_cpi], 2), "cpi_month": str(last_cpi),
+                        "real": rnd(bot.POLICY_RATES[-1][1] - yoy[last_cpi], 2)}}
+
+
 def _write_compact(name: str, obj) -> None:
     with open(os.path.join(bot.OUT_DIR, name), "w", encoding="utf-8") as f:
         json.dump(obj, f, ensure_ascii=False, allow_nan=False, separators=(",", ":"))
@@ -431,6 +475,12 @@ def run() -> None:
             print(f"  ✓ Halka arzlar: {len(ipo['items'])} hisse")
     except Exception as e:  # noqa: BLE001
         print(f"  ! Halka arzlar: {type(e).__name__}: {e}", file=sys.stderr)
+    try:
+        eco = economy_data()
+        _write_compact("economy.json", {"generated_at": stamp, **eco})
+        print(f"  ✓ Ekonomi: {len(eco['monthly']['m'])} ay ({eco['source']})")
+    except Exception as e:  # noqa: BLE001
+        print(f"  ! Ekonomi: {type(e).__name__}: {e}", file=sys.stderr)
     n = sum(len(g["items"]) for g in groups)
     print(f"  ✓ {n} gösterge" + (f" · BIST {bist['date']}: {bist['adv']} yükselen, {bist['dec']} düşen" if bist else ""))
 

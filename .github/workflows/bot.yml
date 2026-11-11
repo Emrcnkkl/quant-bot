@@ -58,7 +58,7 @@ jobs:
               open(name, "wb").write(body)
               return body
           s = get("signals.json")
-          get("backtest.json"); get("valuation.json"); get("calendar.json"); get("markets.json"); get("news.json"); get("ipos.json")
+          get("backtest.json"); get("valuation.json"); get("calendar.json"); get("markets.json"); get("news.json"); get("ipos.json"); get("economy.json")
           n = sum(get(f"stocks/{x['ticker']}.json") is not None for x in (json.loads(s)["signals"] if s else []))
           print(f"Yayındaki veri indirildi: {json.loads(s)['data_date'] if s else 'yok'} · {n} hisse grafiği")
           EOF
@@ -131,7 +131,7 @@ jobs:
         run: |
           mkdir -p _site
           cp -r *.html assets fonts img signals.json backtest.json live.json _site/
-          for f in valuation.json calendar.json markets.json news.json ipos.json; do if [ -e "$f" ]; then cp "$f" _site/; fi; done
+          for f in valuation.json calendar.json markets.json news.json ipos.json economy.json; do if [ -e "$f" ]; then cp "$f" _site/; fi; done
           [ -d stocks ] && cp -r stocks _site/
           # Tarayıcı önbelleği eski ortak dosyaları kullanmasın: adreslere içerik özetinden sürüm etiketi ekle
           V=$(cat assets/* | md5sum | cut -c1-10)

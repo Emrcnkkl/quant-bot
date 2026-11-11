@@ -1,9 +1,10 @@
 // Ortak yardımcılar ve site çerçevesi (menü, altbilgi, belirme efekti) — tüm sayfalar
 // Sitenin adı yalnızca burada (ve sayfa <title> etiketlerinde) geçer.
 const SITE = {name: ["Piyasa", "Pusulası"], tg: "https://t.me/+T8qnrNlgQIwzNTJk"};
-const NAV = [["index.html", "Ana sayfa", "home"], ["piyasalar.html", "Piyasalar", "piyasalar"], ["haberler.html", "Haberler", "haberler"],
-             ["halkaarz.html", "Halka arz", "halkaarz"], ["takvim.html", "Takvim", "takvim"],
-             ["sinyal.html", "Sinyal botu", "sinyal"], ["sozluk.html", "Sözlük", "sozluk"], ["iletisim.html", "İletişim", "iletisim"]];
+// 4. alan "alt": masaüstü üst menüde gösterilmez (alt bilgide ve mobil menüde görünür)
+const NAV = [["index.html", "Ana sayfa", "home"], ["piyasalar.html", "Piyasalar", "piyasalar"], ["ekonomi.html", "Ekonomi", "ekonomi"],
+             ["haberler.html", "Haberler", "haberler"], ["halkaarz.html", "Halka arz", "halkaarz"], ["takvim.html", "Takvim", "takvim"],
+             ["sinyal.html", "Sinyal botu", "sinyal"], ["sozluk.html", "Sözlük", "sozluk", "alt"], ["iletisim.html", "İletişim", "iletisim", "alt"]];
 const $ = s => document.querySelector(s);
 const fmt = (x, d = 2) => x == null ? "–" : Number(x).toLocaleString("tr-TR", {minimumFractionDigits: d, maximumFractionDigits: d});
 const pct = (x, d = 1) => x == null ? "–" : `<span class="${x > 0 ? "pos" : x < 0 ? "neg" : ""}">${x > 0 ? "+" : ""}${fmt(x, d)}%</span>`;
@@ -37,10 +38,11 @@ function countUp(el, to, fmtFn, ms = 1100) {
 
 function chrome(active) {
   const brand = `<span>${SITE.name[0]} <span class="gtext">${SITE.name[1]}</span></span>`;
-  const links = NAV.map(([h, t, k]) => `<a href="${h}"${k === active ? ' class="on" aria-current="page"' : ""}>${t}</a>`).join("");
+  const link = ([h, t, k]) => `<a href="${h}"${k === active ? ' class="on" aria-current="page"' : ""}>${t}</a>`;
+  const top = NAV.filter(x => !x[3] || x[2] === active).map(link).join(""), links = NAV.map(link).join("");
   $("#top").innerHTML = `<div class="wrap">
     <a class="brand" href="index.html"><span class="mark"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3 2 8l10 5 10-5-10-5Z" fill="#3b82f6"/><path d="m2 12 10 5 10-5" stroke="#3b82f6" stroke-width="2" stroke-linejoin="round" opacity=".7"/><path d="m2 16 10 5 10-5" stroke="#10b981" stroke-width="2" stroke-linejoin="round"/></svg></span>${brand}</a>
-    <div class="links">${links}</div>
+    <div class="links">${top}</div>
     <span class="live" title="Piyasa verisi gün içinde yarım saatte bir, sinyaller her iş günü 18:40'ta güncellenir"><span class="dot"></span><span class="t" id="livetxt">GÜNCEL</span></span>
     <a class="help tg" href="${SITE.tg}" target="_blank" rel="noopener" title="Telegram kanalı: AL/SAT bildirimleri"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21.4 3.6 2.9 10.8c-1.2.5-1.2 1.3-.2 1.6l4.7 1.5 1.8 5.6c.2.6.4.8.9.8.4 0 .6-.2.9-.4l2.3-2.2 4.7 3.5c.9.5 1.5.2 1.7-.8L22.8 5c.3-1.3-.5-1.9-1.4-1.4ZM8.6 13.6l9.6-6.1c.5-.3.9-.1.5.2l-8 7.3-.3 3.3-1.8-4.7Z"/></svg></a>
     <a class="help" href="sinyal.html#sss" title="Sık sorulan sorular">?</a>
@@ -112,3 +114,32 @@ function ago(iso) {
   return (d0 === d1 ? "bugün " : new Date(Date.now() - 864e5).toLocaleDateString("tr-TR", {timeZone: "Europe/Istanbul"}) === d1 ? "dün " : t.toLocaleDateString("tr-TR", {day: "numeric", month: "short", timeZone: "Europe/Istanbul"}) + " ") + t.toLocaleTimeString("tr-TR", opt);
 }
 const esc = s => String(s).replace(/[&<>"]/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"}[c]));
+
+// Çok çizgili grafik (aylık seriler): series = [{name, color, vals, dash}], x = ["2005-01", ...]
+function lineChart(box, x, series, o = {}) {
+  const W = Math.max(300, box.clientWidth), H = o.h || (W < 560 ? 230 : 300), L = 8, R = 56, T = 12, Bm = 24;
+  const all = series.flatMap(s => s.vals).filter(v => v != null && (!o.log || v > 0));
+  let lo = Math.min(...all, o.zero ? 0 : Infinity), hi = Math.max(...all);
+  const tr = v => o.log ? Math.log(v) : v; lo = tr(lo); hi = tr(hi); const pad = (hi - lo) * .05 || 1;
+  const X = i => L + i / (x.length - 1) * (W - L - R), Y = v => T + (1 - (tr(v) - lo + pad) / (hi - lo + 2 * pad)) * (H - T - Bm);
+  const ticks = (o.log ? [Math.exp(lo), Math.exp((lo + hi) / 2), Math.exp(hi)] : [lo, (lo + hi) / 2, hi]).map(v =>
+    `<line x1="${L}" x2="${W - R}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--line)"/><text x="${W - R + 6}" y="${Y(v) + 4}" font-size="11" fill="var(--muted)">${o.fmt ? o.fmt(v) : fmt(v, 0)}</text>`).join("");
+  const zero = !o.log && lo < 0 && hi > 0 ? `<line x1="${L}" x2="${W - R}" y1="${Y(0)}" y2="${Y(0)}" stroke="var(--line2)" stroke-dasharray="3 3"/>` : "";
+  const step = Math.ceil(x.length / (W < 560 ? 5 : 9));
+  const xl = x.map((m, i) => i % step ? "" : `<text x="${X(i)}" y="${H - 6}" font-size="11" fill="var(--muted)" text-anchor="middle">${m.slice(0, 4)}</text>`).join("");
+  const paths = series.map(s => { let d = "", pen = false;
+    s.vals.forEach((v, i) => { if (v == null || (o.log && v <= 0)) { pen = false; return; } d += `${pen ? "L" : "M"}${X(i).toFixed(1)},${Y(v).toFixed(1)}`; pen = true; });
+    return `<path d="${d}" fill="none" stroke="${s.color}" stroke-width="${s.w || 2}" ${s.dash ? `stroke-dasharray="${s.dash}"` : ""} stroke-linejoin="round"/>`; }).join("");
+  box.style.position = "relative";
+  box.innerHTML = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">${ticks}${zero}${xl}${paths}<line class="hx" y1="${T}" y2="${H - Bm}" stroke="var(--line2)" visibility="hidden"/></svg><div class="tip"></div>`;
+  const svg = box.querySelector("svg"), tip = box.querySelector(".tip"), hx = svg.querySelector(".hx");
+  svg.onmousemove = svg.ontouchmove = ev => {
+    const p = ev.touches ? ev.touches[0] : ev, r = svg.getBoundingClientRect();
+    const i = Math.max(0, Math.min(x.length - 1, Math.round((p.clientX - r.left - L) / (W - L - R) * (x.length - 1))));
+    hx.setAttribute("x1", X(i)); hx.setAttribute("x2", X(i)); hx.setAttribute("visibility", "visible");
+    tip.style.display = "block"; tip.style.left = Math.min(Math.max(X(i), 90), W - 90) + "px"; tip.style.top = (T + 30) + "px";
+    tip.innerHTML = `<b>${monthName(x[i])}</b><br>` + series.map(s => `<span style="color:${s.color}">●</span> ${s.name}: <b>${s.vals[i] == null ? "–" : (o.fmt ? o.fmt(s.vals[i]) : fmt(s.vals[i], 1))}</b>`).join("<br>");
+  };
+  svg.onmouseleave = () => { tip.style.display = "none"; hx.setAttribute("visibility", "hidden"); };
+}
+const legend = series => `<div class="lgd">${series.map(s => `<span><i style="background:${s.color}"></i>${s.name}</span>`).join("")}</div>`;

@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Türkiye ekonomisi · Piyasa Pusulası</title>
+<meta name="description" content="Politika faizi, enflasyon, reel faiz, döviz kurları ve dolar bazında borsa; enflasyon hesaplayıcı.">
+<!-- Paylaşım önizlemesi (WhatsApp, Telegram, X...) -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Piyasa Pusulası">
+<meta property="og:title" content="Türkiye ekonomisi · Piyasa Pusulası">
+<meta property="og:description" content="Politika faizi, enflasyon, reel faiz, döviz kurları ve dolar bazında borsa; enflasyon hesaplayıcı.">
+<meta property="og:url" content="https://emrcnkkl.github.io/quant-bot/ekonomi.html">
+<meta property="og:image" content="https://emrcnkkl.github.io/quant-bot/img/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="tr_TR">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#06080b">
+<link rel="icon" type="image/png" sizes="512x512" href="img/icon-512.png">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+<link rel="preload" href="fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/app.css">
+</head>
+<body>
+<nav id="top"></nav>
+
+<main class="wrap">
+  <div class="ph"><div><h1>Türkiye ekonomisi</h1><div class="sub" id="asof">Yükleniyor…</div></div>
+    <div class="seg" id="rng"><button data-y="5">5 yıl</button><button data-y="10" class="on">10 yıl</button><button data-y="0">2005'ten</button></div></div>
+  <div class="eco-cards" id="ecocards"></div>
+
+  <div class="card chartcard"><h3 class="t">Faiz ve enflasyon</h3><p class="st">TCMB politika faizi ile yıllık enflasyon (TÜFE). Faiz enflasyonun üstündeyse <b>reel faiz</b> pozitiftir: faizdeki para enflasyona karşı değer kazanır.</p><div id="lg1"></div><div id="ch1"></div></div>
+  <div class="two" style="margin-top:0">
+    <div class="card chartcard"><h3 class="t">Dolar ve euro</h3><p class="st">Ay sonu kuru (₺) · logaritmik ölçek: eşit yükseklik = eşit yüzde değişim</p><div id="lg2"></div><div id="ch2"></div></div>
+    <div class="card chartcard"><h3 class="t">Borsa dolar bazında</h3><p class="st" id="xust">BIST 100'ün dolar karşılığı</p><div id="lg3"></div><div id="ch3"></div></div>
+  </div>
+
+  <section id="hesap" style="padding-top:12px">
+    <h2>Enflasyon hesaplayıcı</h2>
+    <p class="lead">Geçmişteki bir tutarın bugünkü karşılığı ve o para dolarda, altında, borsada ya da faizde dursaydı ne olurdu?</p>
+    <div class="card chartcard">
+      <div class="calc"><label>Tutar (₺)<input id="camt" type="number" min="1" step="any" value="1000" inputmode="decimal"></label>
+        <label>Yıl<select id="cy"></select></label><label>Ay<select id="cm"></select></label><div class="small muted" id="cnote"></div></div>
+      <div class="calc-out" id="cout"></div>
+      <p class="muted small" style="margin:12px 0 0">Enflasyon: TÜİK TÜFE (aylık değişimlerden). Faiz: TCMB politika faizinin aylık bileşiği (mevduat faizi genelde biraz farklıdır, stopaj düşülmedi). Borsa: BIST 100 endeksi, temettüler hariç. Altın: gram altın (ons × dolar kuru). Geçmiş getiri geleceğin garantisi değildir.</p>
+    </div>
+  </section>
+
+  <div class="two">
+    <div class="card"><h3 class="t">Son faiz kararları</h3><p class="st">TCMB Para Politikası Kurulu</p><table class="mini" id="dec"></table></div>
+    <div class="card"><h3 class="t">Son 12 ay enflasyon</h3><p class="st">TÜİK · aylık ve yıllık değişim</p><table class="mini" id="cpi"></table></div>
+  </div>
+
+  <footer id="foot"></footer>
+</main>
+
+<script src="assets/core.js"></script>
+<script>
+chrome("ekonomi");
+let E = null, years = 10;
+const C = {pol: "var(--accent)", cpi: "var(--sat)", real: "var(--al)", usd: "var(--usdc)", eur: "var(--uni)", xu: "var(--bench)"};
+function sl(arr) { const n = years ? years * 12 : arr.length; return arr.slice(-n); }
+function draw() {
+  const m = E.monthly, x = sl(m.m);
+  const s1 = [{name: "Politika faizi", color: C.pol, vals: sl(m.policy)}, {name: "Yıllık enflasyon", color: C.cpi, vals: sl(m.cpi)},
+              {name: "Reel faiz", color: C.real, vals: sl(m.real), dash: "5 4", w: 1.6}];
+  $("#lg1").innerHTML = legend(s1); lineChart($("#ch1"), x, s1, {fmt: v => "%" + fmt(v, v < 10 && v > -10 ? 1 : 0), zero: true});
+  const s2 = [{name: "Dolar / TL", color: C.usd, vals: sl(m.usd)}, {name: "Euro / TL", color: C.eur, vals: sl(m.eur)}];
+  $("#lg2").innerHTML = legend(s2); lineChart($("#ch2"), x, s2, {log: true, fmt: v => fmt(v, v < 10 ? 2 : 1) + " ₺", h: 240});
+  const s3 = [{name: "BIST 100 (dolar)", color: C.xu, vals: sl(m.xu100_usd)}];
+  $("#lg3").innerHTML = legend(s3); lineChart($("#ch3"), x, s3, {fmt: v => "$" + fmt(v, 0), h: 240});
+  const xs = m.xu100_usd, i0 = xs.findIndex(v => v != null), last = xs.filter(v => v != null).at(-1);
+  $("#xust").innerHTML = `BIST 100 endeksinin dolar karşılığı · ${m.m[i0].slice(0, 4)}'te $${fmt(xs[i0], 0)}, bugün $${fmt(last, 0)}: 20 yılda dolar bazında ${pct((last / xs[i0] - 1) * 100, 0)}`;
+}
+function cards() {
+  const s = E.summary, m = E.monthly, n = m.m.length;
+  const at = (k, back) => { const v = m[k].filter(v => v != null); return v[v.length - 1 - back]; };
+  const usdY = (at("usd", 0) / at("usd", 12) - 1) * 100, xuY = (at("xu100_usd", 0) / at("xu100_usd", 12) - 1) * 100;
+  const lastDec = E.decisions[0];
+  $("#ecocards").innerHTML = [
+    ["Politika faizi", `%${fmt(s.policy, 1)}`, lastDec ? `${trDate(lastDec.date)} kararı: ${lastDec.chg > 0 ? "+" : ""}${fmt(lastDec.chg, 2)} puan` : ""],
+    ["Yıllık enflasyon", `%${fmt(s.cpi, 1)}`, `${monthName(s.cpi_month)} · bir yıl önce %${fmt(at("cpi", 12), 1)}`],
+    ["Aylık enflasyon", `%${fmt(s.cpi_mom, 2)}`, `${monthName(s.cpi_month)} · yıllığa çevrilirse %${fmt((Math.pow(1 + s.cpi_mom / 100, 12) - 1) * 100, 0)}`],
+    ["Reel faiz", `<span class="${s.real > 0 ? "pos" : "neg"}">%${fmt(s.real, 1)}</span>`, s.real > 0 ? "faiz enflasyonun üstünde" : "faiz enflasyonun altında"],
+    ["Dolar / TL", fmt(at("usd", 0), 2) + " ₺", `son 12 ayda ${pct(usdY, 1)}`],
+    ["Borsa dolar bazında", "$" + fmt(at("xu100_usd", 0), 0), `BIST 100 · son 12 ayda ${pct(xuY, 1)}`]].map(([l, b, s_]) =>
+    `<div class="card"><div class="lb">${l}</div><div class="bg">${b}</div><div class="sm">${s_}</div></div>`).join("");
+  $("#dec").innerHTML = E.decisions.slice(0, 10).map(d => `<tr><td style="width:auto">${trDate(d.date)}</td><td class="r">%${fmt(d.rate, 2)}</td><td>${d.chg > 0 ? `<span class="neg">+${fmt(d.chg, 2)}</span>` : `<span class="pos">${fmt(d.chg, 2)}</span>`}</td></tr>`).join("");
+  const rows = []; for (let i = n - 1; i >= 0 && rows.length < 12; i--) if (m.cpi[i] != null) rows.push(i);
+  $("#cpi").innerHTML = `<tr><td class="n" style="width:auto">Ay</td><td class="r n">Aylık</td><td class="n">Yıllık</td></tr>` + rows.map(i => `<tr><td style="width:auto">${monthName(m.m[i])}</td><td class="r">%${fmt(m.mom[i], 2)}</td><td>%${fmt(m.cpi[i], 2)}</td></tr>`).join("");
+}
+// Hesaplayıcı
+function calcInit() {
+  const m = E.monthly, first = +m.m[0].slice(0, 4), lastIdx = m.cpi_idx.map((v, i) => v != null ? i : -1).filter(i => i >= 0).at(-1);
+  $("#cy").innerHTML = Array.from({length: +m.m[lastIdx].slice(0, 4) - first + 1}, (_, k) => first + k).reverse().map(y => `<option${y === 2015 ? " selected" : ""}>${y}</option>`).join("");
+  $("#cm").innerHTML = MONTHS.map((n, k) => `<option value="${k + 1}">${n}</option>`).join("");
+  ["camt", "cy", "cm"].forEach(id => $("#" + id).addEventListener("input", calc));
+  calc();
+}
+function calc() {
+  const m = E.monthly, amt = Math.max(0, +$("#camt").value || 0);
+  const key = `${$("#cy").value}-${String($("#cm").value).padStart(2, "0")}`;
+  let i0 = m.m.indexOf(key); if (i0 < 0) i0 = 0;
+  const ok = k => m[k].map((v, i) => v != null ? i : -1).filter(i => i >= 0).at(-1);
+  const ic = ok("cpi_idx"); if (i0 >= ic) { $("#cout").innerHTML = `<div>Başlangıç ayı en son enflasyon verisinden (${monthName(m.m[ic])}) önce olmalı.</div>`; return; }
+  const infl = amt * m.cpi_idx[ic] / m.cpi_idx[i0];
+  const grow = (k) => { const i1 = ok(k); return m[k][i0] ? amt * m[k][i1] / m[k][i0] : null; };
+  let faiz = amt; for (let i = i0 + 1; i <= ok("policy"); i++) faiz *= Math.pow(1 + (m.policy[i - 1] || 0) / 100, 1 / 12);
+  const box = (lbl, v, hl) => `<div class="${hl ? "hl" : ""}"><span>${lbl}</span><b>${v == null ? "–" : fmt(v, 0) + " ₺"}</b>${v != null && !hl ? `<span>enflasyona göre ${pct((v / infl - 1) * 100, 0)}</span>` : hl ? `<span>${monthName(m.m[i0])} → ${monthName(m.m[ic])}: fiyatlar ${fmt(m.cpi_idx[ic] / m.cpi_idx[i0], 1)} katına çıktı</span>` : ""}</div>`;
+  $("#cout").innerHTML = box("Bugünkü karşılığı (enflasyon)", infl, true) + box("Dolarda dursaydı", grow("usd")) + box("Euroda dursaydı", grow("eur")) +
+    box("Gram altında dursaydı", grow("gold")) + box("Borsada (BIST 100) dursaydı", grow("xu100")) + box("Faizde dursaydı", faiz);
+  $("#cnote").textContent = `${fmt(amt, 0)} ₺ · ${monthName(m.m[i0])}`;
+}
+(async () => {
+  E = await loadJSON("economy.json");
+  if (!E) { $("#asof").textContent = "Ekonomi verisi hazırlanıyor; birkaç dakika içinde burada görünecek."; return; }
+  $("#asof").textContent = `Kaynak: TCMB (faiz), TÜİK (enflasyon), piyasa verileri · ${E.source} · son faiz kararı ${trDate(E.summary.policy_date)}`;
+  cards(); draw(); calcInit(); reveal(".eco-cards > *, .chartcard, #hesap > *, .two > *, footer > *");
+})();
+$("#rng").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; years = +b.dataset.y;
+  document.querySelectorAll("#rng button").forEach(x => x.classList.toggle("on", x === b)); draw(); });
+let rz; addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(() => E && draw(), 150); });
+</script>
+</body>
+</html>

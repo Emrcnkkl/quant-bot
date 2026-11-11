@@ -471,3 +471,25 @@ footer p{margin:0 0 8px;max-width:860px}
 .tv{display:inline-block;min-width:22px;text-align:center;font-size:12px;font-weight:700;padding:2px 6px;border-radius:6px;background:var(--al-bg);color:var(--al)}
 @media(max-width:700px){.itbl .h-sm{display:none}}
 .itbl td,.itbl th{padding-left:9px;padding-right:9px}.itbl td.sp svg{width:84px}
+/* Ekonomi */
+.lgd{display:flex;flex-wrap:wrap;gap:14px;font-size:12.5px;color:var(--muted);margin:2px 0 6px}
+.lgd i{display:inline-block;width:10px;height:3px;border-radius:2px;margin-right:6px;vertical-align:middle}
+.eco-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px}
+@media(max-width:900px){.eco-cards{grid-template-columns:repeat(2,1fr)}}
+.eco-cards .card{padding:16px 18px;border-radius:16px}
+.eco-cards .lb{font-size:12px;font-weight:650;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.eco-cards .bg{font-size:28px;font-weight:740;margin:4px 0 2px;font-variant-numeric:tabular-nums}
+.eco-cards .sm{font-size:12.5px;color:var(--muted)}
+.chartcard{padding:20px 22px;border-radius:20px;margin-bottom:16px}
+.chartcard .tip{transform:translate(-50%,0);text-align:left;line-height:1.5}
+.calc{display:grid;grid-template-columns:repeat(3,auto) 1fr;gap:10px;align-items:end;margin-bottom:14px}
+@media(max-width:700px){.calc{grid-template-columns:1fr 1fr}}
+.calc label{display:grid;gap:6px;font-size:12.5px;font-weight:600;color:var(--muted)}
+.calc input,.calc select{padding:10px 12px;border-radius:11px;border:1px solid var(--line2);background:var(--surface);color:var(--ink);font:inherit;font-size:15px;min-width:0}
+.calc select option{background:var(--card);color:var(--ink)}
+.calc-out{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media(max-width:700px){.calc-out{grid-template-columns:repeat(2,1fr)}}
+.calc-out div{border:1px solid var(--line);border-radius:12px;padding:11px 13px;background:var(--surface)}
+.calc-out b{display:block;font-size:19px;font-weight:720;font-variant-numeric:tabular-nums}
+.calc-out span{font-size:12px;color:var(--muted)}
+.calc-out .hl{border-color:color-mix(in srgb,var(--accent) 45%,transparent)}
