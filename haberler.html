@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ekonomi haberleri · Piyasa Pusulası</title>
+<meta name="description" content="Türkiye'nin önde gelen ekonomi haber sitelerinden son 48 saatin başlıkları; borsa, faiz, döviz, altın ve enerji.">
+<!-- Paylaşım önizlemesi (WhatsApp, Telegram, X...) -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Piyasa Pusulası">
+<meta property="og:title" content="Ekonomi haberleri · Piyasa Pusulası">
+<meta property="og:description" content="Türkiye'nin önde gelen ekonomi haber sitelerinden son 48 saatin başlıkları; borsa, faiz, döviz, altın ve enerji.">
+<meta property="og:url" content="https://emrcnkkl.github.io/quant-bot/haberler.html">
+<meta property="og:image" content="https://emrcnkkl.github.io/quant-bot/img/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="tr_TR">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#06080b">
+<link rel="icon" type="image/png" sizes="512x512" href="img/icon-512.png">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+<link rel="preload" href="fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/app.css">
+</head>
+<body>
+<nav id="top"></nav>
+
+<main class="wrap">
+  <div class="ph"><div><h1>Ekonomi haberleri</h1><div class="sub" id="asof">Yükleniyor…</div></div></div>
+  <div class="nw-bar"><div class="tabs" id="ncat"></div><input type="search" id="nq" placeholder="Haberlerde ara (ör. faiz)"></div>
+  <div class="small muted" id="nsrc" style="margin-bottom:6px"></div>
+  <div id="nlist"></div>
+  <p class="muted small" style="margin-top:18px">Başlıklar haber sitelerinin herkese açık RSS akışlarından alınır; habere tıklayınca kaynağın kendi sitesinde açılır. Haber metinleri kopyalanmaz. Son 48 saat gösterilir, yarım saatte bir güncellenir.</p>
+
+  <footer id="foot"></footer>
+</main>
+
+<script src="assets/core.js"></script>
+<script>
+chrome("haberler");
+let N = null, ncat = "Tümü", nsrc = null;
+const fold = t => t.toLocaleLowerCase("tr-TR").replace(/ı/g, "i");
+function renderNews() {
+  const cats = ["Tümü", "Borsa", "Faiz", "Enflasyon", "Döviz", "Altın", "Enerji", "Kripto", "Küresel"];
+  $("#ncat").innerHTML = cats.map(c => `<button data-c="${c}" class="${c === ncat ? "on" : ""}">${c}</button>`).join("");
+  $("#nsrc").innerHTML = "Kaynak: " + [`<a href="#" data-s="" style="${!nsrc ? "font-weight:700" : ""}">tümü</a>`].concat(N.sources.filter(s => s.n).map(s => `<a href="#" data-s="${esc(s.name)}" style="${nsrc === s.name ? "font-weight:700" : ""}">${esc(s.name)}</a>`)).join(" · ");
+  const q = fold($("#nq").value.trim());
+  const list = N.items.filter(x => (ncat === "Tümü" || x.cats.includes(ncat)) && (!nsrc || x.src === nsrc) && (!q || fold(x.title).includes(q)));
+  const groups = [];
+  const label = iso => { if (!iso) return "Tarihsiz"; const m = (Date.now() - new Date(iso)) / 6e4;
+    return m < 60 ? "Son bir saat" : new Date(iso).toLocaleDateString("tr-TR", {timeZone: "Europe/Istanbul"}) === new Date().toLocaleDateString("tr-TR", {timeZone: "Europe/Istanbul"}) ? "Bugün" : "Daha önce"; };
+  list.forEach(x => { const l = label(x.ts); let g = groups.find(g => g.l === l); if (!g) groups.push(g = {l, xs: []}); g.xs.push(x); });
+  $("#nlist").innerHTML = groups.map(g => `<div class="nw-h">${g.l}</div><ul class="nw">${g.xs.map(x => `<li><span class="tm">${x.ts ? ago(x.ts) : ""}</span>
+    <div class="bd"><a class="tt" href="${esc(x.link)}" target="_blank" rel="noopener noreferrer">${esc(x.title)}</a>
+    <div class="mt"><span class="s">${esc(x.src)}</span>${x.cats.map(c => `<span>${c}</span>`).join("")}</div></div></li>`).join("")}</ul>`).join("")
+    || `<p class="muted">Bu süzgeçle eşleşen haber yok.</p>`;
+}
+(async () => {
+  N = await loadJSON("news.json");
+  if (!N) { $("#asof").textContent = "Haberler hazırlanıyor; birkaç dakika içinde burada görünecek."; return; }
+  const g = new Date(N.generated_at.replace(/(\+\d\d)(\d\d)$/, "$1:$2"));
+  $("#asof").textContent = `${N.items.length} başlık · ${N.sources.filter(s => s.n).length} kaynak · son güncelleme ${g.toLocaleTimeString("tr-TR", {hour: "2-digit", minute: "2-digit", timeZone: "Europe/Istanbul"})}`;
+  const h = decodeURIComponent(location.hash.slice(1)); if (h) ncat = h[0].toLocaleUpperCase("tr-TR") + h.slice(1);
+  renderNews(); reveal("#nlist > *, footer > *");
+})();
+$("#ncat").addEventListener("click", e => { if (e.target.dataset.c) { ncat = e.target.dataset.c; renderNews(); } });
+$("#nsrc").addEventListener("click", e => { const a = e.target.closest("a[data-s]"); if (a) { e.preventDefault(); nsrc = a.dataset.s || null; renderNews(); } });
+$("#nq").addEventListener("input", () => N && renderNews());
+</script>
+</body>
+</html>

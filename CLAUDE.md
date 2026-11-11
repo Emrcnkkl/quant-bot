@@ -21,7 +21,17 @@ ve sonuçları statik bir web sayfasında gösteren bir bot. Şu an **Aşama 1**
   ilk 10 yükselen/düşen (5 mn ₺ altı hacim hariç) ve en çok işlem görenler). Kompakt JSON (~200 KB).
 - Workflow: seans boyunca `15,45 6-15 * * 1-5` ve hafta sonu `20 9 * * 0,6` yalnızca panel (`check.outputs.panel`), akşam bot çalışmasında
   da `panel.py` koşar (hata botu durdurmaz). Site paketi `*.html assets fonts img` + üretilen JSON'lar.
-- Fazlar: 1 iskelet + ana sayfa + piyasalar (**yapıldı**) · 2 Haberler (RSS başlıkları, yalnızca başlık+bağlantı) + Halka arz ·
+- **Haberler** (`haberler.html`, `news.json`): `panel.fetch_news()` — RSS `NEWS_FEEDS` (Habertürk, Bloomberg HT, AA, TRT Haber,
+  Dünya Gazetesi, Ekonomim; NTV akışı bayat olduğu için çıkarıldı, CNN Türk piyango vb. yüzünden alınmadı). Yalnızca başlık + saat +
+  bağlantı (metin kopyalanmaz, telif). Son 48 saat, başlığa göre tekrar silme, `NEWS_SKIP` gürültü süzgeci, `NEWS_CATS` konu etiketi
+  (kelime başı eşleşme; "=" tam kelime; "çin" ≠ "için"). Her panel çalıştırmasında (yarım saatte bir).
+- **Halka arz** (`halkaarz.html`, `ipos.json`, kalıcı durum `ipo_state.json` — commit edilir): Borsa İstanbul bülteninde ilk kez görünen
+  `.E` kodları (`update_ipo_state`: ilk kurulumda son 2 yıl ikili aramayla, `_codes_only` hafif okuma; sonra her gün yalnızca yeni kodlar).
+  Halka arz fiyatı bültende YOK (ilk gün önceki kapanış boş) → getiri **ilk işlem günü açılışına** göre (sitede açıkça yazıyor);
+  tavan serisi (ilk gün kapanış ≥ açılış×1.095 ve sonraki günler ≥ %9.5), BIST100 farkı, zirve/zirveden, Yahoo fiyatı ilk gün kapanışına
+  ölçeklenir. Pazar/kod değiştiren birkaç hisse de girebilir. Yaklaşan halka arzlar: güvenilir ücretsiz kaynak bulunamadı
+  (SPK bülteni PDF'i seyrek ve kişisel veri içeriyor — KULLANMA; KAP'ta yalnızca tahvil/kira sertifikası izahnameleri çıkıyor).
+- Fazlar: 1 iskelet + ana sayfa + piyasalar (**yapıldı**) · 2 Haberler + Halka arz (**yapıldı**) ·
   3 Fonlar (TEFAS) + Ekonomi göstergeleri · 4 eski fikir listesi (piyasa hava durumu, konuşan Telegram botu, strateji laboratuvarı…).
 
 ## Durum (10 Kasım 2026)
@@ -54,7 +64,7 @@ ve sonuçları statik bir web sayfasında gösteren bir bot. Şu an **Aşama 1**
   6+ hissede uyarı). Son gün henüz düzeltilmediği için düzeltilmiş = ham fiyat. Bülten yoksa yedek `isy_fill()` (İş Yatırım
   `HisseTekil`; açılış yok, 18:30 öncesi bugünü kullanmaz). Endeks (XU030) bültende yok → saatlik tamamlama kalır.
   İş Yatırım/Borsa İstanbul resmî API değil; adresler değişirse bot Yahoo ile devam eder (hata durdurmaz).
-  `quant-bot` cloud ortamında www.isyatirim.com.tr, www.borsaistanbul.com, www.kap.org.tr izinli.
+  `quant-bot` cloud ortamında www.isyatirim.com.tr, www.borsaistanbul.com, www.kap.org.tr, haber siteleri ve spk.gov.tr izinli.
 - **Değerleme kaydı** (`append_valuation_history` → `valuation_history.csv`, 9 Kasım 2026'dan): her veri günü hisse başına
   close, eps, book (TL), pe, pb, div_yield, roe, mcap_bn, sector, score, signal, fund_date. Yalnızca eklenir (aynı/eski gün yazılmaz).
   Amaç: birkaç yıl sonra ucuzluk puanını noktasal veriyle test etmek (Yahoo geçmiş F/K vermiyor).
@@ -105,7 +115,8 @@ YENİ PROJE/
 ├── bot.py             # tüm mantık: veri, indikatörler, skor, backtest, JSON yazımı (tek dosya)
 ├── index.html, piyasalar.html, takvim.html, sinyal.html, sozluk.html, iletisim.html  # panel sayfaları (sayfa JS'i içinde)
 ├── assets/app.css, assets/core.js  # ortak tasarım ve kod
-├── panel.py           # piyasa verisi → markets.json (depoda değil)
+├── panel.py           # piyasa verisi → markets.json, haberler → news.json, halka arzlar → ipos.json (depoda değil) + ipo_state.json (depoda)
+├── haberler.html, halkaarz.html
 ├── fonts/             # Inter değişken yazı tipi (woff2, latin + latin-ext; OFL lisansı OFL-Inter.txt)
 ├── requirements.txt   # yfinance, pandas, numpy
 ├── .github/workflows/bot.yml  # GitHub Actions workflow

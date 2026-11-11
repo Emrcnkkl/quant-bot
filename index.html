@@ -52,13 +52,19 @@
   </div>
   <div class="two">
     <div class="card"><h3 class="t">Şirket haberleri (KAP) <a href="takvim.html">Tümü →</a></h3><p class="st">50 büyük şirketin son önemli bildirimleri</p><ul class="evl" id="kapnews"></ul></div>
+    <div class="card"><h3 class="t">Son haberler <a href="haberler.html">Tümü →</a></h3><p class="st">Ekonomi haber sitelerinden</p><ul class="evl" id="news"></ul></div>
+  </div>
+  <div class="two">
+    <div class="card"><h3 class="t">Son halka arzlar <a href="halkaarz.html">Tümü →</a></h3><p class="st" id="ipost">Borsa İstanbul'da yeni işlem görmeye başlayan hisseler</p><table class="mini" id="ipos"></table></div>
     <div class="card"><h3 class="t">Panelde neler var?</h3><p class="st">Yeni bölümler ekleniyor</p>
       <ul class="evl">
         <li><span class="d">Piyasalar</span><span>Döviz, altın, emtia, dünya borsaları ve kripto; tüm BIST'in yükselen ve düşenleri</span></li>
+        <li><span class="d">Haberler</span><span>Altı ekonomi haber sitesinden son 48 saat, konuya göre</span></li>
+        <li><span class="d">Halka arz</span><span>Son 2 yılın halka arzları: getiri, tavan serisi, endeks kıyası</span></li>
         <li><span class="d">Takvim</span><span>TCMB faiz kararları, enflasyon günleri, bilançolar, KAP bildirimleri</span></li>
         <li><span class="d">Sinyal botu</span><span>50 büyük hisse için AL / TUT / SAT, 20 yıllık test, canlı portföy</span></li>
       </ul>
-      <div class="soon"><span>Yakında: Haberler</span><span>Halka arz takibi</span><span>Fonlar (TEFAS)</span><span>Ekonomi göstergeleri</span></div>
+      <div class="soon"><span>Yakında: Fonlar (TEFAS)</span><span>Ekonomi göstergeleri</span></div>
     </div>
   </div>
   <div class="card tgcard">
@@ -77,7 +83,13 @@ const HOME_CARDS = ["XU100.IS", "USDTRY=X", "EURTRY=X", "GRAM", "BZ=F", "BTC-USD
 const STRIP = ["XU100.IS", "XU030.IS", "USDTRY=X", "EURTRY=X", "GRAM", "GC=F", "BZ=F", "^GSPC", "^GDAXI", "BTC-USD", "^TNX"];
 const shortDay = iso => new Date(iso + "T00:00:00").toLocaleDateString("tr-TR", {day: "numeric", month: "short"});
 (async () => {
-  const [M, S, C] = await Promise.all([loadJSON("markets.json"), loadJSON("signals.json"), loadJSON("calendar.json")]);
+  const [M, S, C, N, I] = await Promise.all([loadJSON("markets.json"), loadJSON("signals.json"), loadJSON("calendar.json"), loadJSON("news.json"), loadJSON("ipos.json")]);
+  if (N) $("#news").innerHTML = N.items.slice(0, 7).map(x => `<li><span class="d">${x.ts ? ago(x.ts) : ""}</span><span><a href="${esc(x.link)}" target="_blank" rel="noopener noreferrer">${esc(x.title)}</a> <span class="muted small">· ${esc(x.src)}</span></span></li>`).join("");
+  else $("#news").innerHTML = "<li>Haberler hazırlanıyor.</li>";
+  if (I?.items?.length) {
+    $("#ipost").textContent = `Son 12 ayda ${I.stats.n12} halka arz · ${I.stats.up12} tanesi ilk işlem fiyatının üstünde`;
+    $("#ipos").innerHTML = I.items.slice(0, 6).map(x => `<tr><td><a href="halkaarz.html">${x.t}</a></td><td class="n">${esc(x.name)}</td><td class="r">${new Date(x.first_day + "T00:00:00").toLocaleDateString("tr-TR", {day: "numeric", month: "short"})}</td><td>${pct(x.ret, 1)}</td></tr>`).join("");
+  }
   if (M) {
     const g = new Date(M.generated_at.replace(/(\+\d\d)(\d\d)$/, "$1:$2"));
     $("#asof").textContent = `${g.toLocaleDateString("tr-TR", {day: "numeric", month: "long", weekday: "long", timeZone: "Europe/Istanbul"})} · son güncelleme ${g.toLocaleTimeString("tr-TR", {hour: "2-digit", minute: "2-digit", timeZone: "Europe/Istanbul"})} · fiyatlar 15 dakikaya kadar gecikmeli olabilir`;

@@ -209,6 +209,74 @@ class TestPanel(unittest.TestCase):
         self.assertEqual(t["chg"], 0.5)                                           # faizde puan farkı
 
 
+class TestHaberVeHalkaArz(unittest.TestCase):
+    def test_rss_ayrisma_ve_suzme(self):
+        import panel
+        now = pd.Timestamp.now(tz="UTC")
+        rss = ("<rss><channel>"
+               f"<item><title><![CDATA[Merkez Bankası faizi sabit tuttu]]></title><link>https://a.example/1</link><pubDate>{now:%a, %d %b %Y %H:%M:%S} +0000</pubDate></item>"
+               f"<item><title>Merkez Bankası faizi sabit tuttu</title><link>https://a.example/2</link><pubDate>{now:%a, %d %b %Y %H:%M:%S} +0000</pubDate></item>"
+               f"<item><title>Şans Topu sonuçları açıklandı</title><link>https://a.example/3</link><pubDate>{now:%a, %d %b %Y %H:%M:%S} +0000</pubDate></item>"
+               "<item><title>Eski haber: dolar rekor kırdı</title><link>https://a.example/4</link><pubDate>Mon, 01 Jan 2024 10:00:00 +0000</pubDate></item>"
+               "</channel></rss>").encode()
+        old_http, old_feeds = bot._http, panel.NEWS_FEEDS
+        try:
+            bot._http = lambda url, timeout=30: rss
+            panel.NEWS_FEEDS = [("Deneme", "https://a.example/rss")]
+            out = panel.fetch_news()
+        finally:
+            bot._http, panel.NEWS_FEEDS = old_http, old_feeds
+        self.assertEqual([x["title"] for x in out["items"]], ["Merkez Bankası faizi sabit tuttu"])   # tekrar, piyango ve eski haber yok
+        self.assertIn("Faiz", out["items"][0]["cats"])
+
+    def test_halka_arz_yeni_kod_eklenir(self):
+        import panel
+        def bul(codes):
+            return pd.DataFrame({"Open": 10.0, "High": 11.0, "Low": 9.0, "Close": 11.0, "Volume": 1.0, "PrevClose": 10.0,
+                                 "TLVolume": 1e7, "Name": "ORNEK"}, index=codes)
+        base = [f"K{i:03d}" for i in range(120)]
+        days = {pd.Timestamp("2026-11-10"): bul(base), pd.Timestamp("2026-11-11"): bul(base + ["YENI"])}
+        old = bot.fetch_bulletin
+        try:
+            bot.fetch_bulletin = lambda d: days.get(pd.Timestamp(d).normalize())
+            st = {"last_date": "2026-11-10", "known": base, "ipos": []}
+            new = panel.update_ipo_state(st, pd.Timestamp("2026-11-11"))
+            again = panel.update_ipo_state(new, pd.Timestamp("2026-11-11"))
+        finally:
+            bot.fetch_bulletin = old
+        self.assertEqual([x["t"] for x in new["ipos"]], ["YENI"])
+        self.assertEqual(new["ipos"][0]["first_day"], "2026-11-11")
+        self.assertEqual(new["ipos"][0]["first_open"], 10.0)
+        self.assertEqual(again["ipos"], new["ipos"])                                    # tekrar çalıştırmada değişmez
+
+    def test_halka_arz_ilk_kurulum_tatillerle_biter(self):
+        import panel
+        def bul(codes):
+            return pd.DataFrame({"Open": 5.0, "High": 5.5, "Low": 5.0, "Close": 5.5, "Volume": 1.0, "PrevClose": float("nan"),
+                                 "TLVolume": 1e7, "Name": "ORNEK"}, index=codes)
+        base = [f"K{i:03d}" for i in range(120)]
+        cal = pd.bdate_range("2026-09-01", "2026-11-11")
+        holidays = set(cal[30:45]) | set(cal[-4:-1])        # uzun tatil + son günlerden hemen önce boşluk
+        first = {"AAA": cal[10], "BBB": cal[46], "CCC": cal[-1]}
+        def fake(d):
+            d = pd.Timestamp(d).normalize()
+            if d not in set(cal) or d in holidays:
+                return None
+            return bul(base + [t for t, f in first.items() if d >= f])
+        old = bot.fetch_bulletin
+        try:
+            bot.fetch_bulletin = fake
+            panel._codes_only.__globals__["bot"].fetch_bulletin = fake
+            orig_codes = panel._codes_only
+            panel._codes_only = lambda day, cache: (None if fake(day) is None else set(fake(day).index))
+            st = panel.update_ipo_state(None, pd.Timestamp("2026-11-11"), back_days=75)
+        finally:
+            bot.fetch_bulletin = old
+            panel._codes_only = orig_codes
+        self.assertEqual({x["t"]: x["first_day"] for x in st["ipos"]},
+                         {t: str(f.date()) for t, f in first.items()})
+
+
 class TestCanliPortfoy(unittest.TestCase):
     def test_gecmis_kayitlar_degismez(self):
         with tempfile.TemporaryDirectory() as tmp:

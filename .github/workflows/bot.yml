@@ -58,7 +58,7 @@ jobs:
               open(name, "wb").write(body)
               return body
           s = get("signals.json")
-          get("backtest.json"); get("valuation.json"); get("calendar.json"); get("markets.json")
+          get("backtest.json"); get("valuation.json"); get("calendar.json"); get("markets.json"); get("news.json"); get("ipos.json")
           n = sum(get(f"stocks/{x['ticker']}.json") is not None for x in (json.loads(s)["signals"] if s else []))
           print(f"Yayındaki veri indirildi: {json.loads(s)['data_date'] if s else 'yok'} · {n} hisse grafiği")
           EOF
@@ -117,7 +117,7 @@ jobs:
           git config user.name "bist30-bot"
           git config user.email "bot@users.noreply.github.com"
           # Yalnızca küçük, kalıcı kayıtlar depoya yazılır; site dosyaları aşağıda Pages'e yüklenir.
-          for f in history.json live.json notify.json fundamentals.json names.json valuation_history.csv; do
+          for f in history.json live.json notify.json fundamentals.json names.json valuation_history.csv ipo_state.json; do
             if [ -e "$f" ]; then git add -A -- "$f"; fi
           done
           if git diff --staged --quiet; then echo "Değişiklik yok"; exit 0; fi
@@ -131,7 +131,7 @@ jobs:
         run: |
           mkdir -p _site
           cp -r *.html assets fonts img signals.json backtest.json live.json _site/
-          for f in valuation.json calendar.json markets.json; do if [ -e "$f" ]; then cp "$f" _site/; fi; done
+          for f in valuation.json calendar.json markets.json news.json ipos.json; do if [ -e "$f" ]; then cp "$f" _site/; fi; done
           [ -d stocks ] && cp -r stocks _site/
           du -sh _site
           echo "ready=true" >> "$GITHUB_OUTPUT"

@@ -445,3 +445,29 @@ footer p{margin:0 0 8px;max-width:860px}
 .cols2>*{min-width:0}
 @media(max-width:560px){.cols2{grid-template-columns:1fr}}
 .non td.n{display:none}
+/* Haberler */
+.nw-bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
+.nw{list-style:none;margin:0;padding:0}
+.nw li{display:flex;gap:14px;align-items:baseline;padding:13px 4px;border-top:1px solid var(--line)}
+.nw li .tm{flex:none;width:92px;font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.nw li .bd{flex:1;min-width:0}
+.nw li a.tt{color:var(--ink);font-weight:560;font-size:15px;line-height:1.4}
+.nw li a.tt:hover{color:var(--accent)}
+.nw li .mt{display:flex;gap:6px;flex-wrap:wrap;margin-top:5px}
+.nw li .mt span{font-size:11.5px;font-weight:650;padding:2px 7px;border-radius:6px;background:var(--surface2);border:1px solid var(--line);color:var(--muted)}
+.nw li .mt span.s{color:var(--ink2)}
+@media(max-width:560px){.nw li{flex-direction:column;gap:4px}.nw li .tm{width:auto}}
+.nw-h{margin:22px 0 4px;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+/* Halka arz */
+.ipo-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+@media(max-width:900px){.ipo-cards{grid-template-columns:repeat(2,1fr)}}
+.ipo-cards .card{padding:16px 18px;border-radius:16px}
+.ipo-cards .lb{font-size:12px;font-weight:650;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.ipo-cards .bg{font-size:26px;font-weight:740;margin:4px 0 2px;font-variant-numeric:tabular-nums}
+.ipo-cards .sm{font-size:12.5px;color:var(--muted)}
+.itbl td,.itbl th{white-space:nowrap}
+.itbl td.sp svg{display:block;width:96px;height:26px}
+.itbl th[data-k]{cursor:pointer}
+.tv{display:inline-block;min-width:22px;text-align:center;font-size:12px;font-weight:700;padding:2px 6px;border-radius:6px;background:var(--al-bg);color:var(--al)}
+@media(max-width:700px){.itbl .h-sm{display:none}}
+.itbl td,.itbl th{padding-left:9px;padding-right:9px}.itbl td.sp svg{width:84px}

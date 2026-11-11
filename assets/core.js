@@ -1,7 +1,8 @@
 // Ortak yardımcılar ve site çerçevesi (menü, altbilgi, belirme efekti) — tüm sayfalar
 // Sitenin adı yalnızca burada (ve sayfa <title> etiketlerinde) geçer.
 const SITE = {name: ["Piyasa", "Pusulası"], tg: "https://t.me/+T8qnrNlgQIwzNTJk"};
-const NAV = [["index.html", "Ana sayfa", "home"], ["piyasalar.html", "Piyasalar", "piyasalar"], ["takvim.html", "Takvim", "takvim"],
+const NAV = [["index.html", "Ana sayfa", "home"], ["piyasalar.html", "Piyasalar", "piyasalar"], ["haberler.html", "Haberler", "haberler"],
+             ["halkaarz.html", "Halka arz", "halkaarz"], ["takvim.html", "Takvim", "takvim"],
              ["sinyal.html", "Sinyal botu", "sinyal"], ["sozluk.html", "Sözlük", "sozluk"], ["iletisim.html", "İletişim", "iletisim"]];
 const $ = s => document.querySelector(s);
 const fmt = (x, d = 2) => x == null ? "–" : Number(x).toLocaleString("tr-TR", {minimumFractionDigits: d, maximumFractionDigits: d});
@@ -101,3 +102,13 @@ function areaChart(box, days, vals, it) {
 }
 const loadJSON = f => fetch(f + "?v=" + Date.now()).then(r => r.ok ? r.json() : null).catch(() => null);
 const mkFind = (M, sym) => M?.groups.flatMap(g => g.items).find(i => i.sym === sym);
+
+// Göreli zaman: "12 dk önce", "3 saat önce", "dün 14:20"
+function ago(iso) {
+  const t = new Date(iso), m = Math.round((Date.now() - t) / 6e4);
+  if (m < 1) return "şimdi"; if (m < 60) return `${m} dk önce`; if (m < 360) return `${Math.round(m / 60)} saat önce`;
+  const opt = {hour: "2-digit", minute: "2-digit", timeZone: "Europe/Istanbul"};
+  const d0 = new Date().toLocaleDateString("tr-TR", {timeZone: "Europe/Istanbul"}), d1 = t.toLocaleDateString("tr-TR", {timeZone: "Europe/Istanbul"});
+  return (d0 === d1 ? "bugün " : new Date(Date.now() - 864e5).toLocaleDateString("tr-TR", {timeZone: "Europe/Istanbul"}) === d1 ? "dün " : t.toLocaleDateString("tr-TR", {day: "numeric", month: "short", timeZone: "Europe/Istanbul"}) + " ") + t.toLocaleTimeString("tr-TR", opt);
+}
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"}[c]));
