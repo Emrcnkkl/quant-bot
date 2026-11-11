@@ -1,4 +1,4 @@
-# Piyasa Pusulası — ekonomi ve finans paneli
+# piyasam — ekonomi ve finans paneli
 
 Piyasalar (döviz, altın, emtia, borsalar), ekonomik takvim ve BIST50 sinyal botu tek sitede: https://emrcnkkl.github.io/quant-bot/
 

@@ -1,6 +1,6 @@
 // Ortak yardımcılar ve site çerçevesi (menü, altbilgi, belirme efekti) — tüm sayfalar
 // Sitenin adı yalnızca burada (ve sayfa <title> etiketlerinde) geçer.
-const SITE = {name: ["Piyasa", "Pusulası"], tg: "https://t.me/+T8qnrNlgQIwzNTJk"};
+const SITE = {name: ["piyasa", "m"], tg: "https://t.me/+T8qnrNlgQIwzNTJk"};
 // 4. alan "alt": masaüstü üst menüde gösterilmez (alt bilgide ve mobil menüde görünür)
 const NAV = [["index.html", "Ana sayfa", "home"], ["piyasalar.html", "Piyasalar", "piyasalar"], ["ekonomi.html", "Ekonomi", "ekonomi"],
              ["haberler.html", "Haberler", "haberler"], ["halkaarz.html", "Halka arz", "halkaarz"], ["takvim.html", "Takvim", "takvim"],
@@ -37,7 +37,7 @@ function countUp(el, to, fmtFn, ms = 1100) {
 }
 
 function chrome(active) {
-  const brand = `<span>${SITE.name[0]} <span class="gtext">${SITE.name[1]}</span></span>`;
+  const brand = `<span class="wm">${SITE.name[0]}<span class="gtext">${SITE.name[1]}</span></span>`;
   const link = ([h, t, k]) => `<a href="${h}"${k === active ? ' class="on" aria-current="page"' : ""}>${t}</a>`;
   const top = NAV.filter(x => !x[3] || x[2] === active).map(link).join(""), links = NAV.map(link).join("");
   $("#top").innerHTML = `<div class="wrap">

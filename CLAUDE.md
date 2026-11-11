@@ -1,4 +1,4 @@
-# CLAUDE.md — Piyasa Pusulası (ekonomi ve finans paneli) + BIST50 Teknik Sinyal Botu
+# CLAUDE.md — piyasam (ekonomi ve finans paneli) + BIST50 Teknik Sinyal Botu
 
 Bu dosya, projeye Claude Code ile devam ederken bağlam sağlamak içindir.
 Kullanıcıyla iletişim, arayüz metinleri ve kod yorumları **Türkçe**dir.
@@ -9,8 +9,8 @@ skor verip **AL / TUT / SAT** sinyali üreten, geriye dönük test (backtest) ra
 ve sonuçları statik bir web sayfasında gösteren bir bot. Şu an **Aşama 1** tamamlandı.
 
 ## Panel (11 Kasım 2026'dan) — site artık bir ekonomi/finans paneli, sinyal botu onun bir bölümü
-- Ad: **Piyasa Pusulası** (geçici; kullanıcı kısa, "finansal.org" tarzı bir isim arıyor). Ad `assets/core.js` → `SITE.name` ve sayfa
-  `<title>`/og etiketlerinde.
+- Ad: **piyasam** (11 Kasım 2026, kullanıcı seçti; küçük harf, logoda "piyasa" + gradyanlı "m"). "finansal.org" başkasına ait — KULLANMA.
+  Ad `assets/core.js` → `SITE.name` (`.wm`), sayfa `<title>`/og etiketleri ve `img/og.png` paylaşım görselinde.
 - Çok sayfalı statik site: `index.html` (panel ana sayfası; eski `#sinyaller`, `#takvim`, `#s-…` bağlantılarını yeni sayfalara yönlendirir),
   `piyasalar.html`, `takvim.html`, `sinyal.html` (eski tek sayfa: Bugün/Sinyaller/Performans/Değerleme/Nasıl çalışır+SSS, `#subnav` alt menü,
   `route()`), `sozluk.html`, `iletisim.html`. Ortak tasarım `assets/app.css`, ortak kod `assets/core.js` (`chrome(aktif)` menü+altbilgi, `NAV`,
