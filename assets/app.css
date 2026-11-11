@@ -5,7 +5,7 @@
 @font-face{font-family:"InterV";src:url(../fonts/inter-latin-ext.woff2) format("woff2");font-weight:100 900;font-display:swap;
   unicode-range:U+0100-02AF,U+0304,U+0308,U+0329,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
 
-/* ---- Renk değişkenleri: koyu tema varsayılan, açık tema sistem tercihine göre ---- */
+/* ---- Renk değişkenleri: koyu tema varsayılan; açık tema cihaz tercihine göre ya da menüdeki düğmeyle (html[data-theme]) ---- */
 :root{
   --bg:#06080b;--bg2:#0b0f14;--surface:rgba(255,255,255,.028);--surface2:rgba(255,255,255,.045);
   --card:#0e1217;--card2:#131820;--ink:#f1f4f8;--ink2:#c9d1db;--muted:#7f8b9a;
@@ -18,7 +18,8 @@
   --glow1:rgba(79,140,255,.16);--glow2:rgba(25,199,154,.11);--grid:rgba(255,255,255,.025);
   color-scheme:dark;
 }
-@media (prefers-color-scheme:light){:root{
+/* Açık tema: cihaz ayarı açıksa (elle koyu seçilmediyse) ya da elle açık seçildiyse */
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){
   --bg:#f4f6fa;--bg2:#eceff5;--surface:rgba(255,255,255,.75);--surface2:#fff;
   --card:#fff;--card2:#f7f9fc;--ink:#0d131c;--ink2:#2c3644;--muted:#5d6979;
   --line:rgba(13,19,28,.08);--line2:rgba(13,19,28,.14);--hi:rgba(255,255,255,.9);
@@ -30,6 +31,18 @@
   --glow1:rgba(37,99,235,.10);--glow2:rgba(5,150,105,.07);--grid:rgba(13,19,28,.035);
   color-scheme:light;
 }}
+:root[data-theme="light"]{
+  --bg:#f4f6fa;--bg2:#eceff5;--surface:rgba(255,255,255,.75);--surface2:#fff;
+  --card:#fff;--card2:#f7f9fc;--ink:#0d131c;--ink2:#2c3644;--muted:#5d6979;
+  --line:rgba(13,19,28,.08);--line2:rgba(13,19,28,.14);--hi:rgba(255,255,255,.9);
+  --accent:#2563eb;--accent2:#059669;--grad:linear-gradient(110deg,#2563eb 0%,#0ea5e9 45%,#059669 100%);
+  --al:#0d9a58;--al-bg:#e4f6ed;--sat:#d8334a;--sat-bg:#fdebee;--tut:#b2730f;--tut-bg:#fcf2dd;
+  --strat:#0d9a58;--bench:#2563eb;--cash:#64748b;--uni:#7c3aed;--gold:#b7791f;--usdc:#db2777;--e20:#2563eb;--e50:#ea580c;--e200:#9333ea;
+  --warn-bg:#fffaf0;--warn-line:#f2cf8a;
+  --shadow:0 1px 0 var(--hi) inset,0 20px 50px -24px rgba(20,35,70,.18);
+  --glow1:rgba(37,99,235,.10);--glow2:rgba(5,150,105,.07);--grid:rgba(13,19,28,.035);
+  color-scheme:light;
+}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth;scroll-padding-top:84px}
 body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 "InterV",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
@@ -54,10 +67,10 @@ nav .wrap{display:flex;align-items:center;gap:8px;height:68px}
 .brand{display:flex;align-items:center;gap:11px;font-weight:700;font-size:20px;letter-spacing:-.025em;color:var(--ink);margin-right:auto}
 .brand .mark{display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:var(--surface2);border:1px solid var(--line2);box-shadow:0 0 24px -6px var(--glow1)}
 .brand span{font-weight:600}
-nav .links{display:flex;gap:2px;padding:4px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
-nav .links a{color:var(--muted);padding:7px 14px;border-radius:8px;font-size:14px;font-weight:550;transition:color .15s,background .15s}
+nav .links{display:flex;gap:0;align-self:stretch}
+nav .links a{display:flex;align-items:center;color:var(--muted);padding:0 11px;font-size:14px;font-weight:560;border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .15s,border-color .15s;white-space:nowrap}
 nav .links a:hover{color:var(--ink)}
-nav .links a.on{color:var(--ink);background:var(--surface2);box-shadow:0 1px 0 var(--hi) inset}
+nav .links a.on{color:var(--ink);border-bottom-color:var(--accent)}
 .live{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.04em;margin-left:14px;white-space:nowrap}
 .dot{position:relative;width:8px;height:8px;border-radius:50%;background:var(--al);box-shadow:0 0 10px var(--al)}
 .dot::after{content:"";position:absolute;inset:-4px;border-radius:50%;border:1.5px solid var(--al);opacity:0;animation:ping 2.4s ease-out infinite}
@@ -68,8 +81,8 @@ nav .help:hover{color:var(--ink)}
 @media(max-width:480px){.live span.t{display:none}}
 .mnav{display:none;gap:6px;overflow-x:auto;padding:0 24px 12px;scrollbar-width:none}
 .mnav::-webkit-scrollbar{display:none}
-.mnav a{flex:none;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:6px 13px;font-size:13px;font-weight:550;background:var(--surface)}
-.mnav a.on{color:var(--ink);border-color:var(--line2);background:var(--surface2)}
+.mnav a{flex:none;color:var(--muted);padding:6px 10px;font-size:13.5px;font-weight:560;border-bottom:2px solid transparent}
+.mnav a.on{color:var(--ink);border-bottom-color:var(--accent)}
 @media(max-width:1060px){.mnav{display:flex}}
 
 /* ---- Uyarı bandı ---- */
@@ -493,3 +506,7 @@ footer p{margin:0 0 8px;max-width:860px}
 .calc-out b{display:block;font-size:19px;font-weight:720;font-variant-numeric:tabular-nums}
 .calc-out span{font-size:12px;color:var(--muted)}
 .calc-out .hl{border-color:color-mix(in srgb,var(--accent) 45%,transparent)}
+
+nav .help.th{margin-left:12px;cursor:pointer;font:inherit}
+nav .help.th svg{display:block}
+nav .help.th + .help{margin-left:8px}

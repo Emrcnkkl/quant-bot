@@ -34,7 +34,7 @@ ve sonuçları statik bir web sayfasında gösteren bir bot. Şu an **Aşama 1**
 - **Ekonomi** (`ekonomi.html`, `economy.json`): `panel.economy_data()` — `bot.fetch_macro()` (TCMB canlı) + Yahoo aylık; 2005'ten aylık
   politika faizi, yıllık/aylık TÜFE, TÜFE endeksi, reel faiz, dolar, euro, gram altın, BIST100 (TL ve dolar); son 24 faiz kararı.
   Sayfada özet kartları, `lineChart` (core.js, çok çizgili, log seçeneği) grafikler, enflasyon hesaplayıcı (enflasyon / dolar / euro /
-  altın / BIST100 temettüsüz / politika faizi aylık bileşik). Menüde Sözlük ve İletişim masaüstünde üstte değil (`NAV` 4. alan "alt").
+  altın / BIST100 temettüsüz / politika faizi aylık bileşik). Menü: 9 sekme, kutusuz düz yazı (seçili sekmede alt çizgi); NAV 4. alan "alt" verilirse yalnızca alt bilgi/mobil menüde görünür (şu an kullanılmıyor).
 - **Fonlar yapılamadı**: TEFAS eski API'leri (`/api/DB/BindHistoryInfo`, `BindComparisonFundReturns`) "Method not found or disabled"
   döndürüyor, site F5 bot koruması (TSPD JS testi) arkasında — korumayı aşmaya çalışma. Başka ücretsiz kaynak bulunursa eklenir.
 - Önbellek: workflow site paketinde `assets/*.css|js` adreslerine içerik özetinden `?v=` ekler (eski menü sorunu).
@@ -222,7 +222,7 @@ exit_rule ("score" varsayılan | ema50 | cross | ema200 | regime), entry_rule ("
 ## Kod kuralları
 - `bot.py` tek dosya kalsın, ta ki belirgin şekilde büyüyene kadar; Python 3.10 uyumlu olmalı (kullanıcının makinesi 3.10).
 - JSON `allow_nan=False` ile yazılır → NaN değerleri `r2()` ile `None`'a çevir.
-- Sayfalar dışa bağımlılık içermez (yazı tipi `fonts/`, CSS'te `../fonts/`); koyu tema `:root`'ta, açık tema `@media (prefers-color-scheme: light)` içinde. Yeni sayfa: başlığı diğer sayfalardan kopyala, `<nav id="top">` + `<footer id="foot">`, `assets/core.js`, `chrome("anahtar")`, `NAV`'a ekle. Saatleri `timeZone: "Europe/Istanbul"` ile göster.
+- Sayfalar dışa bağımlılık içermez (yazı tipi `fonts/`, CSS'te `../fonts/`); koyu tema `:root`'ta; açık tema cihaz tercihine göre (`@media (prefers-color-scheme:light){:root:not([data-theme=dark])}`) ya da menüdeki tema düğmesiyle (`html[data-theme]`, localStorage "tema"; her sayfanın başında ilk boyamadan önce uygulayan küçük betik). Üst menüde Telegram düğmesi yok (alt bilgide var). Yeni sayfa: başlığı diğer sayfalardan kopyala, `<nav id="top">` + `<footer id="foot">`, `assets/core.js`, `chrome("anahtar")`, `NAV`'a ekle. Saatleri `timeZone: "Europe/Istanbul"` ile göster.
 - "Premium" tema: arka planda ışık + ızgara, yarı saydam kart yüzeyleri (`--surface`), gradyan kenarlı hero, sayaç animasyonu,
   hisse simgeleri (`who()` / `.av`, renk `hue(ticker)`), kaydırınca belirme (`.rv`), `prefers-reduced-motion` destekli.
 - Mobilde (≤520px) sinyal tablosunda simge ve puan çubuğu gizlenir, şirket adı kısaltılır — tablo 360px'e sığmalı.

@@ -4,7 +4,7 @@ const SITE = {name: ["Piyasa", "Pusulası"], tg: "https://t.me/+T8qnrNlgQIwzNTJk
 // 4. alan "alt": masaüstü üst menüde gösterilmez (alt bilgide ve mobil menüde görünür)
 const NAV = [["index.html", "Ana sayfa", "home"], ["piyasalar.html", "Piyasalar", "piyasalar"], ["ekonomi.html", "Ekonomi", "ekonomi"],
              ["haberler.html", "Haberler", "haberler"], ["halkaarz.html", "Halka arz", "halkaarz"], ["takvim.html", "Takvim", "takvim"],
-             ["sinyal.html", "Sinyal botu", "sinyal"], ["sozluk.html", "Sözlük", "sozluk", "alt"], ["iletisim.html", "İletişim", "iletisim", "alt"]];
+             ["sinyal.html", "Sinyal botu", "sinyal"], ["sozluk.html", "Sözlük", "sozluk"], ["iletisim.html", "İletişim", "iletisim"]];
 const $ = s => document.querySelector(s);
 const fmt = (x, d = 2) => x == null ? "–" : Number(x).toLocaleString("tr-TR", {minimumFractionDigits: d, maximumFractionDigits: d});
 const pct = (x, d = 1) => x == null ? "–" : `<span class="${x > 0 ? "pos" : x < 0 ? "neg" : ""}">${x > 0 ? "+" : ""}${fmt(x, d)}%</span>`;
@@ -44,11 +44,17 @@ function chrome(active) {
     <a class="brand" href="index.html"><span class="mark"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3 2 8l10 5 10-5-10-5Z" fill="#3b82f6"/><path d="m2 12 10 5 10-5" stroke="#3b82f6" stroke-width="2" stroke-linejoin="round" opacity=".7"/><path d="m2 16 10 5 10-5" stroke="#10b981" stroke-width="2" stroke-linejoin="round"/></svg></span>${brand}</a>
     <div class="links">${top}</div>
     <span class="live" title="Piyasa verisi gün içinde yarım saatte bir, sinyaller her iş günü 18:40'ta güncellenir"><span class="dot"></span><span class="t" id="livetxt">GÜNCEL</span></span>
-    <a class="help tg" href="${SITE.tg}" target="_blank" rel="noopener" title="Telegram kanalı: AL/SAT bildirimleri"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21.4 3.6 2.9 10.8c-1.2.5-1.2 1.3-.2 1.6l4.7 1.5 1.8 5.6c.2.6.4.8.9.8.4 0 .6-.2.9-.4l2.3-2.2 4.7 3.5c.9.5 1.5.2 1.7-.8L22.8 5c.3-1.3-.5-1.9-1.4-1.4ZM8.6 13.6l9.6-6.1c.5-.3.9-.1.5.2l-8 7.3-.3 3.3-1.8-4.7Z"/></svg></a>
+    <button class="help th" id="themebtn" type="button" title="Koyu / açık tema" aria-label="Koyu ya da açık temaya geç"></button>
     <a class="help" href="sinyal.html#sss" title="Sık sorulan sorular">?</a>
   </div>
   <div class="mnav">${links}</div>`;
   $("#top .mnav a.on")?.scrollIntoView({block: "nearest", inline: "center"});
+  themeIcon(); $("#themebtn").onclick = () => {
+    const next = isDark() ? "light" : "dark";
+    document.documentElement.dataset.theme = next;
+    try { localStorage.setItem("tema", next); } catch (e) { /* gizli sekme vb. */ }
+    themeIcon(); window.dispatchEvent(new Event("resize"));   // grafikler yeni renklerle yeniden çizilsin
+  };
   const f = $("#foot");
   if (f) f.innerHTML = `<div class="fb"><span class="brand" style="font-size:16px;margin:0">${brand}</span></div>
     <p class="small">${NAV.map(([h, t]) => `<a href="${h}">${t}</a>`).join(" · ")} · <a href="${SITE.tg}" target="_blank" rel="noopener">Telegram kanalı</a></p>
@@ -143,3 +149,13 @@ function lineChart(box, x, series, o = {}) {
   svg.onmouseleave = () => { tip.style.display = "none"; hx.setAttribute("visibility", "hidden"); };
 }
 const legend = series => `<div class="lgd">${series.map(s => `<span><i style="background:${s.color}"></i>${s.name}</span>`).join("")}</div>`;
+
+// Tema: html[data-theme] (elle seçim, localStorage "tema") yoksa cihaz tercihi
+const isDark = () => (document.documentElement.dataset.theme || (matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark")) === "dark";
+function themeIcon() {
+  const b = $("#themebtn"); if (!b) return;
+  b.innerHTML = isDark()
+    ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>'
+    : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>';
+  b.title = isDark() ? "Açık temaya geç" : "Koyu temaya geç";
+}
