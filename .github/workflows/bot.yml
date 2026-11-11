@@ -133,6 +133,10 @@ jobs:
           cp -r *.html assets fonts img signals.json backtest.json live.json _site/
           for f in valuation.json calendar.json markets.json news.json ipos.json; do if [ -e "$f" ]; then cp "$f" _site/; fi; done
           [ -d stocks ] && cp -r stocks _site/
+          # Tarayıcı önbelleği eski ortak dosyaları kullanmasın: adreslere içerik özetinden sürüm etiketi ekle
+          V=$(cat assets/* | md5sum | cut -c1-10)
+          sed -i "s#assets/app.css\"#assets/app.css?v=$V\"#; s#assets/core.js\"#assets/core.js?v=$V\"#" _site/*.html
+          grep -c "?v=$V" _site/index.html
           du -sh _site
           echo "ready=true" >> "$GITHUB_OUTPUT"
       - uses: actions/upload-pages-artifact@v4
