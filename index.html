@@ -5,7 +5,7 @@
 // Eski tek sayfalık sitenin bağlantıları (…/quant-bot/#sinyaller gibi) yeni sayfalara yönlenir
 (function () {
   var h = decodeURIComponent(location.hash.slice(1)); if (!h) return;
-  var m = {takvim: "takvim.html", sozluk: "sozluk.html", iletisim: "iletisim.html"};
+  var m = {halkaarz: "piyasalar.html#halkaarz", takvim: "takvim.html", sozluk: "sozluk.html", iletisim: "iletisim.html"};
   var sig = ["bugun", "sinyaller", "performans", "degerleme", "ucuzluk", "nasil", "sss", "sss-yanlilik", "gecmis", "isabet", "accblock"];
   var dest = m[h] || (/^s-/.test(h) ? "sozluk.html#" + h : sig.indexOf(h) >= 0 ? "sinyal.html#" + h : null);
   if (dest) location.replace(dest);
@@ -56,7 +56,7 @@
     <div class="card"><h3 class="t">Son haberler <a href="haberler.html">Tümü →</a></h3><p class="st">Ekonomi haber sitelerinden</p><ul class="evl" id="news"></ul></div>
   </div>
   <div class="two">
-    <div class="card"><h3 class="t">Son halka arzlar <a href="halkaarz.html">Tümü →</a></h3><p class="st" id="ipost">Borsa İstanbul'da yeni işlem görmeye başlayan hisseler</p><table class="mini" id="ipos"></table></div>
+    <div class="card"><h3 class="t">Son halka arzlar <a href="piyasalar.html#halkaarz">Tümü →</a></h3><p class="st" id="ipost">Borsa İstanbul'da yeni işlem görmeye başlayan hisseler</p><table class="mini" id="ipos"></table></div>
     <div class="card"><h3 class="t">Panelde neler var?</h3><p class="st">Yeni bölümler ekleniyor</p>
       <ul class="evl">
         <li><span class="d">Piyasalar</span><span>Döviz, altın, emtia, dünya borsaları ve kripto; tüm BIST'in yükselen ve düşenleri</span></li>
@@ -89,7 +89,7 @@ const shortDay = iso => new Date(iso + "T00:00:00").toLocaleDateString("tr-TR", 
   else $("#news").innerHTML = "<li>Haberler hazırlanıyor.</li>";
   if (I?.items?.length) {
     $("#ipost").textContent = `Son 12 ayda ${I.stats.n12} halka arz · ${I.stats.up12} tanesi ilk işlem fiyatının üstünde`;
-    $("#ipos").innerHTML = I.items.slice(0, 6).map(x => `<tr><td><a href="halkaarz.html">${x.t}</a></td><td class="n">${esc(x.name)}</td><td class="r">${new Date(x.first_day + "T00:00:00").toLocaleDateString("tr-TR", {day: "numeric", month: "short"})}</td><td>${pct(x.ret, 1)}</td></tr>`).join("");
+    $("#ipos").innerHTML = I.items.slice(0, 6).map(x => `<tr><td><a href="piyasalar.html#halkaarz">${x.t}</a></td><td class="n">${esc(x.name)}</td><td class="r">${new Date(x.first_day + "T00:00:00").toLocaleDateString("tr-TR", {day: "numeric", month: "short"})}</td><td>${pct(x.ret, 1)}</td></tr>`).join("");
   }
   if (M) {
     const g = new Date(M.generated_at.replace(/(\+\d\d)(\d\d)$/, "$1:$2"));

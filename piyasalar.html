@@ -4,12 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Piyasalar · piyasam</title>
-<meta name="description" content="Endeksler, döviz, altın, emtia, dünya borsaları, kripto ve Borsa İstanbul'da günün yükselen ve düşen hisseleri.">
+<meta name="description" content="Endeksler, döviz, altın, emtia, dünya borsaları, kripto, Borsa İstanbul'da günün yükselen ve düşen hisseleri ve son halka arzlar.">
 <!-- Paylaşım önizlemesi (WhatsApp, Telegram, X...) -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="piyasam">
 <meta property="og:title" content="Piyasalar · piyasam">
-<meta property="og:description" content="Endeksler, döviz, altın, emtia, dünya borsaları, kripto ve Borsa İstanbul'da günün yükselen ve düşen hisseleri.">
+<meta property="og:description" content="Endeksler, döviz, altın, emtia, dünya borsaları, kripto, Borsa İstanbul'da günün yükselen ve düşen hisseleri ve son halka arzlar.">
 <meta property="og:url" content="https://emrcnkkl.github.io/quant-bot/piyasalar.html">
 <meta property="og:image" content="https://emrcnkkl.github.io/quant-bot/img/og.png">
 <meta property="og:image:width" content="1200">
@@ -34,6 +34,21 @@
     <h2>Borsa İstanbul'da gün</h2>
     <p class="lead" id="bistlead">Tüm hisseler, Borsa İstanbul'un resmî günlük bülteninden.</p>
     <div id="bistall"></div>
+  </section>
+  <section id="halkaarz" style="padding-top:28px">
+    <h2>Halka arzlar</h2>
+    <p class="lead" id="ipoasof">Yükleniyor…</p>
+    <div class="ipo-cards" id="ipocards"></div>
+    <div class="toolbar"><div class="tabs" id="iper"></div><input type="search" id="iq" placeholder="Hisse ara (ör. QUICK)"></div>
+    <div class="tbl"><table class="itbl" id="itbl"></table></div>
+    <details class="more" style="margin-top:18px"><summary>Bu tablo nasıl hesaplanıyor?</summary><div class="card small">
+    <ul>
+      <li><b>Liste:</b> Borsa İstanbul'un resmî günlük bülteninde ilk kez görünen hisseler (son 2 yıl). Pazar değiştiren ya da kod değiştiren birkaç hisse de listeye girebilir.</li>
+      <li><b>İlk fiyat:</b> Hissenin borsadaki ilk işlem günündeki açılış fiyatıdır; <b>halka arz fiyatı değildir</b>. Halka arzdan pay alanların getirisi genelde bundan yüksektir, çünkü çoğu hisse ilk güne tavanla başlar.</li>
+      <li><b>Tavan serisi:</b> İkinci işlem gününden itibaren üst üste kaç gün tavan (yaklaşık %10 yükseliş) yapıldığı. İlk gün sayılmaz, çünkü halka arz fiyatı bilinmediğinden ilk günün tavan olup olmadığı kesin anlaşılamıyor; çoğu hisse ilk güne zaten tavanla başlar.</li>
+      <li><b>BIST 100'e göre:</b> Aynı dönemde BIST 100 endeksine göre fark (puan).</li>
+      <li>Fiyatlar bedelsiz sermaye artırımlarına göre düzeltilmiştir. Bilgi amaçlıdır, yatırım tavsiyesi değildir.</li>
+    </ul></div></details>
   </section>
 
   <footer id="foot"></footer>
@@ -88,7 +103,7 @@ function renderBist() {
   const h = decodeURIComponent(location.hash.slice(1));
   if (h && mkFind(M, h)) sel = h;
   renderGroups(); renderDetail(); renderBist();
-  if (h === "bist") $("#bist").scrollIntoView();
+  if (h === "bist" || h === "halkaarz") $("#" + h).scrollIntoView();   // halka arz bağlantısı: veriler yerleşince yeniden kaydır
   reveal("#groups > *, #bist > *, footer > *");
 })();
 document.addEventListener("click", e => {
@@ -97,6 +112,44 @@ document.addEventListener("click", e => {
   const b = e.target.closest("#rng button");
   if (b) { range = b.dataset.r; renderDetail(); }
 });
+/* Halka arzlar (sayfanın en altı) */
+let I = null, iper = "12", isort = ["first_day", -1];
+const COLS = [["t", "Hisse", 1], ["first_day", "İlk işlem", -1], ["first_open", "İlk fiyat", -1, "h-sm"], ["last", "Son", -1], ["ret", "Getiri", -1],
+  ["vs_bist", "BIST 100'e göre", -1, "h-sm"], ["peak", "Zirve", -1, "h-sm"], ["from_peak", "Zirveden", -1, "h-sm"], ["tavan", "Tavan serisi", -1], ["spark", "Grafik", 0, "h-sm"]];
+function renderIpo() {
+  const st = I.stats || {};
+  $("#ipocards").innerHTML = [
+    ["Son 12 ayda", `${st.n12 ?? "–"}`, "hisse borsada işlem görmeye başladı"],
+    ["Yükselenler", st.n12 ? `${st.up12} / ${st.n12}` : "–", "ilk işlem fiyatının üstünde"],
+    ["Ortalama getiri", st.avg12 != null ? pct(st.avg12, 1) : "–", `ortanca ${st.med12 != null ? pct(st.med12, 1) : "–"} · ilk fiyata göre`],
+    ["Endeksi geçen", st.n12 ? `${st.beat12} / ${st.n12}` : "–", "aynı dönemde BIST 100'den iyi"]].map(([l, b, s]) =>
+    `<div class="card"><div class="lb">${l}</div><div class="bg">${b}</div><div class="sm">${s}</div></div>`).join("");
+  $("#iper").innerHTML = [["3", "Son 3 ay"], ["12", "Son 12 ay"], ["24", "Son 2 yıl"]].map(([k, l]) => `<button data-p="${k}" class="${k === iper ? "on" : ""}">${l}</button>`).join("");
+  const from = new Date(); from.setMonth(from.getMonth() - +iper); const fs = from.toISOString().slice(0, 10);
+  const q = $("#iq").value.trim().toLocaleUpperCase("tr-TR");
+  const rows = I.items.filter(x => x.first_day >= fs && (!q || x.t.includes(q) || x.name.toLocaleUpperCase("tr-TR").includes(q)));
+  const [k, d] = isort;
+  rows.sort((a, b) => (a[k] == null) - (b[k] == null) || (a[k] > b[k] ? d : a[k] < b[k] ? -d : 0));
+  $("#itbl").innerHTML = `<thead><tr>${COLS.map(([c, l, , cl]) => `<th data-k="${c}" class="${cl || ""}" style="${c === "t" ? "text-align:left" : ""}">${l}${c === k ? (d > 0 ? " ▲" : " ▼") : ""}</th>`).join("")}</tr></thead><tbody>` +
+    rows.map(x => `<tr><td style="text-align:left">${who(x.t, esc(x.name))}</td><td>${new Date(x.first_day + "T00:00:00").toLocaleDateString("tr-TR", {day: "numeric", month: "short", year: "2-digit"})}</td>
+      <td class="h-sm">${fmt(x.first_open, 2)}</td><td>${fmt(x.last, 2)} ${x.chg != null ? `<span class="small">${pct(x.chg, 1)}</span>` : ""}</td><td>${pct(x.ret, 1)}</td>
+      <td class="h-sm">${x.vs_bist != null ? `<span class="${x.vs_bist > 0 ? "pos" : "neg"}">${x.vs_bist > 0 ? "+" : ""}${fmt(x.vs_bist, 1)}</span>` : "–"}</td>
+      <td class="h-sm">${pct(x.peak, 0)}</td><td class="h-sm">${pct(x.from_peak, 0)}</td><td>${x.tavan ? `<span class="tv">${x.tavan}</span>` : "–"}</td>
+      <td class="sp h-sm">${sparkSvg(x.spark, 96, 26)}</td></tr>`).join("") + `</tbody>`;
+  if (!rows.length) $("#itbl").innerHTML += `<tbody><tr><td colspan="10" class="muted">Bu dönemde kayıt yok.</td></tr></tbody>`;
+}
+(async () => {
+  I = await loadJSON("ipos.json");
+  if (!I || !I.items) { $("#ipoasof").textContent = "Halka arz verisi hazırlanıyor; bir sonraki güncellemede burada görünecek."; return; }
+  const g = new Date(I.generated_at.replace(/(\+\d\d)(\d\d)$/, "$1:$2"));
+  $("#ipoasof").textContent = `Borsa İstanbul'da son 2 yılda işlem görmeye başlayan ${I.items.length} hisse · son güncelleme ${g.toLocaleString("tr-TR", {day: "numeric", month: "long", hour: "2-digit", minute: "2-digit", timeZone: "Europe/Istanbul"})}`;
+  renderIpo(); reveal(".ipo-cards > *");
+  if (location.hash === "#halkaarz") $("#halkaarz").scrollIntoView();
+})();
+$("#iper").addEventListener("click", e => { if (e.target.dataset.p) { iper = e.target.dataset.p; renderIpo(); } });
+$("#iq").addEventListener("input", () => I && renderIpo());
+$("#itbl").addEventListener("click", e => { const th = e.target.closest("th[data-k]"); if (!th || th.dataset.k === "spark") return;
+  const k = th.dataset.k; isort = [k, isort[0] === k ? -isort[1] : (k === "t" ? 1 : -1)]; renderIpo(); });
 let rz; addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(() => M && renderDetail(), 150); });
 </script>
 </body>

@@ -77,13 +77,13 @@ nav .links a.on{color:var(--ink);border-bottom-color:var(--accent)}
 @keyframes ping{0%{transform:scale(.5);opacity:.8}100%{transform:scale(1.6);opacity:0}}
 nav .help{display:grid;place-items:center;width:32px;height:32px;border:1px solid var(--line2);border-radius:10px;color:var(--muted);font-weight:650;font-size:14px;margin-left:10px;background:var(--surface)}
 nav .help:hover{color:var(--ink)}
-@media(max-width:1060px){nav .links{display:none}}
+@media(max-width:1120px){nav .links{display:none}}
 @media(max-width:480px){.live span.t{display:none}}
 .mnav{display:none;gap:6px;overflow-x:auto;padding:0 24px 12px;scrollbar-width:none}
 .mnav::-webkit-scrollbar{display:none}
 .mnav a{flex:none;color:var(--muted);padding:6px 10px;font-size:13.5px;font-weight:560;border-bottom:2px solid transparent}
 .mnav a.on{color:var(--ink);border-bottom-color:var(--accent)}
-@media(max-width:1060px){.mnav{display:flex}}
+@media(max-width:1120px){.mnav{display:flex}}
 
 /* ---- Uyarı bandı ---- */
 .warn{display:flex;gap:12px;align-items:flex-start;background:var(--warn-bg);border:1px solid var(--warn-line);border-radius:14px;padding:13px 18px;margin:30px 0 34px;color:var(--ink2);font-size:13.5px}
@@ -389,7 +389,7 @@ footer p{margin:0 0 8px;max-width:860px}
 .subnav::-webkit-scrollbar{display:none}
 .subnav a{flex:none;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:7px 15px;font-size:13.5px;font-weight:600;background:var(--surface)}
 .subnav a.on{color:var(--ink);border-color:var(--line2);background:var(--surface2)}
-@media(max-width:1060px){.subnav{top:112px}}
+@media(max-width:1120px){.subnav{top:112px}}
 
 /* ---- Panel ---- */
 .ph{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin:6px 0 18px}
@@ -513,6 +513,9 @@ nav .help.th + .help{margin-left:8px}
 .wm{font-weight:760;letter-spacing:-.035em;font-size:22px}.wm .gtext{font-weight:800}
 /* Öne çıkan sekme (BIST50 Sinyal): çerçeveli */
 nav .links a.hl{align-self:center;height:34px;margin:0 4px 0 8px;padding:0 13px;border:1px solid color-mix(in srgb,var(--accent) 55%,transparent);border-radius:10px;color:var(--ink);background:color-mix(in srgb,var(--accent) 9%,transparent);font-weight:640}
+nav .links a.hl + a.hl{margin-left:2px}
+nav .help{flex:none}
+@media(max-width:1240px){nav .links a{padding:0 9px}}
 nav .links a.hl:hover{background:color-mix(in srgb,var(--accent) 16%,transparent)}
 nav .links a.hl.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 20%,transparent);border-bottom-width:1px}
 .mnav a.hl{border:1px solid color-mix(in srgb,var(--accent) 55%,transparent);border-radius:9px;color:var(--ink);background:color-mix(in srgb,var(--accent) 9%,transparent);font-weight:640}
