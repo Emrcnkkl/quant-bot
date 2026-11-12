@@ -4,7 +4,7 @@ const SITE = {name: ["piyasa", "m"], tg: "https://t.me/+T8qnrNlgQIwzNTJk"};
 // 4. alan: "alt" → masaüstü üst menüde gösterilmez (alt bilgide ve mobil menüde görünür); "vurgu" → çerçeveli, öne çıkan sekme
 const NAV = [["index.html", "Ana sayfa", "home"], ["piyasalar.html", "Piyasalar", "piyasalar"], ["ekonomi.html", "Ekonomi", "ekonomi"],
              ["haberler.html", "Haberler", "haberler"], ["takvim.html", "Takvim", "takvim"],
-             ["sinyal.html", "BIST50 Sinyal", "sinyal", "vurgu"], ["https://emrcnkkl.github.io/spl-calisma/", "SPL Çalışma", "spl", "vurgu"], ["sozluk.html", "Sözlük", "sozluk"], ["iletisim.html", "İletişim", "iletisim"]];
+             ["sinyal.html", "BIST50 Sinyal", "sinyal", "vurgu"], ["https://emrcnkkl.github.io/spl-calisma/", "SPL Hazırlık", "spl", "vurgu"], ["sozluk.html", "Sözlük", "sozluk"], ["iletisim.html", "İletişim", "iletisim"]];
 const $ = s => document.querySelector(s);
 const fmt = (x, d = 2) => x == null ? "–" : Number(x).toLocaleString("tr-TR", {minimumFractionDigits: d, maximumFractionDigits: d});
 const pct = (x, d = 1) => x == null ? "–" : `<span class="${x > 0 ? "pos" : x < 0 ? "neg" : ""}">${x > 0 ? "+" : ""}${fmt(x, d)}%</span>`;

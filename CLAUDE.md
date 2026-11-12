@@ -25,7 +25,7 @@ ve sonuçları statik bir web sayfasında gösteren bir bot. Şu an **Aşama 1**
   Dünya Gazetesi, Ekonomim; NTV akışı bayat olduğu için çıkarıldı, CNN Türk piyango vb. yüzünden alınmadı). Yalnızca başlık + saat +
   bağlantı (metin kopyalanmaz, telif). Son 48 saat, başlığa göre tekrar silme, `NEWS_SKIP` gürültü süzgeci, `NEWS_CATS` konu etiketi
   (kelime başı eşleşme; "=" tam kelime; "çin" ≠ "için"). Her panel çalıştırmasında (yarım saatte bir).
-- **Halka arz** (`halkaarz.html`, `ipos.json`, kalıcı durum `ipo_state.json` — commit edilir): Borsa İstanbul bülteninde ilk kez görünen
+- **Halka arz** (12 Kasım 2026'dan Piyasalar sayfasının en altında `#halkaarz` bölümü; üst menüde ayrı sekme yok, eski `halkaarz.html` oraya yönlendirir; `ipos.json`, kalıcı durum `ipo_state.json` — commit edilir): Borsa İstanbul bülteninde ilk kez görünen
   `.E` kodları (`update_ipo_state`: ilk kurulumda son 2 yıl ikili aramayla, `_codes_only` hafif okuma; sonra her gün yalnızca yeni kodlar).
   Halka arz fiyatı bültende YOK (ilk gün önceki kapanış boş) → getiri **ilk işlem günü açılışına** göre (sitede açıkça yazıyor);
   tavan serisi (ilk gün kapanış ≥ açılış×1.095 ve sonraki günler ≥ %9.5), BIST100 farkı, zirve/zirveden, Yahoo fiyatı ilk gün kapanışına
@@ -34,7 +34,7 @@ ve sonuçları statik bir web sayfasında gösteren bir bot. Şu an **Aşama 1**
 - **Ekonomi** (`ekonomi.html`, `economy.json`): `panel.economy_data()` — `bot.fetch_macro()` (TCMB canlı) + Yahoo aylık; 2005'ten aylık
   politika faizi, yıllık/aylık TÜFE, TÜFE endeksi, reel faiz, dolar, euro, gram altın, BIST100 (TL ve dolar); son 24 faiz kararı.
   Sayfada özet kartları, `lineChart` (core.js, çok çizgili, log seçeneği) grafikler, enflasyon hesaplayıcı (enflasyon / dolar / euro /
-  altın / BIST100 temettüsüz / politika faizi aylık bileşik). Menü: 9 sekme, kutusuz düz yazı (seçili sekmede alt çizgi); NAV 4. alan "alt" verilirse yalnızca alt bilgi/mobil menüde görünür (şu an kullanılmıyor). Sinyal botunun adı **BIST50 Sinyal** (Telegram mesajlarıyla aynı); menüde `"vurgu"` ile çerçeveli öne çıkan sekme (`a.hl`).
+  altın / BIST100 temettüsüz / politika faizi aylık bileşik). Menü: 9 sekme (Ana sayfa, Piyasalar, Ekonomi, Haberler, Takvim, BIST50 Sinyal, SPL Hazırlık, Sözlük, İletişim), kutusuz düz yazı (seçili sekmede alt çizgi); NAV 4. alan "alt" verilirse yalnızca alt bilgi/mobil menüde görünür (şu an kullanılmıyor). Sinyal botunun adı **BIST50 Sinyal** (Telegram mesajlarıyla aynı); menüde `"vurgu"` ile çerçeveli öne çıkan sekme (`a.hl`). Yanında yine çerçeveli **SPL Hazırlık** (kullanıcının SPL sınav çalışma sitesi https://emrcnkkl.github.io/spl-calisma/, yeni sekmede açılır; `http` ile başlayan NAV adresleri `target="_blank"`). Masaüstü menü 1120px altında mobil menüye geçer, 1240px altında sekme boşluğu 9px (sekme eklersen taşmayı dene).
 - **Fonlar yapılamadı**: TEFAS eski API'leri (`/api/DB/BindHistoryInfo`, `BindComparisonFundReturns`) "Method not found or disabled"
   döndürüyor, site F5 bot koruması (TSPD JS testi) arkasında — korumayı aşmaya çalışma. Başka ücretsiz kaynak bulunursa eklenir.
 - Önbellek: workflow site paketinde `assets/*.css|js` adreslerine içerik özetinden `?v=` ekler (eski menü sorunu).
