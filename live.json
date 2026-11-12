@@ -21,11 +21,17 @@
    "value": 100168.63,
    "bench": 100227.71,
    "stock_pct": 0.0
+  },
+  {
+   "date": "2026-11-12",
+   "value": 100253.05,
+   "bench": 101399.02,
+   "stock_pct": 0.0
   }
  ],
  "events": [],
  "holdings": [],
- "updated": "2026-11-11",
+ "updated": "2026-11-12",
  "notes": [
   {
    "date": "2026-11-10",
