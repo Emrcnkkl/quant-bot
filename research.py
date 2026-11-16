@@ -505,6 +505,77 @@ def main_agirlik() -> None:
     print(df.to_string(index=False))
 
 
+def main_getiri() -> None:
+    """
+    Getiriyi artırma deneyleri (kullanıcı hedefi: belirgin getiri artışı, en büyük düşüş ≥ −%35).
+    Kural: iki dönemde de (2006–20 ve 2021–26) yıllık getiri mevcut modelden en az 3 puan yüksek ve tüm dönem düşüşü ≥ −35.
+    """
+    cal, cash, mem, comps = bot_setup()
+    n = bot.CFG["universe_size"]
+    base_cfg = dict(bot.CFG)
+
+    def hold_tables(cfg_over=None):
+        bot.CFG.update(cfg_over or {})
+        rets, held, atrp, score = {}, {}, {}, {}
+        for t, (d, sc) in comps.items():
+            bt = bot.backtest(d, sc["score"], cash.reindex(d.index).fillna(0), entry_mask=mem[t])
+            rets[t], held[t] = bt["daily"], bt["held"]
+            atrp[t] = (d["atr"] / d["Close"]).shift(1)
+            score[t] = sc["score"].shift(1)
+        bot.CFG.clear(); bot.CFG.update(base_cfg)
+        M = mem.reindex(index=cal, columns=list(comps)).fillna(False)
+        return (pd.DataFrame(rets).reindex(cal).fillna(0),
+                pd.DataFrame(held).reindex(cal).fillna(False).astype(bool) & M,
+                pd.DataFrame(atrp).reindex(cal), pd.DataFrame(score).reindex(cal), M)
+
+    Rr, H, A, SC, M = hold_tables()
+    volf = A.pow(-1).mul(A.where(M).median(axis=1), axis=0).clip(1 / 3, 2).fillna(1)
+    tilt = (SC / 40).clip(0.75, 1.5).fillna(1)
+
+    def port(Wt, R=None, cap=None, full=False):
+        R = Rr if R is None else R
+        if full:                                   # paranın tamamı elde tutulan hisselere bölünür
+            Wt = Wt.div(Wt.sum(axis=1).replace(0, np.nan), axis=0).fillna(0)
+        if cap is not None:
+            Wt = Wt.clip(upper=cap)
+        Wt = Wt.div(Wt.sum(axis=1).clip(lower=1), axis=0)
+        e = Wt.sum(axis=1)
+        return (Wt * R).sum(axis=1) + (1 - e) * cash, e
+
+
+    base = H.astype(float) / n
+    variants = {
+        "mevcut model": port(base * volf),
+        "puana gore agirlik": port(base * volf * tilt),
+        "temel pay 1/25": port(base * n / 25 * volf),
+        "temel pay 1/20": port(base * n / 20 * volf),
+        "tam yatirim, tek hisse max %10": port(base * volf, cap=0.10, full=True),
+        "tam yatirim, tek hisse max %5": port(base * volf, cap=0.05, full=True),
+        "en iyi 15 (her biri ~1/15)": port((H & (SC.where(H).rank(axis=1, ascending=False, method="first") <= 15)).astype(float) / 15 * volf),
+        "en iyi 10 (her biri ~1/10)": port((H & (SC.where(H).rank(axis=1, ascending=False, method="first") <= 10)).astype(float) / 10 * volf),
+        "puan agirlik + tam yatirim %10": port(base * volf * tilt, cap=0.10, full=True),
+    }
+    Rr2, H2, _, SC2, _ = hold_tables({"real_rate_max": None})
+    variants["faiz filtresi kapali"] = port(H2.astype(float) / n * volf, R=Rr2)
+    variants["faiz filtresi kapali + tam yatirim %10"] = port(H2.astype(float) / n * volf, R=Rr2, cap=0.10, full=True)
+    rows = []
+    for k, (r, e) in variants.items():
+        st = period_stats(r, cash, cal)
+        rows.append({"yontem": k, **{f"{p}_{x}": v for p, t3 in st.items() for x, v in zip(("yil", "dd", "sh"), t3)},
+                     "hisse_payi": round(float(e.mean()) * 100)})
+    df = pd.DataFrame(rows)
+    ref = df.iloc[0]
+    df["egitim_fark"] = (df.egitim_yil - ref.egitim_yil).round(1)
+    df["test_fark"] = (df.test_yil - ref.test_yil).round(1)
+    df["kurali_gecti"] = (df.egitim_fark >= 3) & (df.test_fark >= 3) & (df.tum_dd >= -35)
+    ew = (M.astype(float).div(M.sum(axis=1), axis=0) * pd.DataFrame({t: d["Close"].pct_change() for t, (d, _) in comps.items()}).reindex(cal).fillna(0)).sum(axis=1)
+    refs = {"buyuk50_al_bekle": period_stats(ew, cash, cal), "faiz": period_stats(cash, cash, cal)}
+    bot.write("research_getiri.json", {"rows": df.to_dict("records"), "references": refs})
+    pd.set_option("display.width", 260)
+    print(df.to_string(index=False))
+    print("\nKıyas:", refs)
+
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--refresh", action="store_true")
@@ -513,8 +584,11 @@ if __name__ == "__main__":
     ap.add_argument("--faiz", action="store_true", help="reel faiz filtresi, 2006–bugün")
     ap.add_argument("--bilesen", action="store_true", help="puan bileşenlerini tek tek çıkararak test")
     ap.add_argument("--agirlik", action="store_true", help="hisse başına ağırlık yöntemleri")
+    ap.add_argument("--getiri", action="store_true", help="getiriyi artırma deneyleri (düşüş ≥ −%%35)")
     a = ap.parse_args()
-    if a.bilesen:
+    if a.getiri:
+        main_getiri()
+    elif a.bilesen:
         main_bilesen()
     elif a.agirlik:
         main_agirlik()
