@@ -201,25 +201,35 @@ def main_test() -> None:
     px = pd.DataFrame({t: d["Close"] for t, (d, _) in comps.items()}).reindex(cal)
     ret = px.pct_change().fillna(0)
     ema200 = pd.DataFrame({t: d["ema200"] for t, (d, _) in comps.items()}).reindex(cal).shift(1)
+    px1 = px.shift(1)                                                      # bugünün getirisi için yalnızca dünkü bilgi
     mstart = pd.Series(cal.to_period("M"), index=cal).ne(pd.Series(cal.to_period("M"), index=cal).shift())
-    for lab, trend in (("saf ucuzluk (en ucuz 15)", False), ("saf ucuzluk + trend (EMA200 ustu)", True)):
+    def value_port(trend: str | None):
+        """Her ay başı en ucuz 15 (eşit pay). trend: None | "gunluk" (dünkü kapanış > EMA200 değilse o hisse nakitte)
+        | "aylik" (yalnızca ay başında kontrol). Maliyet: her gün ağırlık değişimi × %0,15 (tüm alım-satımlar)."""
         W = pd.DataFrame(0.0, index=cal, columns=tick)
         cur = pd.Series(0.0, index=tick)
-        cost = pd.Series(0.0, index=cal)
+        okm = pd.Series(True, index=tick)
         for i, day in enumerate(cal):
             if mstart.iloc[i]:
                 v = Vf.loc[day].where(M.loc[day]).dropna()
-                pick = v.nlargest(15).index
-                new = pd.Series(0.0, index=tick); new[pick] = 1 / 15
-                cost[day] = (new - cur).abs().sum() * 0.0015
-                cur = new
-            w = cur.copy()
-            if trend:
-                ok = (px.loc[day] > ema200.loc[day]).reindex(tick).fillna(False)
-                w = w.where(ok, 0)
+                cur = pd.Series(0.0, index=tick); cur[v.nlargest(15).index] = 1 / 15
+                okm = (px1.loc[day] > ema200.loc[day]).reindex(tick).fillna(False)
+            w = cur
+            if trend == "gunluk":
+                w = cur.where((px1.loc[day] > ema200.loc[day]).reindex(tick).fillna(False), 0)
+            elif trend == "aylik":
+                w = cur.where(okm, 0)
             W.loc[day] = w.values
+        cost = W.diff().abs().sum(axis=1).fillna(W.iloc[0].abs().sum()) * 0.0015
         e = W.sum(axis=1)
-        variants[lab] = ((W * ret).sum(axis=1) + (1 - e) * cash - cost, e)
+        return (W * ret).sum(axis=1) + (1 - e) * cash - cost, e
+
+    variants["saf ucuzluk (en ucuz 15)"] = value_port(None)
+    variants["ucuzluk + trend (gunluk kontrol)"] = vt_d = value_port("gunluk")
+    variants["ucuzluk + trend (ay basi kontrol)"] = vt_m = value_port("aylik")
+    for lab, (vr, ve) in (("karisim: model + ucuzluk/trend gunluk", vt_d), ("karisim: model + ucuzluk/trend aylik", vt_m)):
+        mr, me = variants["mevcut model"]
+        variants[lab] = (0.5 * mr + 0.5 * vr, 0.5 * me + 0.5 * ve)
     rows = []
     for k, (r, e) in variants.items():
         st = research.period_stats(r, cash, cal)
