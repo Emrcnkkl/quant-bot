@@ -63,6 +63,7 @@ function chrome(active) {
 }
 // Kaydırınca beliren öğeler
 function reveal(sel = "main section > *, footer > *") {
+  helpify();
   const rio = new IntersectionObserver(es => es.forEach(en => { if (en.isIntersecting) { en.target.classList.add("in"); rio.unobserve(en.target); } }), {rootMargin: "0px 0px -8% 0px"});
   document.querySelectorAll(sel).forEach(el => { el.classList.add("rv"); rio.observe(el); });
 }
@@ -159,3 +160,57 @@ function themeIcon() {
     : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>';
   b.title = isDark() ? "Açık temaya geç" : "Koyu temaya geç";
 }
+
+// ---------------- "?" açıklamaları: uzun metinler sayfada değil, başlığın yanındaki ? düğmesinde ----------------
+// Kapsam: p.lead (bölüm açıklaması), .card .st (kart alt yazısı), .legend-sig, [data-help] ve bölüm/kart içindeki uzun
+// "muted small" notlar. Öğe kendisi gizli kutuya taşınır (id'si korunur, sayfa kodu içeriği güncellemeye devam edebilir).
+function helpAttach(heading, nodes) {
+  if (!heading || !nodes.length) return;
+  let btn = heading.querySelector(":scope > .qm");
+  if (!btn) {
+    btn = document.createElement("button");
+    btn.type = "button"; btn.className = "qm"; btn.setAttribute("aria-label", "Açıklama"); btn.textContent = "?";
+    const link = heading.querySelector(":scope > a");
+    link ? heading.insertBefore(btn, link) : heading.appendChild(btn);
+    const box = document.createElement("div");
+    box.className = "qbody"; box.hidden = true;
+    btn._box = box; document.body.appendChild(box);
+  }
+  nodes.forEach(n => btn._box.appendChild(n));
+}
+function helpify(root = document) {
+  const headOf = el => {
+    let p = el.previousElementSibling;
+    while (p && !/^H[1-4]$/.test(p.tagName) && !p.classList.contains("ph")) p = p.previousElementSibling;
+    if (p && p.classList.contains("ph")) p = p.querySelector("h1");
+    if (!p && el.hasAttribute("data-help")) return el.parentElement;     // başlık yoksa düğme metnin hemen yanında
+    if (!p) { const c = el.closest(".card, section"); p = c && c.querySelector("h1, h2, h3"); }
+    return p;
+  };
+  root.querySelectorAll("main p.lead, main .card > p.st, main .legend-sig, main [data-help]").forEach(el => {
+    if (el.closest(".qbody, table, details, .tip")) return;
+    el.hidden = false;
+    helpAttach(headOf(el), [el]);
+  });
+  root.querySelectorAll("main p.small.muted, main p.muted.small").forEach(el => {
+    if (el.closest(".qbody, table, details, footer, .hero, .contact") || el.classList.contains("note") || el.id === "meta") return;
+    if ((el.textContent || "").trim().length < 90 && !el.id) return;
+    helpAttach(headOf(el), [el]);
+  });
+}
+document.addEventListener("click", e => {
+  const b = e.target.closest(".qm");
+  document.querySelectorAll(".qbody:not([hidden])").forEach(x => { if (!b || x !== b._box) x.hidden = true; });
+  if (!b) return;
+  e.preventDefault(); e.stopPropagation();
+  const box = b._box; box.hidden = !box.hidden;
+  if (!box.hidden) {
+    window._qmOpened = Date.now();
+    const r = b.getBoundingClientRect(), w = Math.min(340, innerWidth - 24);
+    box.style.width = w + "px";
+    box.style.left = Math.max(12, Math.min(r.left - 12, innerWidth - w - 12)) + "px";
+    box.style.top = (r.bottom + 8) + "px";
+  }
+}, true);
+document.addEventListener("keydown", e => { if (e.key === "Escape") document.querySelectorAll(".qbody").forEach(x => x.hidden = true); });
+addEventListener("scroll", () => { if (Date.now() - (window._qmOpened || 0) > 400) document.querySelectorAll(".qbody:not([hidden])").forEach(x => x.hidden = true); }, {passive: true});

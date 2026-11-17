@@ -635,3 +635,11 @@ tbody tr.row:hover,.mtbl tr.mrow:hover{background:var(--surface2)}
 @media (prefers-color-scheme:light){:root:not([data-theme="dark"]) .av{color:hsl(var(--h) 50% 36%)}}
 .bar{height:5px;border-radius:2px}
 .bar i{border-radius:2px;box-shadow:none}
+/* "?" açıklama düğmesi ve kutusu */
+.qm{display:inline-grid;place-items:center;width:18px;height:18px;margin-left:8px;border-radius:50%;border:1px solid var(--line2);background:transparent;color:var(--muted);font:600 11px/1 "InterV",sans-serif;cursor:pointer;vertical-align:middle;padding:0;flex:none}
+.qm:hover{color:var(--ink);border-color:var(--muted)}
+h3.t .qm{margin-right:auto}
+.qbody{position:fixed;z-index:60;max-height:60vh;overflow:auto;background:var(--card);border:1px solid var(--line2);border-radius:8px;padding:12px 14px;box-shadow:0 12px 32px -12px rgba(0,0,0,.45);font-size:13px;line-height:1.55;color:var(--ink2);font-weight:400;letter-spacing:0;text-transform:none}
+.qbody p,.qbody .lead,.qbody .st{margin:0 0 8px;font-size:13px;color:var(--ink2);max-width:none}
+.qbody > :last-child{margin-bottom:0}
+.qbody .legend-sig{display:grid;gap:6px;margin:0}
