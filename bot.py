@@ -117,6 +117,10 @@ CFG = {
     "min_bars": 260,
     "cash_rate_factor": 1.0,    # nakit getirisi = politika faizi × bu katsayı (0 -> faiz yok)
     "real_rate_max": 5.0,       # reel faiz %5'in üstündeyken yeni alım yok (docs/uzun-donem-arastirma.md, 20 yıl testi)
+    # Ucuzluk (17 Kasım 2026, research_value.py): AL + o günün en ucuz yarısı = GÜÇLÜ AL; model yalnızca bunları alır.
+    "value_filter": 0.5,     # None = kapalı; ucuzluk puanı (0–1) bu eşiğin altındaysa model yeni alım yapmaz
+    "value_tilt": True,      # pay × (0,5 + ucuzluk puanı): ucuza büyük, pahalıya küçük pay
+    "score_tilt": True,      # pay × (puan / 40, 0,75–1,5 arası): yüksek puana büyük pay
     "changes_days": 30,
     # Çıkış kuralı: "score" = skor < exit_score | "ema50" = kapanış < EMA50 |
     #               "cross" = EMA20 < EMA50 | "ema200" = kapanış < EMA200 |
@@ -1045,19 +1049,98 @@ def pit_membership(data: dict[str, pd.DataFrame], cal: pd.DatetimeIndex, n: int,
     return mem
 
 
+VALUE_HIST = "value_hist.npz"
+
+
+def rank_value(EY: pd.DataFrame, BP: pd.DataFrame, FIN: pd.Series, M: pd.DataFrame) -> pd.DataFrame:
+    """0–1 ucuzluk puanı (1 = en ucuz): o günün evrenindeki hisseler arasında kazanç verimi (son 12 ay net kâr / piyasa
+    değeri) ve defter/piyasa (özkaynak / piyasa değeri) sıralamasının ortalaması. Bankalar/sigortacılar ve diğer şirketler
+    ayrı sıralanır. Zarar edenin kazanç verimi negatif → pahalı sayılır; özkaynağı negatif olanın defter/piyasası yok sayılır."""
+    cols = [c for c in EY.columns if c in M.columns]
+    EY, BP, Mm = EY[cols], BP[cols], M[cols].astype(bool)
+    out = pd.DataFrame(np.nan, index=EY.index, columns=cols)
+    for fin in (True, False):
+        g = [c for c in cols if bool(FIN.get(c, False)) == fin]
+        if not g:
+            continue
+        r1 = EY[g].where(Mm[g]).rank(axis=1, pct=True)
+        r2 = BP[g].where(Mm[g] & (BP[g] > 0)).rank(axis=1, pct=True)
+        out[g] = pd.concat([r1, r2]).groupby(level=0).mean().reindex(EY.index)[g]
+    return out
+
+
+def value_history(cal: pd.DatetimeIndex, tickers: list[str], fund: dict | None = None,
+                  today: dict | None = None) -> pd.DataFrame:
+    """Günlük ucuzluk puanı (0–1, kaydırılmamış). Kaynaklar: value_hist.npz arşivi (2008 – Kasım 2026, noktasal evren),
+    sonrası valuation_history.csv (o gün kaydedilen hisse başı kâr/özkaynak ve kapanış), en son gün `today`
+    ({hisse: (kazanç verimi, defter/piyasa)}). Veri yoksa NaN (filtre uygulanmaz, pay çarpanı 1)."""
+    V = pd.DataFrame(np.nan, index=cal, columns=tickers)
+    last_arch = None
+    path = os.path.join(OUT_DIR, VALUE_HIST)
+    if os.path.exists(path):
+        z = np.load(path, allow_pickle=False)
+        arr = z["v"].astype(float)
+        arr[arr == 255] = np.nan
+        A = pd.DataFrame(arr / 100, index=pd.to_datetime(z["dates"]), columns=list(z["tickers"]))
+        A = A.reindex(columns=tickers)
+        V.update(A.reindex(cal))
+        last_arch = A.index.max()
+    fin = {t: (v or {}).get("fin_group") not in (None, "XI_29") for t, v in (fund or {}).items()}
+    rows = []
+    hp = os.path.join(OUT_DIR, "valuation_history.csv")
+    if os.path.exists(hp):
+        h = pd.read_csv(hp)
+        h["date"] = pd.to_datetime(h["date"])
+        if last_arch is not None:
+            h = h[h["date"] > last_arch]
+        for c in ("eps", "book", "close"):
+            h[c] = pd.to_numeric(h[c], errors="coerce")
+        h["ey"], h["bp"] = h["eps"] / h["close"], h["book"] / h["close"]
+        rows.append(h[["date", "ticker", "ey", "bp"]])
+    if today:
+        d0 = cal[-1]
+        rows.append(pd.DataFrame([{"date": d0, "ticker": t, "ey": e, "bp": b} for t, (e, b) in today.items()]))
+    if rows:
+        h = pd.concat(rows).drop_duplicates(["date", "ticker"], keep="last")
+        h = h[h["ticker"].isin(tickers)]
+        if len(h):
+            EY = h.pivot(index="date", columns="ticker", values="ey")
+            BP = h.pivot(index="date", columns="ticker", values="bp")
+            M = EY.notna() | BP.notna()
+            R = rank_value(EY, BP, pd.Series(fin), M)
+            V.update(R.reindex(index=cal).reindex(columns=tickers))
+    return V
+
+
+def value_today(signals_close: dict, fund: dict, shares: dict) -> dict:
+    """Bugünkü kazanç verimi ve defter/piyasa: İş Yatırım bilançosu (son 12 ay net kâr, özkaynak) ve hisse sayısı ile."""
+    out = {}
+    for t, close in signals_close.items():
+        f = fund.get(t) or {}
+        sh = shares.get(t) or f.get("capital")
+        if not sh or not close or not f.get("equity"):
+            continue
+        mcap = sh * close
+        out[t] = ((f["net_ttm"] / mcap) if f.get("net_ttm") is not None else np.nan, f["equity"] / mcap)
+    return out
+
+
 def sized_portfolio(prep: dict, cal: pd.DatetimeIndex, cash: pd.Series, mem: pd.DataFrame,
-                    mult: float = 1.0, vol: bool = True, cap: float = 2.0, weights: bool = False):
+                    mult: float = 1.0, vol: bool = True, cap: float = 2.0, weights: bool = False,
+                    entry_ok: pd.DataFrame | None = None, tilt: pd.DataFrame | None = None):
     """
     Portföy: her pozisyon temel olarak sermayenin mult/N'i (N = evren büyüklüğü). Hisseye yalnızca evrendeyken girilir.
     vol=True: oynak hissede küçük, sakin hissede büyük pozisyon (temel pay × evren medyan ATR% / hissenin ATR%'si,
     1/3 ile `cap` arası). Toplam hisse payı %100'ü aşarsa hepsi orantılı küçültülür (kaldıraç yok). Boş pay faizde.
     Yaklaşıklık: ağırlıklar günlük yeniden dengelenir; evrenden çıkan hissedeki pozisyon maliyetsiz kapanmış sayılır.
+    entry_ok: hisse × gün giriş izni (ör. ucuzluk filtresi; yoksa her gün izinli). tilt: hisse × gün pay çarpanı.
     Döner: (günlük getiri, günlük hisse payı, hisse bazında backtest sonuçları[, günlük ağırlık tablosu])
     """
     n = CFG["universe_size"]
     rets, held, atrp, bts = {}, {}, {}, {}
     for t, (d, sc) in prep.items():
-        bt = backtest(d, sc, cash.reindex(d.index).fillna(0), entry_mask=mem[t])
+        em = mem[t] if entry_ok is None or t not in entry_ok else (mem[t] & entry_ok[t].reindex(mem.index).fillna(True))
+        bt = backtest(d, sc, cash.reindex(d.index).fillna(0), entry_mask=em)
         bts[t] = bt
         rets[t], held[t] = bt["daily"], bt["held"]
         atrp[t] = (d["atr"] / d["Close"]).shift(1)
@@ -1069,6 +1152,8 @@ def sized_portfolio(prep: dict, cal: pd.DatetimeIndex, cash: pd.Series, mem: pd.
         A = pd.DataFrame(atrp).reindex(cal)
         med = A.where(M).median(axis=1)
         Wt = Wt * A.pow(-1).mul(med, axis=0).clip(1 / 3, cap).fillna(1)
+    if tilt is not None:
+        Wt = Wt * tilt.reindex(index=cal, columns=Wt.columns).fillna(1)
     Wt = Wt.div(Wt.sum(axis=1).clip(lower=1), axis=0)
     expo = Wt.sum(axis=1)
     port = (Wt * R.fillna(0)).sum(axis=1) + (1 - expo) * cash
@@ -1530,6 +1615,27 @@ def run(demo: bool, telegram_test: bool = False) -> None:
     print(f"  Evren: işlem hacmine göre en büyük {len(tickers)} hisse")
     quality = data_quality(data, tickers, bench, usdtry, demo)
 
+    # --- Ucuzluk puanı (GÜÇLÜ AL ve model portföy için): bilanço haftada bir, hisse sayısı her gün İş Yatırım'dan
+    fund, shares, vt = {}, {}, None
+    if not demo:
+        try:
+            fund = fetch_fundamentals(tickers)
+            try:
+                shares = isy_shares(tickers)
+            except Exception:  # noqa: BLE001
+                shares = {}
+            vt = value_today({t: float(data[t]["Close"].iloc[-1]) for t in tickers if t in data}, fund, shares)
+        except Exception as e:  # noqa: BLE001
+            print(f"  ! Ucuzluk verisi alınamadı (filtre bugün uygulanmaz): {type(e).__name__}: {e}", file=sys.stderr)
+    vcols = sorted(set(cand) | set(tickers))
+    V_raw = value_history(full_cal, vcols, fund, vt) if not demo else pd.DataFrame(np.nan, index=full_cal, columns=vcols)
+    V_prev = V_raw.shift(1)                          # karar günü yalnızca dünkü bilgiyle (araştırmayla aynı)
+    thr = CFG["value_filter"]
+    v_ok = ((V_prev >= thr) | V_prev.isna()) if thr is not None else None
+    v_now = V_raw.iloc[-1]
+    if vt is not None:
+        print(f"  Ucuzluk puanı: {int(v_now.reindex(tickers).notna().sum())}/{len(tickers)} hisse")
+
     signals, per_stock, all_daily, recent_trades = [], [], {}, []
     changes, change_dates = [], set()
     prepared = {}           # hesaplanmış indikatör/skorlar (portföy testinde yeniden kullanılır)
@@ -1543,7 +1649,8 @@ def run(demo: bool, telegram_test: bool = False) -> None:
         sc = score_frame(d)
         prepared[t] = (d, sc["score"])
         cash_d = cash_returns(d.index)
-        bt = backtest(d, sc["score"], cash_d)
+        em = v_ok[t].reindex(d.index).fillna(True) if v_ok is not None else None
+        bt = backtest(d, sc["score"], cash_d, entry_mask=em)
 
         last, comp = d.iloc[-1], sc.iloc[-1]
         prev_close = d["Close"].iloc[-2]
@@ -1567,6 +1674,8 @@ def run(demo: bool, telegram_test: bool = False) -> None:
             "change_pct": r2((close / prev_close - 1) * 100),
             "score": round(score, 1),
             "signal": sig,
+            "value_score": None if pd.isna(v_now.get(t)) else int(round(float(v_now[t]) * 100)),
+            "strong": bool(sig == "AL" and thr is not None and pd.notna(v_now.get(t)) and v_now[t] >= thr),
             "state": state,
             "score_5d_ago": round(float(sc["score"].iloc[-6]), 1),
             "components": {k: round(float(comp[k]), 1) for k in ACTIVE},
@@ -1613,7 +1722,17 @@ def run(demo: bool, telegram_test: bool = False) -> None:
             prep[t] = (d_, score_frame(d_)["score"])
     mem = mem[list(prep)]
     cash = cash_returns(cal)
-    port, expo, _, weights = sized_portfolio(prep, cal, cash, mem, 1.0, CFG["vol_sizing"], CFG["vol_cap"], weights=True)
+    cols = list(prep)
+    Vp = V_prev.reindex(index=cal, columns=cols)
+    tilt = pd.DataFrame(1.0, index=cal, columns=cols)
+    if CFG["value_tilt"]:
+        tilt = tilt * (0.5 + Vp).fillna(1)
+    if CFG["score_tilt"]:
+        SCp = pd.DataFrame({t: s_.shift(1) for t, (_, s_) in prep.items()}).reindex(index=cal, columns=cols)
+        tilt = tilt * (SCp / 40).clip(0.75, 1.5).fillna(1)
+    port, expo, _, weights = sized_portfolio(prep, cal, cash, mem, 1.0, CFG["vol_sizing"], CFG["vol_cap"], weights=True,
+                                             entry_ok=v_ok.reindex(index=cal, columns=cols) if v_ok is not None else None,
+                                             tilt=tilt)
     # Adil kıyas: aynı evrenin (her gün o günün üyeleri) eşit ağırlıklı al-bekle'si
     closes = pd.DataFrame({t: d_["Close"] for t, (d_, _) in prep.items()}).reindex(cal)
     rets = closes.pct_change().where(closes.notna() & closes.shift(1).notna() & mem)
@@ -1658,6 +1777,7 @@ def run(demo: bool, telegram_test: bool = False) -> None:
     order = {"AL": 0, "TUT": 1, "SAT": 2}
     signals.sort(key=lambda x: (order[x["signal"]], -x["score"]))
     counts = {k: sum(1 for s in signals if s["signal"] == k) for k in order}
+    counts["GUCLU"] = sum(1 for s in signals if s.get("strong"))
     meta = {
         "generated_at": now.isoformat(timespec="minutes"),
         "data_date": max(s["date"] for s in signals),
@@ -1698,7 +1818,7 @@ def run(demo: bool, telegram_test: bool = False) -> None:
                 write("notify.json", ns)
     if not demo:
         try:
-            fund = fetch_fundamentals([x["ticker"] for x in signals])
+            fund = fund or fetch_fundamentals([x["ticker"] for x in signals])
             rates = {"USD": float(usdtry.iloc[-1]) if usdtry is not None else None}
             if any((v.get("currency") or "TRY").upper() == "EUR" for v in fund.values()):
                 try:
@@ -1707,10 +1827,6 @@ def run(demo: bool, telegram_test: bool = False) -> None:
                                                             auto_adjust=True, threads=False))["Close"].iloc[-1])
                 except Exception:  # noqa: BLE001
                     pass
-            try:
-                shares = isy_shares([x["ticker"] for x in signals])
-            except Exception:  # noqa: BLE001
-                shares = {}
             val = valuation(signals, fund, rates, shares)
             if val:
                 write("valuation.json", {"generated_at": meta["generated_at"], "data_date": meta["data_date"],
@@ -1769,7 +1885,7 @@ def run(demo: bool, telegram_test: bool = False) -> None:
     })
 
     # --- Telegram bildirimi (AL'a giren / çıkan hisseler, model portföy işlemleri)
-    notify(*notify_args, changes, live, demo, test=telegram_test)
+    notify(*notify_args, changes, live, demo, test=telegram_test, strong={s["ticker"] for s in signals if s.get("strong")})
 
     # --- Geçmiş (her çalıştırma, aynı veri günü tekrar yazılmaz)
     hist_path = os.path.join(OUT_DIR, "history.json")
@@ -1859,11 +1975,12 @@ def _notify_state() -> dict:
 
 
 def notify(meta: dict, regime: dict, counts: dict, changes: list[dict], live: dict | None,
-           demo: bool, test: bool = False) -> None:
+           demo: bool, test: bool = False, strong: set | None = None) -> None:
     """Son bildirimden bu yana AL'a girenler / AL'dan çıkanlar ve model portföy işlemleri için Telegram mesajı.
     Durum notify.json'da tutulur; aynı gün için iki kez gönderilmez. İlk çalıştırmada geçmişi göndermez."""
     if demo:
         return
+    strong = strong or set()
     path = os.path.join(OUT_DIR, "notify.json")
     try:
         with open(path, encoding="utf-8") as f:
@@ -1888,7 +2005,7 @@ def notify(meta: dict, regime: dict, counts: dict, changes: list[dict], live: di
         return
 
     def fmt_ch(c):
-        return f"<b>{c['ticker']}</b> ({c['score']:+.0f})"
+        return f"<b>{c['ticker']}</b> ({c['score']:+.0f}){' ⭐' if c['ticker'] in strong else ''}"
     day = pd.Timestamp(today)
     months = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"]
     lines = [f"📊 <b>BIST50 Sinyal</b> · {day.day} {months[day.month - 1]} {day.year} kapanışı"]
@@ -1907,7 +2024,9 @@ def notify(meta: dict, regime: dict, counts: dict, changes: list[dict], live: di
             lines.append("💼 Model portföy sattı: " + ", ".join(sells))
     if regime.get("blocking"):
         lines.append(f"⏸ Reel faiz %{regime['real_rate']:+.1f} (eşik %{regime['filter_max']:.0f}): model yeni alım yapmıyor.")
-    lines.append(f"Toplam: {counts['AL']} AL · {counts['TUT']} TUT · {counts['SAT']} SAT")
+    lines.append(f"Toplam: {counts['AL']} AL ({counts.get('GUCLU', 0)} güçlü ⭐) · {counts['TUT']} TUT · {counts['SAT']} SAT")
+    if ins and any(c["ticker"] in strong for c in ins):
+        lines.append("⭐ = GÜÇLÜ AL (teknik olarak güçlü ve sektörüne göre ucuz; model portföy yalnızca bunları alır)")
     if live and len(live["points"]) > 1:
         p0, p1 = live["points"][0], live["points"][-1]
         lines.append(f"Canlı portföy ({p0['date']}'den beri): %{(p1['value'] / p0['value'] - 1) * 100:+.1f} · "

@@ -85,6 +85,14 @@ ve sonuçları statik bir web sayfasında gösteren bir bot. Şu an **Aşama 1**
   Yahoo eski veri verirse bot hata vermeden çıkar; son denemede (21:10) veri hâlâ yoksa Telegram'a bilgi mesajı.
 - Modelin değeri getiri değil **düşüş koruması** (2008: endeks −%50, model +%7). Teknik göstergelerle al-bekle'yi getiride
   belirgin geçmek gerçekçi testte mümkün olmadı; aşağıdaki "Araştırma bulguları"na bakmadan yeni kural ekleme.
+- **GÜÇLÜ AL / ucuzluk** (17 Kasım 2026): `signals[]` alanları `value_score` (0–100) ve `strong` (AL ve ucuzluk ≥ 50); `counts.GUCLU`.
+  Model portföy (backtest + canlı) yalnızca güçlü AL'lara girer (`sized_portfolio(entry_ok=…)`, hisse bazında `backtest(entry_mask=…)`),
+  pay × (0,5 + ucuzluk) × (puan/40, 0,75–1,5) (`tilt`). Ucuzluk puanı `rank_value()`: o günün evreninde kazanç verimi (son 12 ay net kâr /
+  piyasa değeri) ve defter/piyasa sıralamalarının ortalaması; banka/sigorta (`fin_group` ≠ XI_29) ayrı. Geçmiş: `value_hist.npz` (DEPODA,
+  2008-06 – 2026-11-09, uint8 0–100, 255 = yok; `research_value.py --arsiv` ile üretilir, hisse kodları str dtype — allow_pickle=False),
+  sonrası `valuation_history.csv` (eps, book, close), bugün `value_today()` (fundamentals.json + `isy_shares`). Karar dünkü puanla
+  (`shift(1)`). Temel veri artık sinyallerden önce alınır. Veri yoksa filtre uygulanmaz (NaN → izinli, çarpan 1). Telegram'da ⭐.
+  Sitede ★ GÜÇLÜ AL etiketi, süzgeç, AL kutusunda sayı, SSS `#sss-guclu`. Backtest: yıllık %25,9, düşüş −%15,0, Sharpe 0,91.
 - **Canlı model portföy** (`live.json`): 9 Kasım 2026'da 100.000 ₺ ile başladı; her çalıştırmada yalnızca yeni günler eklenir,
   geçmiş kayıtlar ASLA yeniden yazılmaz (`update_live`). Model mantığı değişirse eski kayıtlar olduğu gibi kalır.
 - **Telegram**: AL'a giren/çıkan hisseler ve model alım/satımları (`notify`, durum `notify.json`). Token/kanal ID GitHub
@@ -112,7 +120,9 @@ ve sonuçları statik bir web sayfasında gösteren bir bot. Şu an **Aşama 1**
 | 30 → 50 hisse | Sharpe 0.34→0.54 (2006–20), 0.73→0.90 (2021–26); 31–50. sıradakilerde de çalışıyor | **eklendi** |
 | Hacim penceresi 3 ay → 12 ay | aynı performans, liste çeyrekte 6.7 yerine 2.9 hisse değişiyor | **12 ay** |
 | Bileşen testi (`research.py --bilesen`) | ema_cross ve relative çıkınca iki dönemde de iyileşiyor; macd, rsi, adx, breakout, volume gerekli; ema200 sınırda | **ema_cross + relative çıkarıldı** (`ACTIVE`) |
-| Ağırlık yöntemleri (`research.py --agirlik`) | puana göre eğim: Sharpe 0.53→0.58 / 1.00→1.13 ama düşüş −16.7→−18.9 (2 puan sınırını az aştı); diğerleri fark yok/kötü | eklenmedi, kullanıcıya soruldu |
+| Ağırlık yöntemleri (`research.py --agirlik`) | puana göre eğim: Sharpe 0.53→0.58 / 1.00→1.13 ama düşüş −16.7→−18.9 (2 puan sınırını az aştı); diğerleri fark yok/kötü | 17 Kasım'da ucuzlukla birlikte **eklendi** (`score_tilt`) |
+| Getiri artırma (`research.py --getiri`, 16 Kasım) | daha büyük pay (1/25, 1/20), tam yatırım, en iyi 10/15, faiz filtresi kapalı: hepsi getiriyi **düşürdü**, riski artırdı (yüksek faizde hisse payı = getiri değil); yalnız puana göre ağırlık +1,2/+5,5 | kullanıcı hedefi getiri, düşüş sınırı −%35 |
+| **Ucuzluk** (`research_value.py`, 2008'den noktasal F/K–PD/DD, İş Yatırım, tüm işlem maliyetleri) | AL + ucuz yarı + ucuza/puana pay: yıllık %23,5→%25,9 (iki dönem +2,4/+2,8), düşüş −16,7→−15,0, Sharpe 0,69→0,91, reel %3,9→%5,8. Saf ucuzluk %27,7 ama −%57; ucuzluk+trend %26,4, −%27 (2. dönem +1,2). Ucuzluk + trend testinde ileriye bakma hatası bulunup düzeltildi | **eklendi** (17 Kasım): `value_filter=0.5`, `value_tilt`, `score_tilt`; GÜÇLÜ AL |
 
 ## Dosya yapısı
 ```
@@ -199,6 +209,7 @@ Bilgi amaçlı stop = kapanış − 2.5×ATR, hedef = kapanış + 4×ATR. Pozisy
 stop_atr, target_atr, commission, slippage, oos_fraction, min_bars, cash_rate_factor (0 = faiz yok), changes_days (30),
 history_start, backtest_start (2006), universe_size (50), universe_window (252), vol_sizing (True), vol_cap (2), jump_limit (0.25),
 real_rate_max (5.0; None = kapalı; reel faiz bunun üstündeyse yeni alım yok — `entry_allowed()`, `macro_frame()`),
+value_filter (0.5; None = kapalı), value_tilt (True), score_tilt (True),
 exit_rule ("score" varsayılan | ema50 | cross | ema200 | regime), entry_rule ("score" | ema200), stop_atr=None → stop yok.
 
 `POLICY_RATES` (2010-05 öncesi `POLICY_RATES_PRE2010` = gecelik borç alma, sonrası 1 hafta repo; 2003'ten) ve `CPI_YOY` (yıllık TÜFE, 2005'ten) yerleşik tablolar; gerçek çalıştırmada

@@ -277,6 +277,39 @@ class TestHaberVeHalkaArz(unittest.TestCase):
                          {t: str(f.date()) for t, f in first.items()})
 
 
+class TestGucluAl(unittest.TestCase):
+    def test_ucuzluk_sirasi_bankalar_ayri(self):
+        idx = pd.DatetimeIndex(["2026-11-16"])
+        EY = pd.DataFrame({"A": [0.20], "B": [0.05], "C": [-0.10], "BNK1": [0.30], "BNK2": [0.10]}, index=idx)
+        BP = pd.DataFrame({"A": [1.5], "B": [0.5], "C": [1.0], "BNK1": [2.0], "BNK2": [0.8]}, index=idx)
+        FIN = pd.Series({"A": False, "B": False, "C": False, "BNK1": True, "BNK2": True})
+        V = bot.rank_value(EY, BP, FIN, EY.notna()).iloc[0]
+        self.assertGreater(V["A"], V["B"])                     # yüksek kazanç verimi ve defter/piyasa = ucuz
+        self.assertEqual(V["BNK1"], 1.0)                        # bankalar kendi aralarında sıralanır
+        self.assertLess(V["C"], V["A"])                         # zarar eden pahalı tarafta
+
+    def test_bugunku_oranlar(self):
+        fund = {"A": {"net_ttm": 50.0, "equity": 200.0}, "B": {"net_ttm": None, "equity": 100.0, "capital": 10.0}}
+        out = bot.value_today({"A": 10.0, "B": 5.0, "C": 3.0}, fund, {"A": 100.0})
+        self.assertAlmostEqual(out["A"][0], 0.05)               # 50 / (100 × 10)
+        self.assertAlmostEqual(out["A"][1], 0.20)
+        self.assertTrue(np.isnan(out["B"][0]))                   # kâr verisi yok
+        self.assertAlmostEqual(out["B"][1], 2.0)                 # hisse sayısı yoksa ödenmiş sermaye
+        self.assertNotIn("C", out)
+
+    def test_pahali_al_portfoye_girmez(self):
+        data = bot.fetch_demo(["AAA", "BBB"])
+        cal = data["AAA"].index[260:]
+        prep = {t: (bot.add_indicators(df, None), None) for t, df in data.items()}
+        prep = {t: (d_, bot.score_frame(d_)["score"]) for t, (d_, _) in prep.items()}
+        mem = pd.DataFrame(True, index=cal, columns=list(prep))
+        cash = bot.cash_returns(cal)
+        no = pd.DataFrame({"AAA": False, "BBB": True}, index=cal)
+        r, e, bts = bot.sized_portfolio(prep, cal, cash, mem, entry_ok=no)
+        self.assertEqual(len(bts["AAA"]["trades"]), 0)          # hiç girmesine izin verilmeyen hisse işlem yapmaz
+        self.assertFalse(bts["AAA"]["open"])
+
+
 class TestCanliPortfoy(unittest.TestCase):
     def test_gecmis_kayitlar_degismez(self):
         with tempfile.TemporaryDirectory() as tmp:

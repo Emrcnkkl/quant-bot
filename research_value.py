@@ -246,12 +246,36 @@ def main_test() -> None:
     print(df.to_string(index=False))
 
 
+def main_archive() -> None:
+    """Bot için geçmiş ucuzluk puanı arşivi: value_hist.npz (gün × hisse, 0–100, 255 = veri yok; noktasal evrene göre,
+    kaydırılmamış). Bot bunu okuyup bir gün kaydırarak kullanır; arşivden sonraki günler valuation_history.csv'den hesaplanır."""
+    import research
+    cal, cash, mem, comps = research.bot_setup()
+    with open(RAW, "rb") as f:
+        raw = pickle.load(f)
+    tick = list(comps)
+    M = mem.reindex(index=cal, columns=tick).fillna(False)
+    EY, BP, FIN = value_frames(raw, cal, tick)
+    V = value_score(EY, BP, FIN, M).reindex(columns=tick)
+    V = V.loc[V.notna().any(axis=1)]
+    last = min(rec["mcap"].index.max() for rec in raw.values() if rec["mcap"] is not None and len(rec["mcap"]))
+    V = V.loc[:min(V.index.max(), last)]
+    arr = np.where(V.isna(), 255, (V * 100).round()).astype(np.uint8)
+    np.savez_compressed("value_hist.npz", dates=np.array([str(d.date()) for d in V.index], dtype=str), tickers=np.array(list(V.columns), dtype=str),
+                        v=arr, fin=np.array([bool(FIN.get(t, False)) for t in V.columns]))
+    print(f"value_hist.npz: {V.index[0].date()} – {V.index[-1].date()}, {len(V.columns)} hisse, "
+          f"{os.path.getsize('value_hist.npz') / 1024:.0f} KB")
+
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--veri", action="store_true")
     ap.add_argument("--test", action="store_true")
+    ap.add_argument("--arsiv", action="store_true", help="bot için value_hist.npz üret")
     a = ap.parse_args()
     if a.veri:
         main_data()
     elif a.test:
         main_test()
+    elif a.arsiv:
+        main_archive()
