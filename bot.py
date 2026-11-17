@@ -100,7 +100,8 @@ CANDIDATES = """
 CFG = {
     "history_start": "2004-01-01",  # indirilecek verinin başlangıcı (2005 öncesi eski TL, atılır)
     "backtest_start": "2006-01-01", # portföy testinin başlangıcı (2008 krizi dahil)
-    "universe_size": 50,        # sinyal ve test evreni: her çeyrek işlem hacmine göre en büyük N hisse ("BIST50 benzeri")
+    "universe_size": 100,       # sinyal ve test evreni: her çeyrek işlem hacmine göre en büyük N hisse ("BIST100 benzeri"; 17 Kasım 2026'da 50 → 100)
+    "base_n": 50,               # temel pozisyon payı 1/base_n (evren büyüdü ama pozisyon küçülmedi; araştırma da böyle test edildi)
     "universe_window": 252,     # hacim ortalaması penceresi (gün); 12 ay -> kısa süreli spekülatif hacim listeye sokmaz
     "vol_sizing": True,         # oynaklığa göre pozisyon büyüklüğü (docs/uzun-donem-arastirma.md)
     "vol_cap": 2.0,             # bir pozisyon en fazla temel payın bu katı olabilir
@@ -341,7 +342,7 @@ SECTOR_TR = {"Financial Services": "Finans", "Industrials": "Sanayi", "Basic Mat
              "Real Estate": "Gayrimenkul", "Healthcare": "Sağlık"}
 
 
-def fetch_fundamentals(tickers: list[str], max_age_days: int = 7, limit: int = 60) -> dict:
+def fetch_fundamentals(tickers: list[str], max_age_days: int = 7, limit: int = 120) -> dict:
     """
     Temel veriler (hisse başına kâr, özsermaye, temettü verimi, sektör...) Yahoo'dan haftada bir alınır ve
     fundamentals.json'da saklanır. Oranlar (F/K, PD/DD) her gün güncel fiyatla yeniden hesaplanır (valuation).
@@ -401,7 +402,7 @@ def valuation(signals: list[dict], fund: dict, fx: float | dict | None, shares: 
     sermayeden). Bu veri yoksa Yahoo'nun hisse başı kâr/özsermaye verisi kullanılır; dolarla raporlayan
     şirketlerde Yahoo verisi USD/TRY ile TL'ye çevrilir (Yahoo'nun hazır oranları bu durumda hatalıdır).
     Ucuzluk puanı 0–100: F/K ve PD/DD'nin sektör içi sıralamasının ortalaması (sektörde 4'ten az veri varsa
-    50 hissenin tümüyle kıyaslanır). Zarar eden şirketin F/K'sı yoktur; puanı yalnızca PD/DD'den gelir.
+    100 hissenin tümüyle kıyaslanır). Zarar eden şirketin F/K'sı yoktur; puanı yalnızca PD/DD'den gelir.
     """
     rates = fx if isinstance(fx, dict) else {"USD": fx}
     rows = []
@@ -543,7 +544,7 @@ def data_quality(data: dict, tickers: list[str], bench: pd.DataFrame, usdtry, de
         print(f"  · {n_}")
     if len(missing) > len(tickers) * 0.25 and not demo:
         msg = f"Veri çok eksik ({len(missing)}/{len(tickers)} hisse); dosyalar değiştirilmedi."
-        telegram_send(f"⚠️ <b>BIST50 Sinyal</b> · {msg}", admin=True)
+        telegram_send(f"⚠️ <b>BIST100 Sinyal</b> · {msg}", admin=True)
         sys.exit("  ! " + msg)
     return {"ok": not warns, "warnings": warns, "notes": notes, "checked": str(newest.date())}
 
@@ -1136,7 +1137,7 @@ def sized_portfolio(prep: dict, cal: pd.DatetimeIndex, cash: pd.Series, mem: pd.
     entry_ok: hisse × gün giriş izni (ör. ucuzluk filtresi; yoksa her gün izinli). tilt: hisse × gün pay çarpanı.
     Döner: (günlük getiri, günlük hisse payı, hisse bazında backtest sonuçları[, günlük ağırlık tablosu])
     """
-    n = CFG["universe_size"]
+    n = CFG.get("base_n") or CFG["universe_size"]
     rets, held, atrp, bts = {}, {}, {}, {}
     for t, (d, sc) in prep.items():
         em = mem[t] if entry_ok is None or t not in entry_ok else (mem[t] & entry_ok[t].reindex(mem.index).fillna(True))
@@ -1551,7 +1552,7 @@ def r2(x):
 
 def run(demo: bool, telegram_test: bool = False) -> None:
     tickers = list(BIST30)
-    print(f"BIST50 sinyal botu — {'DEMO (sentetik veri)' if demo else 'gerçek veri'}")
+    print(f"BIST100 sinyal botu — {'DEMO (sentetik veri)' if demo else 'gerçek veri'}")
     if not demo:
         fetch_macro()
     if demo:
@@ -1782,7 +1783,7 @@ def run(demo: bool, telegram_test: bool = False) -> None:
         "generated_at": now.isoformat(timespec="minutes"),
         "data_date": max(s["date"] for s in signals),
         "demo": demo,
-        "universe": f"BIST50 benzeri: işlem hacmine göre en büyük {CFG['universe_size']} hisse (her çeyrek güncellenir)",
+        "universe": f"BIST100 benzeri: işlem hacmine göre en büyük {CFG['universe_size']} hisse (her çeyrek güncellenir)",
         "thresholds": {"buy": CFG["buy_threshold"], "sell": CFG["sell_threshold"]},
         "disclaimer": "Buradaki bilgiler algoritmik teknik analiz çıktısıdır; yatırım tavsiyesi değildir. "
                       "Yatırım danışmanlığı hizmeti, SPK lisanslı kuruluşlar tarafından kişiye özel sunulur.",
@@ -1813,7 +1814,7 @@ def run(demo: bool, telegram_test: bool = False) -> None:
         except (FileNotFoundError, json.JSONDecodeError):
             ns = {}
         if ns.get("last_warn") != meta["data_date"]:
-            if telegram_send("⚠️ <b>BIST50 Sinyal</b> veri uyarısı\n• " + "\n• ".join(quality["warnings"]), admin=True):
+            if telegram_send("⚠️ <b>BIST100 Sinyal</b> veri uyarısı\n• " + "\n• ".join(quality["warnings"]), admin=True):
                 ns["last_warn"] = meta["data_date"]
                 write("notify.json", ns)
     if not demo:
@@ -2008,7 +2009,7 @@ def notify(meta: dict, regime: dict, counts: dict, changes: list[dict], live: di
         return f"<b>{c['ticker']}</b> ({c['score']:+.0f}){' ⭐' if c['ticker'] in strong else ''}"
     day = pd.Timestamp(today)
     months = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"]
-    lines = [f"📊 <b>BIST50 Sinyal</b> · {day.day} {months[day.month - 1]} {day.year} kapanışı"]
+    lines = [f"📊 <b>BIST100 Sinyal</b> · {day.day} {months[day.month - 1]} {day.year} kapanışı"]
     if test and not (ins or outs or ev):
         lines.append("🔔 Deneme mesajı: bildirimler çalışıyor.")
     if ins:

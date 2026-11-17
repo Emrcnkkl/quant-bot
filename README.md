@@ -1,10 +1,10 @@
 # piyasam — ekonomi ve finans paneli
 
-Piyasalar (döviz, altın, emtia, borsalar), ekonomik takvim ve BIST50 sinyal botu tek sitede: https://emrcnkkl.github.io/quant-bot/
+Piyasalar (döviz, altın, emtia, borsalar), ekonomik takvim ve BIST100 sinyal botu tek sitede: https://emrcnkkl.github.io/quant-bot/
 
-## BIST50 Teknik Sinyal Botu
+## BIST100 Teknik Sinyal Botu
 
-Borsa İstanbul'un işlem hacmine göre en büyük 50 hissesi için günlük veriyle çoklu indikatör skoru hesaplar, AL / TUT / SAT sinyali üretir ve geriye dönük test raporu çıkarır.
+Borsa İstanbul'un işlem hacmine göre en büyük 100 hissesi için günlük veriyle çoklu indikatör skoru hesaplar, AL / TUT / SAT sinyali üretir ve geriye dönük test raporu çıkarır.
 
 ## Dosyalar
 | Dosya | Açıklama |

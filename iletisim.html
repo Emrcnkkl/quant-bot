@@ -65,7 +65,7 @@ $("#cform").addEventListener("submit", async e => {
     const r = await fetch(`https://formsubmit.co/ajax/${FORM_KEY}`, {
       method: "POST", headers: {"Content-Type": "application/json", Accept: "application/json"},
       body: JSON.stringify({Ad: d.name || "-", "E-posta": d.email || "-", Konu: d.topic, Mesaj: d.message,
-                            _subject: `BIST50 Sinyal · ${d.topic}${d.name ? " · " + d.name : ""}`,
+                            _subject: `BIST100 Sinyal · ${d.topic}${d.name ? " · " + d.name : ""}`,
                             _replyto: d.email || undefined, _template: "table", _captcha: "false"})});
     const j = await r.json().catch(() => ({}));
     if (!r.ok || String(j.success) !== "true") throw new Error(j.message || r.status);

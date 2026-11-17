@@ -1,10 +1,10 @@
-# CLAUDE.md — piyasam (ekonomi ve finans paneli) + BIST50 Teknik Sinyal Botu
+# CLAUDE.md — piyasam (ekonomi ve finans paneli) + BIST100 Teknik Sinyal Botu
 
 Bu dosya, projeye Claude Code ile devam ederken bağlam sağlamak içindir.
 Kullanıcıyla iletişim, arayüz metinleri ve kod yorumları **Türkçe**dir.
 
 ## Proje özeti
-Borsa İstanbul'un en büyük 50 hissesi (işlem hacmine göre, "BIST50 benzeri") için günlük veriyle teknik analiz yapan, her hisseye −100…+100 arası
+Borsa İstanbul'un en büyük 100 hissesi (işlem hacmine göre, "BIST100 benzeri"; 17 Kasım 2026'ya kadar 50) için günlük veriyle teknik analiz yapan, her hisseye −100…+100 arası
 skor verip **AL / TUT / SAT** sinyali üreten, geriye dönük test (backtest) raporu çıkaran
 ve sonuçları statik bir web sayfasında gösteren bir bot. Şu an **Aşama 1** tamamlandı.
 
@@ -34,7 +34,7 @@ ve sonuçları statik bir web sayfasında gösteren bir bot. Şu an **Aşama 1**
 - **Ekonomi** (`ekonomi.html`, `economy.json`): `panel.economy_data()` — `bot.fetch_macro()` (TCMB canlı) + Yahoo aylık; 2005'ten aylık
   politika faizi, yıllık/aylık TÜFE, TÜFE endeksi, reel faiz, dolar, euro, gram altın, BIST100 (TL ve dolar); son 24 faiz kararı.
   Sayfada özet kartları, `lineChart` (core.js, çok çizgili, log seçeneği) grafikler, enflasyon hesaplayıcı (enflasyon / dolar / euro /
-  altın / BIST100 temettüsüz / politika faizi aylık bileşik). Menü: 9 sekme (Ana sayfa, Piyasalar, Ekonomi, Haberler, Takvim, BIST50 Sinyal, SPL Hazırlık, Sözlük, İletişim), kutusuz düz yazı (seçili sekmede alt çizgi); NAV 4. alan "alt" verilirse yalnızca alt bilgi/mobil menüde görünür (şu an kullanılmıyor). Sinyal botunun adı **BIST50 Sinyal** (Telegram mesajlarıyla aynı); menüde `"vurgu"` ile çerçeveli öne çıkan sekme (`a.hl`). Yanında yine çerçeveli **SPL Hazırlık** (kullanıcının SPL sınav çalışma sitesi https://emrcnkkl.github.io/spl-calisma/, yeni sekmede açılır; `http` ile başlayan NAV adresleri `target="_blank"`). Masaüstü menü 1120px altında mobil menüye geçer, 1240px altında sekme boşluğu 9px (sekme eklersen taşmayı dene).
+  altın / BIST100 temettüsüz / politika faizi aylık bileşik). Menü: 9 sekme (Ana sayfa, Piyasalar, Ekonomi, Haberler, Takvim, BIST100 Sinyal, SPL Hazırlık, Sözlük, İletişim), kutusuz düz yazı (seçili sekmede alt çizgi); NAV 4. alan "alt" verilirse yalnızca alt bilgi/mobil menüde görünür (şu an kullanılmıyor). Sinyal botunun adı **BIST100 Sinyal** (17 Kasım 2026'ya kadar BIST50 Sinyal; Telegram mesajlarıyla aynı); menüde `"vurgu"` ile çerçeveli öne çıkan sekme (`a.hl`). Yanında yine çerçeveli **SPL Hazırlık** (kullanıcının SPL sınav çalışma sitesi https://emrcnkkl.github.io/spl-calisma/, yeni sekmede açılır; `http` ile başlayan NAV adresleri `target="_blank"`). Masaüstü menü 1120px altında mobil menüye geçer, 1240px altında sekme boşluğu 9px (sekme eklersen taşmayı dene).
 - **Fonlar yapılamadı**: TEFAS eski API'leri (`/api/DB/BindHistoryInfo`, `BindComparisonFundReturns`) "Method not found or disabled"
   döndürüyor, site F5 bot koruması (TSPD JS testi) arkasında — korumayı aşmaya çalışma. Başka ücretsiz kaynak bulunursa eklenir.
 - Önbellek: workflow site paketinde `assets/*.css|js` adreslerine içerik özetinden `?v=` ekler (eski menü sorunu).
@@ -50,6 +50,10 @@ ve sonuçları statik bir web sayfasında gösteren bir bot. Şu an **Aşama 1**
   (`index.html fonts img` + üretilenler + live.json) yayınlanır. `index.html/fonts/img` push'unda bot çalışmadan yeniden yayınlanır.
   Deploy işi, depoda kalmış eski üretilen dosyaları bir kez `git rm --cached` ile çıkarır. Repo: Emrcnkkl/quant-bot, ana dal `claude/laughing-dijkstra-j1eqmj`.
 - Cloud oturumları için `quant-bot` ortamı Yahoo Finance ve www.tcmb.gov.tr'ye izinli → `python3 bot.py` oturumdan da çalışır (~1 dk).
+- **17 Kasım 2026'da 50 → 100 hisseye geçildi** (kullanıcı kararı; sinyal tablosu 100 hissenin hepsini gösterir, bot adı BIST100 Sinyal).
+  Temel pozisyon payı 1/50 kaldı (`CFG["base_n"]`). `value_hist.npz` 100'lük evrenle yeniden üretildi (155 hisse). Sonuç: yıllık %30,6,
+  düşüş −%20,9, Sharpe 0,99, enflasyondan arındırılmış +%9,7 · büyük 100 al-bekle %24,2 (−%63) · altın %31,2 (−%34). Temel veri
+  (`fetch_fundamentals`, limit 120) 100 hisse için Actions'ta ~8 dk sürer (haftada bir). live.json'a not düşüldü.
 - **10 Kasım 2026'da 30 → 50 hisseye geçildi.** Evren = her çeyrek son 12 ayın (252 gün) TL hacmine göre en büyük 50 hisse
   (`universe_size=50`, `universe_window=252`); sinyaller bugünkü üyeler için, liste otomatik — elle BIST listesi tutulmuyor.
   Kıyas endeksi XU030 kalır (Yahoo'da XU050 geçmişi yok). Şirket adları `NAMES`, yoksa Yahoo → `names.json`.
@@ -122,7 +126,7 @@ ve sonuçları statik bir web sayfasında gösteren bir bot. Şu an **Aşama 1**
 | Bileşen testi (`research.py --bilesen`) | ema_cross ve relative çıkınca iki dönemde de iyileşiyor; macd, rsi, adx, breakout, volume gerekli; ema200 sınırda | **ema_cross + relative çıkarıldı** (`ACTIVE`) |
 | Ağırlık yöntemleri (`research.py --agirlik`) | puana göre eğim: Sharpe 0.53→0.58 / 1.00→1.13 ama düşüş −16.7→−18.9 (2 puan sınırını az aştı); diğerleri fark yok/kötü | 17 Kasım'da ucuzlukla birlikte **eklendi** (`score_tilt`) |
 | Getiri artırma (`research.py --getiri`, 16 Kasım) | daha büyük pay (1/25, 1/20), tam yatırım, en iyi 10/15, faiz filtresi kapalı: hepsi getiriyi **düşürdü**, riski artırdı (yüksek faizde hisse payı = getiri değil); yalnız puana göre ağırlık +1,2/+5,5 | kullanıcı hedefi getiri, düşüş sınırı −%35 |
-| Evren × faiz filtresi (`research_value.py --genis`, 17 Kasım, temel pay 1/50, güncel model) | 50: %25,9 · **75: %28,9** (+2,5/+4,5, −%18,7, Sharpe 0,96) · **100: %30,2** (+5,2/+1,0, −%20,8, 0,97). Yüksek reel faizde güçlü AL'a izin: her evrende 2. dönem kötüleşti | faiz filtresi kalsın; evren kararı kullanıcıda |
+| Evren × faiz filtresi (`research_value.py --genis`, 17 Kasım, temel pay 1/50, güncel model) | 50: %25,9 · **75: %28,9** (+2,5/+4,5, −%18,7, Sharpe 0,96) · **100: %30,2** (+5,2/+1,0, −%20,8, 0,97). Yüksek reel faizde güçlü AL'a izin: her evrende 2. dönem kötüleşti | faiz filtresi kalsın; **100 hisse** (kullanıcı seçti) |
 | **Ucuzluk** (`research_value.py`, 2008'den noktasal F/K–PD/DD, İş Yatırım, tüm işlem maliyetleri) | AL + ucuz yarı + ucuza/puana pay: yıllık %23,5→%25,9 (iki dönem +2,4/+2,8), düşüş −16,7→−15,0, Sharpe 0,69→0,91, reel %3,9→%5,8. Saf ucuzluk %27,7 ama −%57; ucuzluk+trend %26,4, −%27 (2. dönem +1,2). Ucuzluk + trend testinde ileriye bakma hatası bulunup düzeltildi | **eklendi** (17 Kasım): `value_filter=0.5`, `value_tilt`, `score_tilt`; GÜÇLÜ AL |
 
 ## Dosya yapısı
@@ -208,7 +212,7 @@ Bilgi amaçlı stop = kapanış − 2.5×ATR, hedef = kapanış + 4×ATR. Pozisy
 ### Tüm ayarlar
 `bot.py` başındaki `CFG` sözlüğü: warmup_days, buy/sell_threshold, exit_score,
 stop_atr, target_atr, commission, slippage, oos_fraction, min_bars, cash_rate_factor (0 = faiz yok), changes_days (30),
-history_start, backtest_start (2006), universe_size (50), universe_window (252), vol_sizing (True), vol_cap (2), jump_limit (0.25),
+history_start, backtest_start (2006), universe_size (100), base_n (50: temel pay 1/50, evrenden bağımsız), universe_window (252), vol_sizing (True), vol_cap (2), jump_limit (0.25),
 real_rate_max (5.0; None = kapalı; reel faiz bunun üstündeyse yeni alım yok — `entry_allowed()`, `macro_frame()`),
 value_filter (0.5; None = kapalı), value_tilt (True), score_tilt (True),
 exit_rule ("score" varsayılan | ema50 | cross | ema200 | regime), entry_rule ("score" | ema200), stop_atr=None → stop yok.
