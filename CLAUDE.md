@@ -50,6 +50,14 @@ ve sonuçları statik bir web sayfasında gösteren bir bot. Şu an **Aşama 1**
   (`index.html fonts img` + üretilenler + live.json) yayınlanır. `index.html/fonts/img` push'unda bot çalışmadan yeniden yayınlanır.
   Deploy işi, depoda kalmış eski üretilen dosyaları bir kez `git rm --cached` ile çıkarır. Repo: Emrcnkkl/quant-bot, ana dal `claude/laughing-dijkstra-j1eqmj`.
 - Cloud oturumları için `quant-bot` ortamı Yahoo Finance ve www.tcmb.gov.tr'ye izinli → `python3 bot.py` oturumdan da çalışır (~1 dk).
+- **Otomatik aday listesi + kâr büyümesi** (17 Kasım 2026, kullanıcı isteği): Eski 156'lık elle yazılmış aday listesi, son 12 ayın hacmine
+  göre ilk 100'ün 44'ünü kaçırıyordu. Artık `candidates.json` (DEPODA, workflow commit eder): `update_candidates()` her çalıştırmada
+  bültenlerden günün TL hacmine göre ilk 200'ü kaydeder (son 63 gün), son 63 günün ≥20'sinde ilk 150'de olan hisse kalıcı aday olur
+  (`load_candidates()` = `CANDIDATES` ∪ otomatik; ilk kurulumda 134 hisse eklendi → ~290 aday, indirme ~291 seri). Kâr büyümesi:
+  `isy_financials` → `net_dq` (son çeyrek net kâr − geçen yılın aynı çeyreği), bugünkü sıra `growth_history()` (dq / piyasa değeri,
+  evrende, bankalar ayrı); geçmiş `value_hist.npz` içinde `g` dizisi (arşivden sonra 70 iş günü taşınır). `CFG["growth_filter"]=0.5`:
+  GÜÇLÜ AL = AL & ucuzluk ≥ 50 & büyüme ≥ 50 (veri yoksa şart yok); `signals[]` `growth_score`. Bot sonucu (17 Kasım): yıllık %31,6,
+  düşüş −%16,6, Sharpe 1,19, reel +%10,6; altın %31,2 (−%34). value_hist.npz `RESEARCH_WIDE=.cache/wide_bot.pkl python3 research_value.py --arsiv`.
 - **17 Kasım 2026'da 50 → 100 hisseye geçildi** (kullanıcı kararı; sinyal tablosu 100 hissenin hepsini gösterir, bot adı BIST100 Sinyal).
   Temel pozisyon payı 1/50 kaldı (`CFG["base_n"]`). `value_hist.npz` 100'lük evrenle yeniden üretildi (155 hisse). Sonuç: yıllık %30,6,
   düşüş −%20,9, Sharpe 0,99, enflasyondan arındırılmış +%9,7 · büyük 100 al-bekle %24,2 (−%63) · altın %31,2 (−%34). Temel veri
@@ -127,6 +135,9 @@ ve sonuçları statik bir web sayfasında gösteren bir bot. Şu an **Aşama 1**
 | Ağırlık yöntemleri (`research.py --agirlik`) | puana göre eğim: Sharpe 0.53→0.58 / 1.00→1.13 ama düşüş −16.7→−18.9 (2 puan sınırını az aştı); diğerleri fark yok/kötü | 17 Kasım'da ucuzlukla birlikte **eklendi** (`score_tilt`) |
 | Getiri artırma (`research.py --getiri`, 16 Kasım) | daha büyük pay (1/25, 1/20), tam yatırım, en iyi 10/15, faiz filtresi kapalı: hepsi getiriyi **düşürdü**, riski artırdı (yüksek faizde hisse payı = getiri değil); yalnız puana göre ağırlık +1,2/+5,5 | kullanıcı hedefi getiri, düşüş sınırı −%35 |
 | Evren × faiz filtresi (`research_value.py --genis`, 17 Kasım, temel pay 1/50, güncel model) | 50: %25,9 · **75: %28,9** (+2,5/+4,5, −%18,7, Sharpe 0,96) · **100: %30,2** (+5,2/+1,0, −%20,8, 0,97). Yüksek reel faizde güçlü AL'a izin: her evrende 2. dönem kötüleşti | faiz filtresi kalsın; **100 hisse** (kullanıcı seçti) |
+| Sinyal gecikmesi (`research_lag.py`, 17 Kasım) | AL'dan önceki 20 günde hisse ort. +%5 yükselmiş (trend takibinin doğası); sinyal günü kapanışı → ertesi açılış ort. +%0,32. Ertesi açılışta alım %30,2 · 1 gün geç %27,4 · 2 gün geç %26,3 · sinyal günü kapanışında (teorik, kapanış seansı) %33,0 · eşik 35/30 ile erken giriş fark yok | kural aynı; SSS `#sss-zaman`: ertesi sabah açılışta al. Kapanış seansında işlem +2,8 puan ama sinyal 18:00'den önce gerekir (GitHub zamanlaması güvenilmez) |
+| Kâr büyümesi (`research_growth.py`, 17 Kasım) | çeyreklik büyüme beşte birlik dilimleri 21 günde %2,0 → %3,3 (tekdüze). "Ucuz VE büyüyen" (çeyrek): %30,2→%31,9 (+0,1/+7,0), düşüş −20,8→−17,2, Sharpe 0,97→1,20; yıllık büyüme ve "ya da" türleri daha zayıf | **eklendi** (`growth_filter`) |
+| Aday listesi (`research_auto.py`, 17 Kasım) | eski 156: model %30,2, evren al-bekle %24,1 · +bugünkü ilk 200: %29,8 / %21,1 · tüm hisseler (bültendeki ~630, en dürüstü): %29,1 / %15,6 (eski listenin al-bekle'si hayatta kalma yanlılığıyla şişikti). Kâr büyümesi her sette iyileştiriyor (tümünde %31,0, −%18,5) | **otomatik aday listesi** |
 | **Ucuzluk** (`research_value.py`, 2008'den noktasal F/K–PD/DD, İş Yatırım, tüm işlem maliyetleri) | AL + ucuz yarı + ucuza/puana pay: yıllık %23,5→%25,9 (iki dönem +2,4/+2,8), düşüş −16,7→−15,0, Sharpe 0,69→0,91, reel %3,9→%5,8. Saf ucuzluk %27,7 ama −%57; ucuzluk+trend %26,4, −%27 (2. dönem +1,2). Ucuzluk + trend testinde ileriye bakma hatası bulunup düzeltildi | **eklendi** (17 Kasım): `value_filter=0.5`, `value_tilt`, `score_tilt`; GÜÇLÜ AL |
 
 ## Dosya yapısı
@@ -157,6 +168,9 @@ YENİ PROJE/
 ├── experiments.py     # giriş/çıkış kuralı deneyleri (al-bekle'yi geçen hisse sayısı), çıktı experiments.json
 ├── research.py        # 2005–bugün uzun dönem testi, momentum rotasyonu, kayan pencereli seçim; veri .cache/long.pkl, çıktı research.json
 │                      # --pit noktasal evren · --sizing pozisyon büyüklüğü · --faiz reel faiz filtresi (research_*.json)
+├── research_value.py  # ucuzluk testi, --arsiv (value_hist.npz), --genis (evren 50/75/100)
+├── research_growth.py # kâr büyümesi testi · research_lag.py: sinyal gecikmesi · research_auto.py: aday listesi (RESEARCH_WIDE ile aday seti)
+├── candidates.json    # otomatik aday hisseler + son 63 günün hacim sıralaması (depoda, workflow commit eder)
 └── history.json       # günlük sinyal geçmişi (yalnızca gerçek veriyle çalışınca oluşur/eklenir, son 500 gün)
 ```
 
@@ -214,7 +228,7 @@ Bilgi amaçlı stop = kapanış − 2.5×ATR, hedef = kapanış + 4×ATR. Pozisy
 stop_atr, target_atr, commission, slippage, oos_fraction, min_bars, cash_rate_factor (0 = faiz yok), changes_days (30),
 history_start, backtest_start (2006), universe_size (100), base_n (50: temel pay 1/50, evrenden bağımsız), universe_window (252), vol_sizing (True), vol_cap (2), jump_limit (0.25),
 real_rate_max (5.0; None = kapalı; reel faiz bunun üstündeyse yeni alım yok — `entry_allowed()`, `macro_frame()`),
-value_filter (0.5; None = kapalı), value_tilt (True), score_tilt (True),
+value_filter (0.5; None = kapalı), growth_filter (0.5; None = kapalı), value_tilt (True), score_tilt (True),
 exit_rule ("score" varsayılan | ema50 | cross | ema200 | regime), entry_rule ("score" | ema200), stop_atr=None → stop yok.
 
 `POLICY_RATES` (2010-05 öncesi `POLICY_RATES_PRE2010` = gecelik borç alma, sonrası 1 hafta repo; 2003'ten) ve `CPI_YOY` (yıllık TÜFE, 2005'ten) yerleşik tablolar; gerçek çalıştırmada

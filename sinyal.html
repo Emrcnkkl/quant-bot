@@ -61,14 +61,14 @@
     <p class="lead">Borsa İstanbul'un işlem hacmine göre en büyük 100 hissesi (her çeyrek güncellenir). Her hisseye 6 teknik göstergeye bakılarak −100 ile +100 arasında bir puan verilir. Puan yükseldikçe fiyat hareketi o kadar güçlü görünür. <b>Ayrıntı ve grafik için bir hisseye dokunun.</b></p>
     <div id="filt"></div>
     <div class="legend-sig">
-      <span><span class="badge AL strong"><span class="lg">GÜÇLÜ </span>AL</span>&nbsp; AL + sektörüne göre ucuz: model portföy bunları alır <a href="#sss-guclu">?</a></span>
+      <span><span class="badge AL strong"><span class="lg">GÜÇLÜ </span>AL</span>&nbsp; AL + ucuz + kârı büyüyen: model portföy bunları alır <a href="#sss-guclu">?</a></span>
       <span><span class="badge AL">AL</span>&nbsp; puan +40 ve üstü: teknik görünüm güçlü</span>
       <span><span class="badge TUT">TUT</span>&nbsp; arada: belirgin bir yön yok</span>
       <span><span class="badge SAT">SAT</span>&nbsp; puan −40 ve altı: teknik görünüm zayıf, uzak dur</span>
     </div>
     <div class="toolbar">
       <div class="tabs" id="tabs">
-        <button data-f="ALL" class="on">Tümü</button><button data-f="GUCLU" title="AL sinyali olan ve sektörüne göre ucuz yarıda bulunan hisseler; model portföy yalnızca bunları alır">★ Güçlü AL</button><button data-f="AL">AL</button><button data-f="TUT">TUT</button><button data-f="SAT">SAT</button><button data-f="POS">Modelde olanlar</button>
+        <button data-f="ALL" class="on">Tümü</button><button data-f="GUCLU" title="AL sinyali olan, ucuz yarıda bulunan ve kârı büyüyen hisseler; model portföy yalnızca bunları alır">★ Güçlü AL</button><button data-f="AL">AL</button><button data-f="TUT">TUT</button><button data-f="SAT">SAT</button><button data-f="POS">Modelde olanlar</button>
       </div>
       <input type="search" id="q" placeholder="Hisse ara (ör. THYAO)">
     </div>
@@ -157,9 +157,9 @@
     <h2>Nasıl çalışır?</h2>
     <p class="lead">Her iş günü borsa kapandıktan sonra (18:40) otomatik çalışır; kimse elle müdahale etmez.</p>
     <div class="steps">
-      <div class="step"><div class="n">1</div><h4>Veri</h4><p>~1100 büyük hissenin 2004'ten beri günlük fiyatları indirilir; işlem hacmine göre en büyük 100'ü seçilir. Faiz ve enflasyon TCMB'den alınır.</p></div>
+      <div class="step"><div class="n">1</div><h4>Veri</h4><p>Borsa İstanbul'da hacmi yüksek ~290 hissenin 2004'ten beri günlük fiyatları indirilir; işlem hacmine göre en büyük 100'ü seçilir. Yeni büyüyen hisseler resmî günlük bültenden otomatik eklenir. Faiz ve enflasyon TCMB'den alınır.</p></div>
       <div class="step"><div class="n">2</div><h4>Puan</h4><p>Trend, momentum, hacim ve kırılım gibi 6 gösterge birleştirilip her hisseye −100…+100 puan verilir.</p></div>
-      <div class="step"><div class="n">3</div><h4>Sinyal</h4><p>Puan +40 üstü AL, −40 altı SAT, arası TUT. AL'lardan sektörüne göre ucuz yarıda olanlar <b>★ GÜÇLÜ AL</b>; model portföy yalnızca bunları alır ve zarar-kes seviyesi takip eder.</p></div>
+      <div class="step"><div class="n">3</div><h4>Sinyal</h4><p>Puan +40 üstü AL, −40 altı SAT, arası TUT. AL'lardan ucuz yarıda olup kârı da büyüyenler <b>★ GÜÇLÜ AL</b>; model portföy yalnızca bunları alır ve zarar-kes seviyesi takip eder.</p></div>
       <div class="step"><div class="n">4</div><h4>Test</h4><p>Aynı kurallar 2006'dan bu yana, her dönemin o zamanki büyük hisselerine uygulanır; sonuç endeks ve faizle kıyaslanır.</p></div>
     </div>
 
@@ -174,10 +174,11 @@
           <li><b>Kırılım (13):</b> 20 günlük zirve üstünde kapanış +13, dip altında −13</li>
           <li class="muted">Kasım 2026'da her gösterge tek tek test edildi; 20/50 günlük ortalama kesişimi ve endekse göre güç katkı vermediği için çıkarıldı.</li>
         </ul>
-        <b>Ucuzluk (GÜÇLÜ AL) ve pay</b>
+        <b>Ucuzluk, kâr büyümesi (GÜÇLÜ AL) ve pay</b>
         <ul>
           <li>Ucuzluk puanı 0–100: son 12 ay net kâr / piyasa değeri ve özkaynak / piyasa değeri, o günün evrenindeki hisselerle (bankalar ve sigortacılar kendi aralarında) sıralanıp ortalanır. Bilanço, dönem sonundan 75 gün (yıl sonu 100 gün) sonra kullanılır; test geleceği bilmez.</li>
-          <li>Model yalnızca ucuzluk puanı 50 ve üstü olan AL'ları alır. Pay: temel pay × oynaklık çarpanı × (0,5 + ucuzluk) × (puan / 40, 0,75–1,5 arası).</li>
+          <li>Kâr büyümesi puanı 0–100: (son çeyrek net kâr − geçen yılın aynı çeyreği) / piyasa değeri, aynı şekilde evrende sıralanır. Fiyata bölmek zarar eden şirketlerdeki işaret sorununu ve enflasyonu (aynı gün herkes aynı enflasyonu yaşar) yumuşatır.</li>
+          <li>Model yalnızca ucuzluk ve kâr büyümesi puanı 50 ve üstü olan AL'ları alır (verisi olmayan hissede o şart aranmaz). Pay: temel pay × oynaklık çarpanı × (0,5 + ucuzluk) × (puan / 40, 0,75–1,5 arası).</li>
         </ul>
         <b>Test kuralları</b>
         <ul>
@@ -198,8 +199,11 @@
     <h2>Sık sorulan sorular</h2>
     <p class="lead"></p>
     <details id="sss-guclu"><summary>"★ GÜÇLÜ AL" ne demek?</summary><div>
-      <p>Teknik puanı AL olan bir hisse, aynı gün <b>ucuzluk puanına</b> göre de değerlendirilir: şirketin son 12 aylık kârının ve özkaynağının borsadaki değerine oranı, o günün en büyük 100 hissesiyle (bankalar kendi aralarında) kıyaslanır. Ucuz yarıda olan AL'lar <b>GÜÇLÜ AL</b> olur. Model portföy yalnızca güçlü AL'ları alır; ucuz ve puanı yüksek hisselere biraz daha büyük pay verir. Diğer AL'lar listede yine görünür.</p>
-      <p>2008'den bu yana, her gün yalnızca o gün bilinen bilançolarla, en büyük 50 hisseyle yapılan testte bu kural yıllık getiriyi %23,5'ten %25,9'a çıkardı, en büyük düşüşü −%16,7'den −%15,0'a indirdi. Hem 2006–2020'de hem 2021–2026'da iyileştirdi. Evren 100 hisseye genişletilince (Kasım 2026) yıllık getiri %30'a çıktı, en büyük düşüş −%21 oldu. Kâr ve özkaynak verisi İş Yatırım'daki mali tablolardan alınır.</p></div></details>
+      <p>Teknik puanı AL olan bir hisse, bilançosuna göre de değerlendirilir. <b>Ucuzluk</b>: şirketin son 12 aylık kârının ve özkaynağının borsadaki değerine oranı. <b>Kâr büyümesi</b>: son çeyrek kârının geçen yılın aynı çeyreğine göre artışı (borsa değerine oranla). İkisi de o günün en büyük 100 hissesiyle (bankalar kendi aralarında) kıyaslanır. Hem ucuz yarıda hem kârı büyüyen yarıda olan AL'lar <b>GÜÇLÜ AL</b> olur. Model portföy yalnızca güçlü AL'ları alır; ucuz ve puanı yüksek hisselere biraz daha büyük pay verir. Diğer AL'lar listede yine görünür.</p>
+      <p>2008'den bu yana, her gün yalnızca o gün bilinen bilançolarla yapılan testlerde: ucuzluk şartı (50 hisse) yıllık getiriyi %23,5'ten %25,9'a çıkardı; evren 100 hisseye genişleyince %30'a çıktı; kâr büyümesi şartı (Kasım 2026) getiriyi biraz artırıp en büyük düşüşü −%21'den −%17'ye indirdi. Her kural hem 2006–2020'de hem 2021–2026'da ayrı ayrı denendi. Kâr ve özkaynak verisi İş Yatırım'daki mali tablolardan alınır.</p></div></details>
+    <details id="sss-zaman"><summary>Sinyal gelince ne zaman almak gerekir? Geç kalıyor muyuz?</summary><div>
+      <p>Sinyaller her iş günü kapanıştan sonra (~18:40) üretilir; test, alımın <b>ertesi sabah açılışta</b> yapıldığını varsayar. 2006'dan bu yana test: ertesi sabah açılışta alan yılda ortalama %30,2 kazandı; bir gün geç alan %27,4, iki gün geç alan %26,3. Yani sinyali bekletmek yılda ~3 puan kaybettirir.</p>
+      <p>Hisse, AL'a geçmeden önceki 20 günde ortalama %5 yükselmiş oluyor; bu, trend takibinin doğası (yükseliş başladıktan sonra girer). Asıl kazanç sonrasında: AL'dan 3 ay sonra ortalama %7,7, herhangi bir hissenin aynı süredeki ortalamasının üstünde. AL eşiğini düşürüp daha erken girmek sonucu değiştirmedi.</p></div></details>
     <details><summary>Bu bir yatırım tavsiyesi mi?</summary><div><p>Hayır. Sayfa bir hobi/araştırma projesidir; kimsenin kişisel durumunu, risk tercihini ya da vergisini bilmez. Yatırım danışmanlığı yalnızca SPK lisanslı kuruluşlarca kişiye özel verilir.</p></div></details>
     <details><summary>AL sinyali gelen hisse kesin yükselir mi?</summary><div><p>Hayır. AL, sadece fiyat hareketinin teknik olarak güçlü göründüğü anlamına gelir. Testte işlemlerin yarısından azı kârla kapandı; model kazancını, kârlı işlemlerin zararlılardan daha büyük olmasından elde ediyor.</p></div></details>
     <details><summary>Model endeksi geçiyor mu?</summary><div id="faq-perf"><p>Yükleniyor…</p></div></details>
@@ -373,7 +377,7 @@ function renderSignals() {
     const main = `<tr class="row${open ? " open" : ""}" data-t="${x.ticker}">
       <td>${who(x.ticker, x.name, '<span class="chev">▶</span>')}</td>
       <td>${fmt(x.close)}</td><td>${pct(x.change_pct, 2)}</td>
-      <td>${x.strong ? `<span class="badge AL strong" title="Güçlü AL: teknik olarak güçlü ve sektörüne göre ucuz (ucuzluk ${x.value_score}/100). Model portföy yalnızca bunları alır."><span class="lg">GÜÇLÜ </span>AL</span>` : `<span class="badge ${x.signal}"${x.signal === "AL" && x.value_score != null ? ` title="AL, ama sektörüne göre pahalı yarıda (ucuzluk ${x.value_score}/100); model portföy almaz"` : ""}>${x.signal}</span>`}<div class="state">${STATE[x.state] || (x.signal === "AL" && x.value_score != null ? `ucuzluk ${x.value_score}` : "")}</div></td>
+      <td>${x.strong ? `<span class="badge AL strong" title="Güçlü AL: teknik olarak güçlü, ucuz (ucuzluk ${x.value_score}/100) ve kârı büyüyen (kâr büyümesi ${x.growth_score ?? "–"}/100). Model portföy yalnızca bunları alır."><span class="lg">GÜÇLÜ </span>AL</span>` : `<span class="badge ${x.signal}"${x.signal === "AL" && x.value_score != null ? ` title="AL, ama ucuzluk (${x.value_score}/100) ya da kâr büyümesi (${x.growth_score ?? "–"}/100) 50'nin altında; model portföy almaz"` : ""}>${x.signal}</span>`}<div class="state">${STATE[x.state] || (x.signal === "AL" && x.value_score != null ? `ucuzluk ${x.value_score}${x.growth_score != null ? ` · büyüme ${x.growth_score}` : ""}` : "")}</div></td>
       <td>${scoreBar(x.score)}<div class="state">5 günde ${trend >= 0 ? "▲" : "▼"} ${fmt(Math.abs(trend), 0)}</div></td>
       <td>${fmt(x.rsi, 0)}</td><td>${fmt(stop)}</td><td>${fmt(x.target)}</td></tr>`;
     if (!open) return main;

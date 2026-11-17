@@ -97,6 +97,53 @@ CANDIDATES = """
     VAKBN VAKKO VERUS VESBE VESTL VKGYO YATAS YKBNK YUNSA YYLGD ZOREN ZRGYO
 """.split()
 
+# Otomatik aday listesi (17 Kasım 2026'dan): Borsa İstanbul bülteninden, günlük TL hacmine göre son 63 iş gününün en az
+# 20'sinde ilk 150'de olan hisseler kalıcı olarak adaylara eklenir (candidates.json, depoda). Böylece yeni halka arz olup
+# büyüyen hisseler elle eklemeden evrene girebilir. Evren seçimi yine noktasal (pit_membership): aday olmak evrende olmak değildir.
+AUTO_CAND = "candidates.json"
+AUTO_DAYS, AUTO_TOP, AUTO_MIN = 63, 150, 20
+LAST_BULLETINS: dict = {}
+
+
+def load_candidates() -> list[str]:
+    try:
+        with open(os.path.join(OUT_DIR, AUTO_CAND), encoding="utf-8") as f:
+            auto = list(json.load(f).get("auto", {}))
+    except (FileNotFoundError, json.JSONDecodeError):
+        auto = []
+    return sorted(set(CANDIDATES) | set(auto))
+
+
+def update_candidates(bulletins: dict) -> list[str]:
+    """Bültenlerden günlük hacim sıralamasını kaydeder ve kuralı sağlayan yeni hisseleri adaylara ekler. Döner: yeni eklenenler."""
+    path = os.path.join(OUT_DIR, AUTO_CAND)
+    try:
+        with open(path, encoding="utf-8") as f:
+            st = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        st = {}
+    auto, days = st.get("auto", {}), st.get("days", {})
+    for d, b in bulletins.items():
+        if b is None or "TLVolume" not in b:
+            continue
+        days[str(pd.Timestamp(d).date())] = list(b["TLVolume"].dropna().nlargest(200).index)
+    days = dict(sorted(days.items())[-AUTO_DAYS:])
+    count: dict[str, int] = {}
+    for codes in days.values():
+        for c in codes[:AUTO_TOP]:
+            count[c] = count.get(c, 0) + 1
+    known = set(CANDIDATES) | set(auto)
+    today = str(pd.Timestamp.now(tz="Europe/Istanbul").date())
+    added = sorted(c for c, k in count.items() if k >= AUTO_MIN and c not in known and len(days) >= AUTO_MIN)
+    for c in added:
+        auto[c] = today
+    st = {"note": "Otomatik eklenen aday hisseler (kod: eklenme günü) ve son günlerin TL hacmine göre ilk 200 hissesi.",
+          "rule": f"son {AUTO_DAYS} iş gününün en az {AUTO_MIN}'sinde ilk {AUTO_TOP}", "auto": dict(sorted(auto.items())), "days": days}
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(st, f, ensure_ascii=False, separators=(",", ":"))
+    return added
+
+
 CFG = {
     "history_start": "2004-01-01",  # indirilecek verinin başlangıcı (2005 öncesi eski TL, atılır)
     "backtest_start": "2006-01-01", # portföy testinin başlangıcı (2008 krizi dahil)
@@ -121,6 +168,8 @@ CFG = {
     # Ucuzluk (17 Kasım 2026, research_value.py): AL + o günün en ucuz yarısı = GÜÇLÜ AL; model yalnızca bunları alır.
     "value_filter": 0.5,     # None = kapalı; ucuzluk puanı (0–1) bu eşiğin altındaysa model yeni alım yapmaz
     "value_tilt": True,      # pay × (0,5 + ucuzluk puanı): ucuza büyük, pahalıya küçük pay
+    "growth_filter": 0.5,       # GÜÇLÜ AL ayrıca kârı büyüyen olmalı: son çeyrek net kâr − geçen yılın aynı çeyreği, piyasa
+                                # değerine bölünüp evrende sıralanır (0–1); bu sıra ≥ 0,5 (veri yoksa uygulanmaz). None = kapalı
     "score_tilt": True,      # pay × (puan / 40, 0,75–1,5 arası): yüksek puana büyük pay
     "changes_days": 30,
     # Çıkış kuralı: "score" = skor < exit_score | "ema50" = kapanış < EMA50 |
@@ -356,7 +405,7 @@ def fetch_fundamentals(tickers: list[str], max_age_days: int = 7, limit: int = 1
         cache = {"items": {}}
     items = cache.setdefault("items", {})
     today = pd.Timestamp.today().normalize()
-    stale = [t for t in tickers if t not in items
+    stale = [t for t in tickers if t not in items or "net_dq" not in items[t]          # net_dq: 17 Kasım 2026'da eklendi
              or (today - pd.Timestamp(items[t].get("fetched", "2000-01-01"))).days >= max_age_days]
     if stale:
         import time
@@ -387,6 +436,8 @@ def fetch_fundamentals(tickers: list[str], max_age_days: int = 7, limit: int = 1
                     got_isy += 1
             except Exception as e:  # noqa: BLE001
                 print(f"  ! {t}: İş Yatırım bilançosu alınamadı ({type(e).__name__})", file=sys.stderr)
+            if items.get(t) is not None and items[t].get("fetched") == str(today.date()):
+                items[t].setdefault("net_dq", None)          # bilanço yoksa her gün yeniden denenmesin
             time.sleep(0.3)
         cache["updated"] = str(today.date())
         print(f"  ✓ Temel veriler: Yahoo {got}, İş Yatırım bilanço {got_isy} / {len(stale[:limit])} hisse")
@@ -704,6 +755,7 @@ def official_fill(data: dict[str, pd.DataFrame], days: int = 6, bulletins: dict 
             b = fetch_bulletin(d)
             if b is not None:
                 bulletins[d] = b
+    LAST_BULLETINS.update(bulletins)
     for d in sorted(bulletins):
         b = bulletins[d]
         for t, df in data.items():
@@ -831,8 +883,17 @@ def isy_financials(t: str, today: pd.Timestamp, groups=("XI_29", "UFRS_K", "UFRS
             fy, prev = (last[0] - 1, 12), (last[0] - 1, last[1])
             ttm = net(last) + net(fy) - net(prev) if fy in ok and prev in ok and None not in (
                 net(last), net(fy), net(prev)) else None
+        def qnet(p):                  # çeyreklik net kâr (tablo yıl başından birikimli)
+            if p not in vals or net(p) is None:
+                return None
+            if p[1] == 3:
+                return net(p)
+            pp = (p[0], p[1] - 3)
+            return net(p) - net(pp) if pp in vals and net(pp) is not None else None
+        a, b = qnet(last), qnet((last[0] - 1, last[1]))
         return {"net_ttm": ttm, "equity": f(vals[last], "2O"), "capital": f(vals[last], "2OA"),
-                "fin_period": f"{last[0]}/{last[1]:02d}", "fin_group": group}
+                "fin_period": f"{last[0]}/{last[1]:02d}", "fin_group": group,
+                "net_dq": (a - b) if a is not None and b is not None else None}   # son çeyrek − geçen yılın aynı çeyreği
     return None
 
 
@@ -1111,6 +1172,36 @@ def value_history(cal: pd.DatetimeIndex, tickers: list[str], fund: dict | None =
             R = rank_value(EY, BP, pd.Series(fin), M)
             V.update(R.reindex(index=cal).reindex(columns=tickers))
     return V
+
+
+def growth_history(cal: pd.DatetimeIndex, tickers: list[str], fund: dict | None = None, closes: dict | None = None,
+                   shares: dict | None = None, universe: list[str] | None = None) -> pd.DataFrame:
+    """Günlük kâr büyümesi sırası (0–1, kaydırılmamış): (son çeyrek net kâr − geçen yılın aynı çeyreği) / piyasa değeri, o günün
+    evreninde yüzdelik sıra (bankalar ayrı). Arşiv value_hist.npz "g" (noktasal); arşivden sonra son sıra en fazla 70 iş günü taşınır
+    (bilanço değişmedikçe sıra yavaş değişir); bugün fundamentals.json'daki `net_dq` ile yeniden hesaplanır."""
+    G = pd.DataFrame(np.nan, index=cal, columns=tickers)
+    path = os.path.join(OUT_DIR, VALUE_HIST)
+    if os.path.exists(path):
+        z = np.load(path, allow_pickle=False)
+        if "g" in z.files:
+            arr = z["g"].astype(float)
+            arr[arr == 255] = np.nan
+            A = pd.DataFrame(arr / 100, index=pd.to_datetime(z["dates"]), columns=list(z["tickers"])).reindex(columns=tickers)
+            G.update(A.reindex(cal))
+            G = G.ffill(limit=70)
+    if fund and closes:
+        raw, fin = {}, {}
+        for t in (universe or tickers):
+            f_ = fund.get(t) or {}
+            sh = (shares or {}).get(t) or f_.get("capital")
+            if f_.get("net_dq") is not None and sh and closes.get(t):
+                raw[t] = f_["net_dq"] / (sh * closes[t])
+                fin[t] = f_.get("fin_group") not in (None, "XI_29")
+        if raw:
+            x = pd.Series(raw)
+            r = pd.concat([x[[t for t in x.index if fin[t] == g]].rank(pct=True) for g in (True, False)])
+            G.loc[cal[-1], [t for t in r.index if t in G.columns]] = r[[t for t in r.index if t in G.columns]].values
+    return G
 
 
 def value_today(signals_close: dict, fund: dict, shares: dict) -> dict:
@@ -1392,14 +1483,16 @@ def entry_allowed(index: pd.DatetimeIndex) -> pd.Series:
 
 
 def backtest(d: pd.DataFrame, sc: pd.Series, cash: pd.Series | None = None,
-             entry_mask: pd.Series | None = None) -> dict:
+             entry_mask: pd.Series | None = None, exec_px: pd.Series | None = None) -> dict:
     """
     Long-only. t günü kapanışında skor >= buy_threshold ise t+1 açılışta al.
+    exec_px (araştırma için): sinyalle alım-satımın yapıldığı fiyat (varsayılan t+1 açılışı; ör. t kapanışı). Stop yine gerçek fiyatlarla.
     Çıkış: skor < exit_score (t+1 açılışta) veya iz süren stop (gün içi).
     Pozisyonda olunmayan günlerde para nakitte durur ve `cash` getirisini kazanır.
     Döner: günlük strateji getirisi serisi, işlemler, pozisyon durumu.
     """
     o, h, l, c, atr = (d[k].to_numpy() for k in ("Open", "High", "Low", "Close", "atr"))
+    ox = o if exec_px is None else exec_px.reindex(d.index).fillna(d["Open"]).to_numpy()
     score = sc.to_numpy()
     cash_r = cash.reindex(d.index).fillna(0).to_numpy() if cash is not None else np.zeros(len(d))
     allow = entry_allowed(d.index).to_numpy()
@@ -1440,8 +1533,8 @@ def backtest(d: pd.DataFrame, sc: pd.Series, cash: pd.Series | None = None,
     for i in range(start, n):
         # 1) Bir önceki kapanışta verilen emri açılışta uygula
         if pending == "buy" and not in_pos:
-            entry_px = o[i] * (1 + cost)
-            stop = o[i] - CFG["stop_atr"] * atr[i - 1] if use_stop else -np.inf
+            entry_px = ox[i] * (1 + cost)
+            stop = ox[i] - CFG["stop_atr"] * atr[i - 1] if use_stop else -np.inf
             in_pos, entry_i = True, i
             held[i] = True
             day_ret = c[i] / entry_px - 1
@@ -1456,7 +1549,7 @@ def backtest(d: pd.DataFrame, sc: pd.Series, cash: pd.Series | None = None,
             daily[i] = day_ret
         elif pending == "sell" and in_pos:
             held[i] = True
-            exit_px = o[i] * (1 - cost)
+            exit_px = ox[i] * (1 - cost)
             daily[i] = exit_px / c[i - 1] - 1
             trades.append(_trade(d, entry_i, i, entry_px, exit_px, "sinyal"))
             in_pos = False
@@ -1558,7 +1651,7 @@ def run(demo: bool, telegram_test: bool = False) -> None:
     if demo:
         data = fetch_demo(tickers + [BENCHMARK])
     else:
-        universe = sorted(set(tickers) | set(CANDIDATES))
+        universe = sorted(set(tickers) | set(load_candidates()))
         print(f"  {len(universe)} hisse + endeks indiriliyor (2004'ten beri)...")
         data = fetch_real(universe + [BENCHMARK], verbose=False)
         try:
@@ -1567,6 +1660,12 @@ def run(demo: bool, telegram_test: bool = False) -> None:
         except Exception as e:  # noqa: BLE001  (yardımcı kaynak; hata botu durdurmasın)
             print(f"  ! Resmî/yedek fiyat kontrolü yapılamadı: {type(e).__name__}: {e}", file=sys.stderr)
         print(f"  {len(data)} seri indirildi")
+        try:
+            added = update_candidates(LAST_BULLETINS)
+            if added:
+                print(f"  ✓ Yeni aday hisseler (bir sonraki çalıştırmadan itibaren): {', '.join(added)}")
+        except Exception as e:  # noqa: BLE001
+            print(f"  ! Aday listesi güncellenemedi: {type(e).__name__}: {e}", file=sys.stderr)
         data = fix_jumps(data)
     usdtry = None
     if not demo:
@@ -1634,6 +1733,13 @@ def run(demo: bool, telegram_test: bool = False) -> None:
     thr = CFG["value_filter"]
     v_ok = ((V_prev >= thr) | V_prev.isna()) if thr is not None else None
     v_now = V_raw.iloc[-1]
+    gthr = CFG.get("growth_filter")
+    G_raw = (growth_history(full_cal, vcols, fund, {t: float(data[t]["Close"].iloc[-1]) for t in tickers if t in data}, shares, tickers)
+             if not demo else pd.DataFrame(np.nan, index=full_cal, columns=vcols))
+    if gthr is not None:
+        g_ok = (G_raw.shift(1) >= gthr) | G_raw.shift(1).isna()
+        v_ok = g_ok if v_ok is None else (v_ok & g_ok)
+    g_now = G_raw.iloc[-1]
     if vt is not None:
         print(f"  Ucuzluk puanı: {int(v_now.reindex(tickers).notna().sum())}/{len(tickers)} hisse")
 
@@ -1676,7 +1782,9 @@ def run(demo: bool, telegram_test: bool = False) -> None:
             "score": round(score, 1),
             "signal": sig,
             "value_score": None if pd.isna(v_now.get(t)) else int(round(float(v_now[t]) * 100)),
-            "strong": bool(sig == "AL" and thr is not None and pd.notna(v_now.get(t)) and v_now[t] >= thr),
+            "growth_score": None if pd.isna(g_now.get(t)) else int(round(float(g_now[t]) * 100)),
+            "strong": bool(sig == "AL" and thr is not None and pd.notna(v_now.get(t)) and v_now[t] >= thr
+                           and (gthr is None or pd.isna(g_now.get(t)) or g_now[t] >= gthr)),
             "state": state,
             "score_5d_ago": round(float(sc["score"].iloc[-6]), 1),
             "components": {k: round(float(comp[k]), 1) for k in ACTIVE},
@@ -2027,7 +2135,8 @@ def notify(meta: dict, regime: dict, counts: dict, changes: list[dict], live: di
         lines.append(f"⏸ Reel faiz %{regime['real_rate']:+.1f} (eşik %{regime['filter_max']:.0f}): model yeni alım yapmıyor.")
     lines.append(f"Toplam: {counts['AL']} AL ({counts.get('GUCLU', 0)} güçlü ⭐) · {counts['TUT']} TUT · {counts['SAT']} SAT")
     if ins and any(c["ticker"] in strong for c in ins):
-        lines.append("⭐ = GÜÇLÜ AL (teknik olarak güçlü ve sektörüne göre ucuz; model portföy yalnızca bunları alır)")
+        lines.append("⭐ = GÜÇLÜ AL (teknik olarak güçlü, ucuz ve kârı büyüyen; model portföy yalnızca bunları alır, "
+                     "ertesi sabah açılışta)")
     if live and len(live["points"]) > 1:
         p0, p1 = live["points"][0], live["points"][-1]
         lines.append(f"Canlı portföy ({p0['date']}'den beri): %{(p1['value'] / p0['value'] - 1) * 100:+.1f} · "

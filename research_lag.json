@@ -1,0 +1,114 @@
+{
+ "events": {
+  "-20": {
+   "n": 32705,
+   "avg_pct": 5.05,
+   "pos_pct": 66
+  },
+  "-5": {
+   "n": 32705,
+   "avg_pct": 1.45,
+   "pos_pct": 58
+  },
+  "gun": {
+   "n": 32705,
+   "avg_pct": 3.0,
+   "pos_pct": 94
+  },
+  "gap": {
+   "n": 32705,
+   "avg_pct": 0.32,
+   "pos_pct": 59
+  },
+  "+5": {
+   "n": 32705,
+   "avg_pct": 0.51,
+   "pos_pct": 49
+  },
+  "+21": {
+   "n": 32705,
+   "avg_pct": 2.68,
+   "pos_pct": 53
+  },
+  "+63": {
+   "n": 32705,
+   "avg_pct": 7.65,
+   "pos_pct": 56
+  }
+ },
+ "base21_pct": 1.99,
+ "rows": [
+  {
+   "yontem": "bugunku: kapanista sinyal, ertesi acilista islem",
+   "egitim_yil": 22.84,
+   "egitim_dd": -16.39,
+   "egitim_sh": 0.99,
+   "test_yil": 51.51,
+   "test_dd": -20.83,
+   "test_sh": 1.0,
+   "tum_yil": 30.21,
+   "tum_dd": -20.83,
+   "tum_sh": 0.97
+  },
+  {
+   "yontem": "0 gecikme: sinyal gunu kapanisinda islem (teorik)",
+   "egitim_yil": 25.39,
+   "egitim_dd": -16.64,
+   "egitim_sh": 1.16,
+   "test_yil": 54.99,
+   "test_dd": -20.05,
+   "test_sh": 1.13,
+   "tum_yil": 33.0,
+   "tum_dd": -20.05,
+   "tum_sh": 1.12
+  },
+  {
+   "yontem": "+1 gun gec",
+   "egitim_yil": 20.58,
+   "egitim_dd": -18.26,
+   "egitim_sh": 0.82,
+   "test_yil": 47.01,
+   "test_dd": -21.51,
+   "test_sh": 0.82,
+   "tum_yil": 27.41,
+   "tum_dd": -21.51,
+   "tum_sh": 0.81
+  },
+  {
+   "yontem": "+2 gun gec",
+   "egitim_yil": 19.78,
+   "egitim_dd": -19.46,
+   "egitim_sh": 0.76,
+   "test_yil": 45.03,
+   "test_dd": -25.77,
+   "test_sh": 0.74,
+   "tum_yil": 26.32,
+   "tum_dd": -25.77,
+   "tum_sh": 0.74
+  },
+  {
+   "yontem": "erken giris: esik 35",
+   "egitim_yil": 23.2,
+   "egitim_dd": -16.88,
+   "egitim_sh": 1.01,
+   "test_yil": 51.35,
+   "test_dd": -20.9,
+   "test_sh": 0.99,
+   "tum_yil": 30.45,
+   "tum_dd": -20.9,
+   "tum_sh": 0.98
+  },
+  {
+   "yontem": "erken giris: esik 30",
+   "egitim_yil": 23.35,
+   "egitim_dd": -17.42,
+   "egitim_sh": 1.0,
+   "test_yil": 52.22,
+   "test_dd": -20.65,
+   "test_sh": 1.01,
+   "tum_yil": 30.77,
+   "tum_dd": -20.65,
+   "tum_sh": 0.98
+  }
+ ]
+}

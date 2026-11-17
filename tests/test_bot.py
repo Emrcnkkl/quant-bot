@@ -353,5 +353,33 @@ class TestUcuncuUc(unittest.TestCase):
                 bot.OUT_DIR = old
 
 
+class TestOtomatikAday(unittest.TestCase):
+    def test_kural_ve_kalicilik(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            old = bot.OUT_DIR
+            bot.OUT_DIR = tmp
+            try:
+                days = pd.bdate_range("2026-08-03", periods=25)
+                # YENI: her gün ilk 150'de; AZ: yalnızca 5 gün; eski aday (THYAO) eklenmez
+                def bul(i):
+                    codes = ["YENI", "THYAO"] + [f"X{k:03d}" for k in range(300)]
+                    vol = [1e9, 9e8] + [1e6 - k for k in range(300)]
+                    if i < 5:
+                        codes.append("AZ"); vol.append(2e9)
+                    return pd.DataFrame({"TLVolume": vol}, index=codes)
+                added = bot.update_candidates({d: bul(i) for i, d in enumerate(days)})
+                self.assertIn("YENI", added)
+                self.assertNotIn("AZ", added)
+                self.assertNotIn("THYAO", added)
+                self.assertIn("YENI", bot.load_candidates())
+                self.assertIn("THYAO", bot.load_candidates())
+                st = json.load(open(os.path.join(tmp, bot.AUTO_CAND)))
+                self.assertLessEqual(len(st["days"]), bot.AUTO_DAYS)
+                self.assertEqual(bot.update_candidates({}), [])          # ikinci kez eklenmez, kalıcı
+                self.assertIn("YENI", bot.load_candidates())
+            finally:
+                bot.OUT_DIR = old
+
+
 if __name__ == "__main__":
     unittest.main()

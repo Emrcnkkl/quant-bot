@@ -1,0 +1,121 @@
+{
+ "rows": [
+  {
+   "adaylar": "eski 156 aday",
+   "yontem": "model",
+   "egitim_yil": 22.84,
+   "egitim_dd": -16.39,
+   "egitim_sh": 0.99,
+   "test_yil": 51.51,
+   "test_dd": -20.83,
+   "test_sh": 1.0,
+   "tum_yil": 30.21,
+   "tum_dd": -20.83,
+   "tum_sh": 0.97
+  },
+  {
+   "adaylar": "eski 156 aday",
+   "yontem": "model + kar buyumesi",
+   "egitim_yil": 22.93,
+   "egitim_dd": -11.99,
+   "egitim_sh": 1.15,
+   "test_yil": 58.55,
+   "test_dd": -17.15,
+   "test_sh": 1.38,
+   "tum_yil": 31.94,
+   "tum_dd": -17.15,
+   "tum_sh": 1.2
+  },
+  {
+   "adaylar": "eski 156 aday",
+   "yontem": "evren al-bekle",
+   "egitim_yil": 19.38,
+   "egitim_dd": -63.05,
+   "egitim_sh": 0.44,
+   "test_yil": 37.07,
+   "test_dd": -37.06,
+   "test_sh": 0.35,
+   "tum_yil": 24.05,
+   "tum_dd": -63.05,
+   "tum_sh": 0.41
+  },
+  {
+   "adaylar": "+ bugunku ilk 200",
+   "yontem": "model",
+   "egitim_yil": 22.18,
+   "egitim_dd": -17.32,
+   "egitim_sh": 0.94,
+   "test_yil": 51.92,
+   "test_dd": -19.89,
+   "test_sh": 1.03,
+   "tum_yil": 29.81,
+   "tum_dd": -19.89,
+   "tum_sh": 0.95
+  },
+  {
+   "adaylar": "+ bugunku ilk 200",
+   "yontem": "model + kar buyumesi",
+   "egitim_yil": 22.58,
+   "egitim_dd": -12.75,
+   "egitim_sh": 1.11,
+   "test_yil": 58.33,
+   "test_dd": -16.32,
+   "test_sh": 1.39,
+   "tum_yil": 31.62,
+   "tum_dd": -16.32,
+   "tum_sh": 1.19
+  },
+  {
+   "adaylar": "+ bugunku ilk 200",
+   "yontem": "evren al-bekle",
+   "egitim_yil": 18.44,
+   "egitim_dd": -65.12,
+   "egitim_sh": 0.4,
+   "test_yil": 28.39,
+   "test_dd": -60.14,
+   "test_sh": 0.12,
+   "tum_yil": 21.13,
+   "tum_dd": -65.12,
+   "tum_sh": 0.32
+  },
+  {
+   "adaylar": "tum hisseler",
+   "yontem": "model",
+   "egitim_yil": 21.54,
+   "egitim_dd": -19.19,
+   "egitim_sh": 0.87,
+   "test_yil": 50.92,
+   "test_dd": -21.48,
+   "test_sh": 0.99,
+   "tum_yil": 29.08,
+   "tum_dd": -21.48,
+   "tum_sh": 0.9
+  },
+  {
+   "adaylar": "tum hisseler",
+   "yontem": "model + kar buyumesi",
+   "egitim_yil": 22.26,
+   "egitim_dd": -14.28,
+   "egitim_sh": 1.04,
+   "test_yil": 56.71,
+   "test_dd": -18.45,
+   "test_sh": 1.33,
+   "tum_yil": 30.99,
+   "tum_dd": -18.45,
+   "tum_sh": 1.13
+  },
+  {
+   "adaylar": "tum hisseler",
+   "yontem": "evren al-bekle",
+   "egitim_yil": 13.25,
+   "egitim_dd": -69.23,
+   "egitim_sh": 0.22,
+   "test_yil": 21.87,
+   "test_dd": -60.28,
+   "test_sh": -0.07,
+   "tum_yil": 15.58,
+   "tum_dd": -69.23,
+   "tum_sh": 0.14
+  }
+ ]
+}

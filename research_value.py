@@ -74,7 +74,7 @@ def fetch_mcap(t: str) -> pd.Series | None:
 
 def main_data(workers: int = 4) -> None:
     from concurrent.futures import ThreadPoolExecutor, as_completed
-    with open(os.path.join(".cache", "wide.pkl"), "rb") as f:
+    with open(os.environ.get("RESEARCH_WIDE") or os.path.join(".cache", "wide.pkl"), "rb") as f:
         tickers = sorted(pickle.load(f).keys())
     tickers = [t for t in tickers if t != bot.BENCHMARK]
     try:
@@ -123,7 +123,7 @@ def value_frames(raw: dict, cal: pd.DatetimeIndex, tickers: list[str]):
                 ttm[avail] = v
             eq[avail] = e
         mc = rec["mcap"]
-        mc = mc[mc > 0].reindex(cal).ffill(limit=5)
+        mc = mc[mc > 0]; mc = mc[~mc.index.duplicated(keep="last")].reindex(cal).ffill(limit=5)
         lim = 400                                              # 400 günden eski bilanço kullanılmaz
         T = pd.Series(ttm).sort_index()
         E = pd.Series(eq).sort_index()
@@ -247,7 +247,7 @@ def main_test() -> None:
 
 
 def main_archive() -> None:
-    """Bot için geçmiş ucuzluk puanı arşivi: value_hist.npz (gün × hisse, 0–100, 255 = veri yok; noktasal evrene göre,
+    """Bot için geçmiş ucuzluk (v) ve kâr büyümesi (g) sırası arşivi: value_hist.npz (gün × hisse, 0–100, 255 = veri yok; noktasal evrene göre,
     kaydırılmamış). Bot bunu okuyup bir gün kaydırarak kullanır; arşivden sonraki günler valuation_history.csv'den hesaplanır."""
     import research
     cal, cash, mem, comps = research.bot_setup()
@@ -257,12 +257,19 @@ def main_archive() -> None:
     M = mem.reindex(index=cal, columns=tick).fillna(False)
     EY, BP, FIN = value_frames(raw, cal, tick)
     V = value_score(EY, BP, FIN, M).reindex(columns=tick)
+    import research_growth
+    GQ, _ = research_growth.growth_frames(raw, cal, tick)
+    G = research_growth.rank_in_universe(GQ, FIN, M).reindex(index=V.index, columns=tick)
     V = V.loc[V.notna().any(axis=1)]
-    last = min(rec["mcap"].index.max() for rec in raw.values() if rec["mcap"] is not None and len(rec["mcap"]))
+    G = G.reindex(V.index)
+    # arşiv sonu: hisselerin çoğunun piyasa değeri verisinin bittiği gün (borsadan çıkan/kod değiştirenler en erken günü belirlemesin)
+    last = pd.Series([rec["mcap"].index.max() for rec in raw.values() if rec["mcap"] is not None and len(rec["mcap"])]).quantile(0.5)
     V = V.loc[:min(V.index.max(), last)]
+    G = G.loc[V.index]
     arr = np.where(V.isna(), 255, (V * 100).round()).astype(np.uint8)
+    garr = np.where(G.isna(), 255, (G * 100).round()).astype(np.uint8)
     np.savez_compressed("value_hist.npz", dates=np.array([str(d.date()) for d in V.index], dtype=str), tickers=np.array(list(V.columns), dtype=str),
-                        v=arr, fin=np.array([bool(FIN.get(t, False)) for t in V.columns]))
+                        v=arr, g=garr, fin=np.array([bool(FIN.get(t, False)) for t in V.columns]))
     print(f"value_hist.npz: {V.index[0].date()} – {V.index[-1].date()}, {len(V.columns)} hisse, "
           f"{os.path.getsize('value_hist.npz') / 1024:.0f} KB")
 

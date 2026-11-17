@@ -117,7 +117,7 @@ jobs:
           git config user.name "bist30-bot"
           git config user.email "bot@users.noreply.github.com"
           # Yalnızca küçük, kalıcı kayıtlar depoya yazılır; site dosyaları aşağıda Pages'e yüklenir.
-          for f in history.json live.json notify.json fundamentals.json names.json valuation_history.csv ipo_state.json; do
+          for f in history.json live.json notify.json fundamentals.json names.json valuation_history.csv ipo_state.json candidates.json; do
             if [ -e "$f" ]; then git add -A -- "$f"; fi
           done
           if git diff --staged --quiet; then echo "Değişiklik yok"; exit 0; fi

@@ -59,7 +59,7 @@ def fix(data: dict[str, pd.DataFrame], quiet: bool = False) -> dict[str, pd.Data
     return bot.fix_jumps(data, START, quiet)
 
 
-WIDE = os.path.join(bot.OUT_DIR, ".cache", "wide.pkl")
+WIDE = os.environ.get("RESEARCH_WIDE") or os.path.join(bot.OUT_DIR, ".cache", "wide.pkl")   # RESEARCH_WIDE: başka aday seti
 
 
 def pit_membership(data: dict[str, pd.DataFrame], cal: pd.DatetimeIndex, n: int = 30) -> pd.DataFrame:
