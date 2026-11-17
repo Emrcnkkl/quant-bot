@@ -122,6 +122,7 @@ ve sonuçları statik bir web sayfasında gösteren bir bot. Şu an **Aşama 1**
 | Bileşen testi (`research.py --bilesen`) | ema_cross ve relative çıkınca iki dönemde de iyileşiyor; macd, rsi, adx, breakout, volume gerekli; ema200 sınırda | **ema_cross + relative çıkarıldı** (`ACTIVE`) |
 | Ağırlık yöntemleri (`research.py --agirlik`) | puana göre eğim: Sharpe 0.53→0.58 / 1.00→1.13 ama düşüş −16.7→−18.9 (2 puan sınırını az aştı); diğerleri fark yok/kötü | 17 Kasım'da ucuzlukla birlikte **eklendi** (`score_tilt`) |
 | Getiri artırma (`research.py --getiri`, 16 Kasım) | daha büyük pay (1/25, 1/20), tam yatırım, en iyi 10/15, faiz filtresi kapalı: hepsi getiriyi **düşürdü**, riski artırdı (yüksek faizde hisse payı = getiri değil); yalnız puana göre ağırlık +1,2/+5,5 | kullanıcı hedefi getiri, düşüş sınırı −%35 |
+| Evren × faiz filtresi (`research_value.py --genis`, 17 Kasım, temel pay 1/50, güncel model) | 50: %25,9 · **75: %28,9** (+2,5/+4,5, −%18,7, Sharpe 0,96) · **100: %30,2** (+5,2/+1,0, −%20,8, 0,97). Yüksek reel faizde güçlü AL'a izin: her evrende 2. dönem kötüleşti | faiz filtresi kalsın; evren kararı kullanıcıda |
 | **Ucuzluk** (`research_value.py`, 2008'den noktasal F/K–PD/DD, İş Yatırım, tüm işlem maliyetleri) | AL + ucuz yarı + ucuza/puana pay: yıllık %23,5→%25,9 (iki dönem +2,4/+2,8), düşüş −16,7→−15,0, Sharpe 0,69→0,91, reel %3,9→%5,8. Saf ucuzluk %27,7 ama −%57; ucuzluk+trend %26,4, −%27 (2. dönem +1,2). Ucuzluk + trend testinde ileriye bakma hatası bulunup düzeltildi | **eklendi** (17 Kasım): `value_filter=0.5`, `value_tilt`, `score_tilt`; GÜÇLÜ AL |
 
 ## Dosya yapısı
@@ -234,8 +235,10 @@ exit_rule ("score" varsayılan | ema50 | cross | ema200 | regime), entry_rule ("
 - `bot.py` tek dosya kalsın, ta ki belirgin şekilde büyüyene kadar; Python 3.10 uyumlu olmalı (kullanıcının makinesi 3.10).
 - JSON `allow_nan=False` ile yazılır → NaN değerleri `r2()` ile `None`'a çevir.
 - Sayfalar dışa bağımlılık içermez (yazı tipi `fonts/`, CSS'te `../fonts/`); koyu tema `:root`'ta; açık tema cihaz tercihine göre (`@media (prefers-color-scheme:light){:root:not([data-theme=dark])}`) ya da menüdeki tema düğmesiyle (`html[data-theme]`, localStorage "tema"; her sayfanın başında ilk boyamadan önce uygulayan küçük betik). Üst menüde Telegram düğmesi yok (alt bilgide var). Yeni sayfa: başlığı diğer sayfalardan kopyala, `<nav id="top">` + `<footer id="foot">`, `assets/core.js`, `chrome("anahtar")`, `NAV`'a ekle. Saatleri `timeZone: "Europe/Istanbul"` ile göster.
-- "Premium" tema: arka planda ışık + ızgara, yarı saydam kart yüzeyleri (`--surface`), gradyan kenarlı hero, sayaç animasyonu,
-  hisse simgeleri (`who()` / `.av`, renk `hue(ticker)`), kaydırınca belirme (`.rv`), `prefers-reduced-motion` destekli.
+- **Tasarım 2 — "profesyonel terminal"** (17 Kasım 2026, kullanıcı "yapay ve ucuz" buldu): `assets/app.css` sonundaki katman eski "premium"
+  kuralların üzerine yazar — düz yüzeyler, 1px çizgi, 6–8px köşe, tek vurgu rengi (koyu #4a86ff / açık #1f5bd8), sakin yeşil/kırmızı;
+  arka plan ışığı/ızgarası, renk geçişli yazı (`.gtext` düz renk), parlama, gölge, ping animasyonu, `.kicker` bölüm etiketleri YOK; menü 56px,
+  sıkı tablolar, sade hisse simgeleri (`.av` tonlu düz kutu). Yeni bileşen eklerken bu dili koru (gradyan/glow ekleme).
 - Mobilde (≤520px) sinyal tablosunda simge ve puan çubuğu gizlenir, şirket adı kısaltılır — tablo 360px'e sığmalı.
 - Sayfa metinleri teknik bilgisi olmayan okura göre yazılır; jargon gerekiyorsa `title` ipucu ya da SSS ile açıklanır.
 - Sayılar `tr-TR` formatında gösterilir.

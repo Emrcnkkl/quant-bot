@@ -524,3 +524,114 @@ nav .links a.hl.on{border-color:var(--accent);background:color-mix(in srgb,var(-
 .badge.strong{background:linear-gradient(135deg,color-mix(in srgb,var(--al) 26%,transparent),color-mix(in srgb,var(--accent) 22%,transparent));border-color:color-mix(in srgb,var(--al) 70%,transparent);color:var(--al);box-shadow:0 0 14px -4px var(--al);white-space:nowrap}
 .badge.strong::before{content:"★";width:auto;height:auto;background:none;font-size:11px}
 @media(max-width:520px){.badge.strong .lg{display:none}}
+
+/* =========================================================================================
+   TASARIM 2 — "Profesyonel terminal" (17 Kasım 2026): düz yüzeyler, 1px çizgiler, küçük köşeler,
+   tek vurgu rengi; parlama, renk geçişi, arka plan ışığı/ızgarası ve hareketli süsler yok.
+   Bu katman yukarıdaki kuralların üzerine yazar.
+   ========================================================================================= */
+:root{
+  --bg:#0c0f13;--bg2:#10141a;--surface:#12161c;--surface2:#181d24;--card:#12161c;--card2:#181d24;
+  --ink:#e6e9ed;--ink2:#b6bdc6;--muted:#7d8793;--line:#222831;--line2:#2e3641;--hi:transparent;
+  --accent:#4a86ff;--accent2:#4a86ff;--grad:linear-gradient(var(--accent),var(--accent));
+  --al:#26b37f;--al-bg:rgba(38,179,127,.12);--sat:#ef5361;--sat-bg:rgba(239,83,97,.12);--tut:#d6a23c;--tut-bg:rgba(214,162,60,.12);
+  --warn-bg:rgba(214,162,60,.06);--warn-line:rgba(214,162,60,.28);
+  --shadow:none;--glow1:transparent;--glow2:transparent;--grid:transparent;
+}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){
+  --bg:#f4f5f7;--bg2:#eceef1;--surface:#ffffff;--surface2:#f7f8fa;--card:#ffffff;--card2:#f7f8fa;
+  --ink:#14181d;--ink2:#3b434e;--muted:#69727e;--line:#e2e5e9;--line2:#d2d7dd;--hi:transparent;
+  --accent:#1f5bd8;--accent2:#1f5bd8;--grad:linear-gradient(var(--accent),var(--accent));
+  --al:#0e875c;--al-bg:#e5f3ec;--sat:#c62f3d;--sat-bg:#fbe8ea;--tut:#a26a0e;--tut-bg:#faf0dd;
+  --warn-bg:#fdf8ee;--warn-line:#ecd9b0;--shadow:none;--glow1:transparent;--glow2:transparent;--grid:transparent;
+}}
+:root[data-theme="light"]{
+  --bg:#f4f5f7;--bg2:#eceef1;--surface:#ffffff;--surface2:#f7f8fa;--card:#ffffff;--card2:#f7f8fa;
+  --ink:#14181d;--ink2:#3b434e;--muted:#69727e;--line:#e2e5e9;--line2:#d2d7dd;--hi:transparent;
+  --accent:#1f5bd8;--accent2:#1f5bd8;--grad:linear-gradient(var(--accent),var(--accent));
+  --al:#0e875c;--al-bg:#e5f3ec;--sat:#c62f3d;--sat-bg:#fbe8ea;--tut:#a26a0e;--tut-bg:#faf0dd;
+  --warn-bg:#fdf8ee;--warn-line:#ecd9b0;--shadow:none;--glow1:transparent;--glow2:transparent;--grid:transparent;
+}
+body{font-size:14.5px}
+body::before,body::after{display:none}
+html{scroll-padding-top:72px}
+.gtext{background:none;-webkit-background-clip:border-box;background-clip:border-box;color:var(--accent)}
+/* Menü */
+nav{background:var(--bg);backdrop-filter:none;-webkit-backdrop-filter:none}
+nav .wrap{height:56px}
+.brand .mark{box-shadow:none;border-radius:7px;width:30px;height:30px}
+.wm{font-size:20px}
+.dot{box-shadow:none}.dot::after{display:none}
+nav .help{border-radius:7px;background:transparent}
+nav .links a.hl{border-radius:6px;background:transparent;border-color:var(--line2);height:32px}
+nav .links a.hl:hover{background:var(--surface2)}
+nav .links a.hl.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,transparent)}
+.mnav a.hl{border-radius:6px;background:transparent;border-color:var(--line2)}
+.subnav{top:56px;background:var(--bg);backdrop-filter:none;-webkit-backdrop-filter:none;border-bottom:1px solid var(--line);padding:8px 0}
+.subnav a{border-radius:6px;background:transparent;border-color:transparent;padding:6px 12px}
+.subnav a.on{background:var(--surface2);border-color:var(--line2)}
+@media(max-width:1120px){.subnav{top:100px}}
+/* Yüzeyler */
+.card,.tile,.stat,.step,.tbl,.faq details,details.more>summary{background:var(--card);box-shadow:none;border-color:var(--line)}
+.card{border-radius:8px;padding:18px 20px}
+.hero{border-radius:8px;padding:30px 28px 26px}
+.hero::before,.hero::after{display:none}
+.tile{border-radius:8px;padding:16px 18px}
+.tile::after{display:none}
+.tile:hover,.mk:hover{transform:none}
+.tile .v{font-size:34px;font-weight:700}
+.step{border-radius:8px}
+.step .n{background:var(--accent);box-shadow:none;border-radius:6px;width:28px;height:28px;font-size:13px}
+.faq details{border-radius:6px}
+.chip{border-radius:6px;padding:7px 12px}
+.chip i{box-shadow:none}
+.tabs,.seg{border-radius:7px;padding:3px}
+.tabs button,.seg button{border-radius:5px;padding:6px 12px;font-size:13px}
+input[type=search]{border-radius:7px}
+.warn{border-radius:6px;padding:10px 14px;margin:18px 0}
+.filt{border-radius:6px}
+/* Başlıklar ve bölümler */
+.kicker{display:none}
+h2{font-size:22px;font-weight:680;letter-spacing:-.015em;margin:0 0 6px}
+h3.sm{font-size:16px;font-weight:650}
+.lead{font-size:14px;margin-bottom:16px}
+.ph h1{font-size:26px;font-weight:700;letter-spacing:-.02em}
+section{padding-top:28px}
+/* Tablolar: sıkı ve hizalı */
+.tbl{border-radius:8px}
+th,td{padding:9px 12px}
+th{font-size:10.5px;letter-spacing:.07em;background:var(--surface2)}
+tbody tr.row:hover,.mtbl tr.mrow:hover{background:var(--surface2)}
+.mini td{padding:6px 4px}
+/* Etiketler */
+.badge{border-radius:4px;min-width:42px;padding:2px 8px;font-size:11px;letter-spacing:.05em}
+.badge::before{display:none}
+.badge.strong{background:var(--al-bg);border-color:color-mix(in srgb,var(--al) 60%,transparent);box-shadow:none;color:var(--al)}
+.badge.strong::before{display:inline;content:"★";font-size:10px}
+.tv{border-radius:4px}
+/* Panel parçaları */
+.mk{border-radius:8px;padding:16px 18px 10px}
+.mk .v{font-size:24px;font-weight:700}
+.strip a{border-radius:6px;padding:7px 11px}
+.kv div,.calc-out div,.cal-it,.nw li .mt span,.cal-it .tks a,.cal-it .tks span{border-radius:6px}
+.ipo-cards .card,.eco-cards .card,.cal-top .card,.chartcard,.detail{border-radius:8px}
+.ipo-cards .bg,.eco-cards .bg,.cal-top .bg{font-size:24px}
+.tip{border-radius:5px}
+.tgcard .ic{background:#229ed9;box-shadow:none;border-radius:8px}
+.btn-tg{background:#229ed9;box-shadow:none;border-radius:6px}
+.btn-tg:hover,.contact button:hover{transform:none;filter:brightness(1.08)}
+.contact{border-radius:8px}
+.contact button{background:var(--accent);box-shadow:none;border-radius:6px}
+.contact input,.contact select,.contact textarea,.calc input,.calc select{border-radius:6px}
+.gl .term{border-radius:8px}
+/* Hareket: yalnızca kısa bir belirme */
+.rv{transform:none;transition:opacity .3s ease}
+/* Sade sayılar ve simgeler */
+.big{font-size:clamp(40px,6vw,60px);font-weight:700;letter-spacing:-.03em;background:none;-webkit-background-clip:border-box;background-clip:border-box;color:var(--ink);-webkit-text-fill-color:currentColor}
+.delta{border-radius:6px;font-size:16px;padding:3px 10px}
+.tag{border-radius:6px}
+.av{border-radius:6px;background:color-mix(in srgb,hsl(var(--h) 45% 50%) 16%,var(--card));color:hsl(var(--h) 45% 62%);box-shadow:none;border:1px solid color-mix(in srgb,hsl(var(--h) 45% 50%) 30%,transparent);font-weight:700}
+:root[data-theme="light"] .av{color:hsl(var(--h) 50% 36%)}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]) .av{color:hsl(var(--h) 50% 36%)}}
+.bar{height:5px;border-radius:2px}
+.bar i{border-radius:2px;box-shadow:none}

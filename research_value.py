@@ -267,11 +267,67 @@ def main_archive() -> None:
           f"{os.path.getsize('value_hist.npz') / 1024:.0f} KB")
 
 
+def main_genis() -> None:
+    """Evren genişliği (50/75/100) × faiz filtresi biçimi; hepsi güncel modelle (ucuzluk filtresi + ucuza/puana pay).
+    Temel pay her durumda 1/50 (havuz büyür, pozisyon küçülmez)."""
+    import research
+    with open(RAW, "rb") as f:
+        raw = pickle.load(f)
+    rows = []
+    base_cfg = dict(bot.CFG)
+    for N in (50, 75, 100):
+        bot.CFG.clear(); bot.CFG.update(base_cfg); bot.CFG["universe_size"] = N
+        cal, cash, mem, comps = research.bot_setup()
+        tick = list(comps)
+        M = mem.reindex(index=cal, columns=tick).fillna(False)
+        EY, BP, FIN = value_frames(raw, cal, tick)
+        V = value_score(EY, BP, FIN, M).reindex(index=cal, columns=tick).shift(1)
+        real = bot.macro_frame(cal)["real"]
+        high = (real > 5.0).shift(1).fillna(False)
+        variants = {
+            "faiz filtresi (bugunku)": (5.0, (V >= 0.5) | V.isna()),
+            "yuksek faizde de guclu AL": (None, (V >= 0.5) | V.isna()),
+            "yuksek faizde yalniz en ucuz ucte bir": (None, ((V >= 0.5) & (~high.values[:, None] | (V >= 2 / 3))) | V.isna()),
+        }
+        for lab, (rr, ok) in variants.items():
+            bot.CFG["real_rate_max"] = rr
+            rets, held, atrp, score = {}, {}, {}, {}
+            for t, (d, sc) in comps.items():
+                em = mem[t] & ok[t].reindex(mem.index).fillna(True)
+                bt = bot.backtest(d, sc["score"], cash.reindex(d.index).fillna(0), entry_mask=em)
+                rets[t], held[t] = bt["daily"], bt["held"]
+                atrp[t] = (d["atr"] / d["Close"]).shift(1)
+                score[t] = sc["score"].shift(1)
+            R = pd.DataFrame(rets).reindex(cal).fillna(0)
+            H = pd.DataFrame(held).reindex(cal).fillna(False).astype(bool) & M
+            A = pd.DataFrame(atrp).reindex(cal)
+            SC = pd.DataFrame(score).reindex(cal)
+            volf = A.pow(-1).mul(A.where(M).median(axis=1), axis=0).clip(1 / 3, 2).fillna(1)
+            Wt = H.astype(float) / 50 * volf * (0.5 + V).fillna(1) * (SC / 40).clip(0.75, 1.5).fillna(1)
+            Wt = Wt.div(Wt.sum(axis=1).clip(lower=1), axis=0)
+            e = Wt.sum(axis=1)
+            r = (Wt * R).sum(axis=1) + (1 - e) * cash
+            st = research.period_stats(r, cash, cal)
+            rows.append({"evren": N, "faiz": lab, **{f"{p}_{x}": v for p, t3 in st.items() for x, v in zip(("yil", "dd", "sh"), t3)},
+                         "hisse_payi": round(float(e.mean()) * 100)})
+            print(rows[-1], flush=True)
+        bot.CFG.clear(); bot.CFG.update(base_cfg)
+    df = pd.DataFrame(rows)
+    ref = df.iloc[0]
+    df["egitim_fark"] = (df.egitim_yil - ref.egitim_yil).round(1)
+    df["test_fark"] = (df.test_yil - ref.test_yil).round(1)
+    df["iki_donem_iyi"] = (df.egitim_fark > 0) & (df.test_fark > 0) & (df.tum_dd >= -35)
+    bot.write("research_genis.json", {"rows": df.to_dict("records")})
+    pd.set_option("display.width", 260)
+    print(df.to_string(index=False))
+
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--veri", action="store_true")
     ap.add_argument("--test", action="store_true")
     ap.add_argument("--arsiv", action="store_true", help="bot için value_hist.npz üret")
+    ap.add_argument("--genis", action="store_true", help="evren 50/75/100 × faiz filtresi biçimi")
     a = ap.parse_args()
     if a.veri:
         main_data()
@@ -279,3 +335,5 @@ if __name__ == "__main__":
         main_test()
     elif a.arsiv:
         main_archive()
+    elif a.genis:
+        main_genis()
