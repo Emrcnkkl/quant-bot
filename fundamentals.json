@@ -2324,6 +2324,23 @@
    "fin_period": "2026/09",
    "fin_group": "XI_29",
    "net_dq": -9642027.0
+  },
+  "GIPTA": {
+   "eps": -3.62,
+   "book": 29.003,
+   "currency": "TRY",
+   "div_yield": 0.1,
+   "roe": -0.17698999,
+   "mcap": 3796320000,
+   "sector": "Consumer Cyclical",
+   "industry": "Specialty Retail",
+   "fetched": "2026-11-17",
+   "net_ttm": -602583748.0,
+   "equity": 3828441468.0,
+   "capital": 132000000.0,
+   "fin_period": "2026/09",
+   "fin_group": "XI_29",
+   "net_dq": -280790279.0
   }
  },
  "updated": "2026-11-17"
