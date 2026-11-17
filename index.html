@@ -44,20 +44,20 @@
   <div class="mk-grid" id="cards"></div>
 
   <div class="two">
-    <div class="card" id="bistcard"><h3 class="t">Borsa İstanbul'da gün <a href="piyasalar.html#bist">Tümü →</a></h3><p class="st" id="bistst">Yükleniyor…</p><div id="bistbody"></div></div>
-    <div class="card" id="ecocard"><h3 class="t">Ekonomi <a href="ekonomi.html">Ayrıntı →</a></h3><p class="st">Türkiye'nin temel göstergeleri</p><div id="eco"></div></div>
+    <div class="card" data-sec="piyasalar" id="bistcard"><h3 class="t">Borsa İstanbul'da gün <a href="piyasalar.html#bist">Tümü →</a></h3><p class="st" id="bistst">Yükleniyor…</p><div id="bistbody"></div></div>
+    <div class="card" data-sec="ekonomi" id="ecocard"><h3 class="t">Ekonomi <a href="ekonomi.html">Ayrıntı →</a></h3><p class="st">Türkiye'nin temel göstergeleri</p><div id="eco"></div></div>
   </div>
   <div class="two">
-    <div class="card" id="sigcard"><h3 class="t">BIST50 Sinyal <a href="sinyal.html">Aç →</a></h3><p class="st">En büyük 50 hisse için teknik puan ve model portföy</p><div id="sig"></div></div>
-    <div class="card"><h3 class="t">Yaklaşan tarihler <a href="takvim.html">Takvim →</a></h3><p class="st">Faiz kararı, enflasyon, bilançolar</p><ul class="evl" id="upcoming"></ul></div>
+    <div class="card" data-sec="sinyal" id="sigcard"><h3 class="t">BIST50 Sinyal <a href="sinyal.html">Aç →</a></h3><p class="st">En büyük 50 hisse için teknik puan ve model portföy</p><div id="sig"></div></div>
+    <div class="card" data-sec="takvim"><h3 class="t">Yaklaşan tarihler <a href="takvim.html">Takvim →</a></h3><p class="st">Faiz kararı, enflasyon, bilançolar</p><ul class="evl" id="upcoming"></ul></div>
   </div>
   <div class="two">
-    <div class="card"><h3 class="t">Şirket haberleri (KAP) <a href="takvim.html">Tümü →</a></h3><p class="st">50 büyük şirketin son önemli bildirimleri</p><ul class="evl" id="kapnews"></ul></div>
-    <div class="card"><h3 class="t">Son haberler <a href="haberler.html">Tümü →</a></h3><p class="st">Ekonomi haber sitelerinden</p><ul class="evl" id="news"></ul></div>
+    <div class="card" data-sec="takvim"><h3 class="t">Şirket haberleri (KAP) <a href="takvim.html">Tümü →</a></h3><p class="st">50 büyük şirketin son önemli bildirimleri</p><ul class="evl" id="kapnews"></ul></div>
+    <div class="card" data-sec="haberler"><h3 class="t">Son haberler <a href="haberler.html">Tümü →</a></h3><p class="st">Ekonomi haber sitelerinden</p><ul class="evl" id="news"></ul></div>
   </div>
   <div class="two">
-    <div class="card"><h3 class="t">Son halka arzlar <a href="piyasalar.html#halkaarz">Tümü →</a></h3><p class="st" id="ipost">Borsa İstanbul'da yeni işlem görmeye başlayan hisseler</p><table class="mini" id="ipos"></table></div>
-    <div class="card"><h3 class="t">Panelde neler var?</h3><p class="st">Yeni bölümler ekleniyor</p>
+    <div class="card" data-sec="piyasalar"><h3 class="t">Son halka arzlar <a href="piyasalar.html#halkaarz">Tümü →</a></h3><p class="st" id="ipost">Borsa İstanbul'da yeni işlem görmeye başlayan hisseler</p><table class="mini" id="ipos"></table></div>
+    <div class="card" data-sec="home"><h3 class="t">Panelde neler var?</h3><p class="st">Yeni bölümler ekleniyor</p>
       <ul class="evl">
         <li><span class="d">Piyasalar</span><span>Döviz, altın, emtia, dünya borsaları ve kripto; tüm BIST'in yükselen ve düşenleri</span></li>
         <li><span class="d">Haberler</span><span>Altı ekonomi haber sitesinden son 48 saat, konuya göre</span></li>
@@ -80,6 +80,8 @@
 <script src="assets/core.js"></script>
 <script>
 chrome("home");
+const MKC = {"XU100.IS": "var(--c-piyasalar)", "USDTRY=X": "var(--c-doviz)", "EURTRY=X": "var(--c-doviz)", GRAM: "var(--c-altin)",
+             "BZ=F": "var(--c-emtia)", "BTC-USD": "var(--c-kripto)"};
 const HOME_CARDS = ["XU100.IS", "USDTRY=X", "EURTRY=X", "GRAM", "BZ=F", "BTC-USD"];
 const STRIP = ["XU100.IS", "XU030.IS", "USDTRY=X", "EURTRY=X", "GRAM", "GC=F", "BZ=F", "^GSPC", "^GDAXI", "BTC-USD", "^TNX"];
 const shortDay = iso => new Date(iso + "T00:00:00").toLocaleDateString("tr-TR", {day: "numeric", month: "short"});
@@ -98,7 +100,7 @@ const shortDay = iso => new Date(iso + "T00:00:00").toLocaleDateString("tr-TR", 
     $("#strip").innerHTML = STRIP.map(s => mkFind(M, s)).filter(Boolean).map(it =>
       `<a href="piyasalar.html#${encodeURIComponent(it.sym)}">${it.name.split(" · ")[0]} <b>${mkVal(it)}</b> ${mkChg(it, it.chg)}</a>`).join("");
     $("#cards").innerHTML = HOME_CARDS.map(s => mkFind(M, s)).filter(Boolean).map(it =>
-      `<a class="card mk" href="piyasalar.html#${encodeURIComponent(it.sym)}"><div class="nm">${it.name}</div><div class="v">${mkVal(it)}</div>
+      `<a class="card mk" style="--mc:${MKC[it.sym] || "var(--c-piyasalar)"}" href="piyasalar.html#${encodeURIComponent(it.sym)}"><div class="nm">${it.name}</div><div class="v">${mkVal(it)}</div>
        <div class="c">${mkChg(it, it.chg)} <span class="m">1 ay ${mkChg(it, it.chg1m)}</span><span class="m">yıl başı ${mkChg(it, it.chgytd)}</span></div>${sparkSvg(it.spark)}</a>`).join("");
     const b = M.bist;
     if (b) {

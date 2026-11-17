@@ -38,7 +38,8 @@ function countUp(el, to, fmtFn, ms = 1100) {
 
 function chrome(active) {
   const brand = `<span class="wm">${SITE.name[0]}<span class="gtext">${SITE.name[1]}</span></span>`;
-  const link = ([h, t, k, f]) => `<a href="${h}" class="${[k === active ? "on" : "", f === "vurgu" ? "hl" : ""].join(" ").trim()}"${k === active ? ' aria-current="page"' : ""}${/^https?:/.test(h) ? ' target="_blank" rel="noopener"' : ""}>${t}</a>`;
+  document.body.dataset.page = active;                     // bölüm rengi: body[data-page] → --accent
+  const link = ([h, t, k, f]) => `<a href="${h}" style="--c:var(--c-${k})" class="${[k === active ? "on" : "", f === "vurgu" ? "hl" : ""].join(" ").trim()}"${k === active ? ' aria-current="page"' : ""}${/^https?:/.test(h) ? ' target="_blank" rel="noopener"' : ""}>${t}</a>`;
   const top = NAV.filter(x => x[3] !== "alt" || x[2] === active).map(link).join(""), links = NAV.map(link).join("");
   $("#top").innerHTML = `<div class="wrap">
     <a class="brand" href="index.html"><span class="mark"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3 2 8l10 5 10-5-10-5Z" fill="#3b82f6"/><path d="m2 12 10 5 10-5" stroke="#3b82f6" stroke-width="2" stroke-linejoin="round" opacity=".7"/><path d="m2 16 10 5 10-5" stroke="#10b981" stroke-width="2" stroke-linejoin="round"/></svg></span>${brand}</a>

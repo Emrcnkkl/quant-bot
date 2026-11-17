@@ -643,3 +643,67 @@ h3.t .qm{margin-right:auto}
 .qbody p,.qbody .lead,.qbody .st{margin:0 0 8px;font-size:13px;color:var(--ink2);max-width:none}
 .qbody > :last-child{margin-bottom:0}
 .qbody .legend-sig{display:grid;gap:6px;margin:0}
+
+/* =========================================================================================
+   TASARIM 3 — renkli tema (17 Kasım 2026): her bölümün kendi rengi, lacivert tonlu zemin, varlık türü renkleri.
+   Düz renk; renk geçişi ve parlama yok.
+   ========================================================================================= */
+:root{
+  --c-home:#818cf8;--c-piyasalar:#4f8dff;--c-ekonomi:#f5a524;--c-haberler:#a78bfa;--c-takvim:#2dd4bf;--c-sinyal:#34d399;
+  --c-spl:#fb7185;--c-sozluk:#f472b6;--c-iletisim:#38bdf8;
+  --c-doviz:#34d399;--c-altin:#fbbf24;--c-emtia:#fb923c;--c-kripto:#f97316;
+  --bg:#0a1020;--bg2:#0e1528;--surface:#0f172a;--surface2:#151f36;--card:#0f172a;--card2:#151f36;
+  --line:#1e2a44;--line2:#2a3958;--ink:#e8edf6;--ink2:#b4bfd2;--muted:#7b88a3;
+}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){
+  --c-home:#4f46e5;--c-piyasalar:#2563eb;--c-ekonomi:#c2700a;--c-haberler:#7c3aed;--c-takvim:#0d9488;--c-sinyal:#059669;
+  --c-spl:#e11d48;--c-sozluk:#db2777;--c-iletisim:#0284c7;
+  --c-doviz:#059669;--c-altin:#b7791f;--c-emtia:#ea580c;--c-kripto:#c2410c;
+  --bg:#f2f5fb;--bg2:#e8edf6;--surface:#ffffff;--surface2:#f5f7fc;--card:#ffffff;--card2:#f5f7fc;
+  --line:#dde3ee;--line2:#ccd5e3;--ink:#111827;--ink2:#374151;--muted:#64708a;
+}}
+:root[data-theme="light"]{
+  --c-home:#4f46e5;--c-piyasalar:#2563eb;--c-ekonomi:#c2700a;--c-haberler:#7c3aed;--c-takvim:#0d9488;--c-sinyal:#059669;
+  --c-spl:#e11d48;--c-sozluk:#db2777;--c-iletisim:#0284c7;
+  --c-doviz:#059669;--c-altin:#b7791f;--c-emtia:#ea580c;--c-kripto:#c2410c;
+  --bg:#f2f5fb;--bg2:#e8edf6;--surface:#ffffff;--surface2:#f5f7fc;--card:#ffffff;--card2:#f5f7fc;
+  --line:#dde3ee;--line2:#ccd5e3;--ink:#111827;--ink2:#374151;--muted:#64708a;
+}
+/* Sayfanın vurgu rengi = bölüm rengi */
+body[data-page="home"]{--accent:var(--c-home)}
+body[data-page="piyasalar"]{--accent:var(--c-piyasalar)}
+body[data-page="ekonomi"]{--accent:var(--c-ekonomi)}
+body[data-page="haberler"]{--accent:var(--c-haberler)}
+body[data-page="takvim"]{--accent:var(--c-takvim)}
+body[data-page="sinyal"]{--accent:var(--c-sinyal)}
+body[data-page="sozluk"]{--accent:var(--c-sozluk)}
+body[data-page="iletisim"]{--accent:var(--c-iletisim)}
+/* Üst şerit: sayfa renginde ince çizgi */
+nav{border-top:3px solid var(--accent)}
+/* Menü: her sekmenin kendi rengi */
+nav .links a:hover,.mnav a:hover{color:var(--c)}
+nav .links a.on,.mnav a.on{border-bottom-color:var(--c);color:var(--ink)}
+nav .links a.hl{border-color:color-mix(in srgb,var(--c) 45%,transparent);color:var(--ink)}
+nav .links a.hl:hover{background:color-mix(in srgb,var(--c) 10%,transparent)}
+nav .links a.hl.on,.mnav a.hl.on{border-color:var(--c);background:color-mix(in srgb,var(--c) 14%,transparent)}
+.mnav a.hl{border-color:color-mix(in srgb,var(--c) 45%,transparent)}
+/* Başlık işaretleri */
+.ph h1::before,section > h2::before{content:"";display:inline-block;width:5px;height:.78em;margin-right:12px;border-radius:2px;background:var(--accent);vertical-align:baseline}
+/* Bölüm kartları: üst renk çizgisi ve başlık işareti */
+.card[data-sec]{--sc:var(--c-home);border-top:2px solid var(--sc)}
+.card[data-sec="piyasalar"]{--sc:var(--c-piyasalar)}.card[data-sec="ekonomi"]{--sc:var(--c-ekonomi)}
+.card[data-sec="haberler"]{--sc:var(--c-haberler)}.card[data-sec="takvim"]{--sc:var(--c-takvim)}
+.card[data-sec="sinyal"]{--sc:var(--c-sinyal)}.card[data-sec="home"]{--sc:var(--c-home)}
+.card[data-sec] h3.t a{color:var(--sc)}
+.card[data-sec] h3.t::before{content:"";width:8px;height:8px;border-radius:2px;background:var(--sc);flex:none;align-self:center;margin-right:-2px}
+/* Piyasa kartları: varlık türü rengi */
+.mk{border-left:3px solid var(--mc,var(--accent))}
+.mk .nm{color:var(--mc,var(--muted))}
+/* Göstergeler: renkli ama sakin */
+.tile .k{color:var(--c,var(--muted))}
+.subnav a.on{background:color-mix(in srgb,var(--accent) 14%,transparent);border-color:color-mix(in srgb,var(--accent) 50%,transparent);color:var(--ink)}
+.tabs button.on,.seg button.on{background:color-mix(in srgb,var(--accent) 16%,transparent);color:var(--ink);box-shadow:none}
+.qm{border-color:color-mix(in srgb,var(--accent) 50%,transparent);color:var(--accent)}
+.strip a{border-left:2px solid color-mix(in srgb,var(--accent) 60%,transparent)}
+th{background:color-mix(in srgb,var(--accent) 6%,var(--surface2))}
+.brand .mark{background:color-mix(in srgb,var(--accent) 14%,transparent);border-color:color-mix(in srgb,var(--accent) 40%,transparent)}
