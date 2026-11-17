@@ -239,11 +239,11 @@ exit_rule ("score" varsayılan | ema50 | cross | ema200 | regime), entry_rule ("
   kuralların üzerine yazar — düz yüzeyler, 1px çizgi, 6–8px köşe, tek vurgu rengi (koyu #4a86ff / açık #1f5bd8), sakin yeşil/kırmızı;
   arka plan ışığı/ızgarası, renk geçişli yazı (`.gtext` düz renk), parlama, gölge, ping animasyonu, `.kicker` bölüm etiketleri YOK; menü 56px,
   sıkı tablolar, sade hisse simgeleri (`.av` tonlu düz kutu). Yeni bileşen eklerken bu dili koru (gradyan/glow ekleme).
-- **Tasarım 3 — renkli tema** (17 Kasım 2026, kullanıcı "sönük, tek renk" buldu): `app.css` en sondaki katman. Her bölümün rengi
-  `--c-home|piyasalar|ekonomi|haberler|takvim|sinyal|spl|sozluk|iletisim` (+ varlık renkleri `--c-doviz|altin|emtia|kripto`); `chrome()`
-  `body[data-page]` koyar → `--accent` o bölümün rengi (menü üst çizgisi, başlık çubuğu, seçili sekme, ?). Menüde her sekme kendi rengiyle
-  (`--c`). Ana sayfa kartları `data-sec="…"` ile üst renk çizgisi alır; piyasa kartları `--mc` ile sol kenar. Zemin lacivert (#0a1020 / açık #f2f5fb).
-  Yine gradyan/parlama yok; renk yalnızca çizgi, çubuk ve vurgu olarak.
+- **Tasarım 4 — karışık tema** (17 Kasım 2026; renkli "Tasarım 3" beğenilmedi, kaldırıldı): `app.css` en sondaki katman. Menü,
+  sayfa başlığı (`.ph.band`), ana sayfa şeridi, sinyal alt menüsü (`.subnav.band`) ve alt bilgi **koyu lacivert bant** (#0b1324,
+  tam genişlik: `box-shadow 100vmax` + `clip-path`); içerik **açık** (#f3f5f9 zemin, beyaz kart, 12px köşe, yumuşak gölge, tek vurgu
+  #2563eb). Son bant öğesi `.ov` ise hemen altındaki `.lift` öğesi banda biner. Varsayılan budur (cihaz ayarına bakılmaz); menüdeki
+  düğme `html[data-theme=dark]` ile yalnızca içeriği koyu yapar. Yeni sayfada başlığı `<div class="ph band">` olarak yaz.
 - **Az yazı, açıklamalar ?'de** (17 Kasım, kullanıcı isteği): `core.js` `helpify()` (her `reveal()`'da ve sinyal sayfasında veri yüklenince)
   `p.lead`, `.card > p.st`, `.legend-sig`, `[data-help]` (gizli span; başlık yoksa düğme ebeveynin sonuna) ve 90+ karakterlik ya da id'li
   `p.muted.small` notları sayfadan kaldırıp en yakın başlığın yanındaki **?** (`.qm`) düğmesinin açılır kutusuna (`.qbody`, body'ye eklenir,

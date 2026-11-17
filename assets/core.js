@@ -38,8 +38,8 @@ function countUp(el, to, fmtFn, ms = 1100) {
 
 function chrome(active) {
   const brand = `<span class="wm">${SITE.name[0]}<span class="gtext">${SITE.name[1]}</span></span>`;
-  document.body.dataset.page = active;                     // bölüm rengi: body[data-page] → --accent
-  const link = ([h, t, k, f]) => `<a href="${h}" style="--c:var(--c-${k})" class="${[k === active ? "on" : "", f === "vurgu" ? "hl" : ""].join(" ").trim()}"${k === active ? ' aria-current="page"' : ""}${/^https?:/.test(h) ? ' target="_blank" rel="noopener"' : ""}>${t}</a>`;
+  document.body.dataset.page = active;
+  const link = ([h, t, k, f]) => `<a href="${h}" class="${[k === active ? "on" : "", f === "vurgu" ? "hl" : ""].join(" ").trim()}"${k === active ? ' aria-current="page"' : ""}${/^https?:/.test(h) ? ' target="_blank" rel="noopener"' : ""}>${t}</a>`;
   const top = NAV.filter(x => x[3] !== "alt" || x[2] === active).map(link).join(""), links = NAV.map(link).join("");
   $("#top").innerHTML = `<div class="wrap">
     <a class="brand" href="index.html"><span class="mark"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3 2 8l10 5 10-5-10-5Z" fill="#3b82f6"/><path d="m2 12 10 5 10-5" stroke="#3b82f6" stroke-width="2" stroke-linejoin="round" opacity=".7"/><path d="m2 16 10 5 10-5" stroke="#10b981" stroke-width="2" stroke-linejoin="round"/></svg></span>${brand}</a>
@@ -152,8 +152,8 @@ function lineChart(box, x, series, o = {}) {
 }
 const legend = series => `<div class="lgd">${series.map(s => `<span><i style="background:${s.color}"></i>${s.name}</span>`).join("")}</div>`;
 
-// Tema: html[data-theme] (elle seçim, localStorage "tema") yoksa cihaz tercihi
-const isDark = () => (document.documentElement.dataset.theme || (matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark")) === "dark";
+// Tema: varsayılan karışık (koyu bant + açık içerik); html[data-theme="dark"] (localStorage "tema") içeriği de koyu yapar
+const isDark = () => document.documentElement.dataset.theme === "dark";
 function themeIcon() {
   const b = $("#themebtn"); if (!b) return;
   b.innerHTML = isDark()

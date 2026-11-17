@@ -645,65 +645,91 @@ h3.t .qm{margin-right:auto}
 .qbody .legend-sig{display:grid;gap:6px;margin:0}
 
 /* =========================================================================================
-   TASARIM 3 — renkli tema (17 Kasım 2026): her bölümün kendi rengi, lacivert tonlu zemin, varlık türü renkleri.
-   Düz renk; renk geçişi ve parlama yok.
+   TASARIM 4 — karışık tema (17 Kasım 2026): koyu lacivert üst bant (menü + sayfa başlığı + alt bilgi), açık içerik
+   (beyaz kartlar, yumuşak gölge). Varsayılan budur; menüdeki düğme yalnızca içerik alanını koyuya çevirir.
+   Bant öğeleri: .band (tam genişlik), son bant öğesi .ov ise altındaki .lift kartları banda biner.
    ========================================================================================= */
-:root{
-  --c-home:#818cf8;--c-piyasalar:#4f8dff;--c-ekonomi:#f5a524;--c-haberler:#a78bfa;--c-takvim:#2dd4bf;--c-sinyal:#34d399;
-  --c-spl:#fb7185;--c-sozluk:#f472b6;--c-iletisim:#38bdf8;
-  --c-doviz:#34d399;--c-altin:#fbbf24;--c-emtia:#fb923c;--c-kripto:#f97316;
-  --bg:#0a1020;--bg2:#0e1528;--surface:#0f172a;--surface2:#151f36;--card:#0f172a;--card2:#151f36;
-  --line:#1e2a44;--line2:#2a3958;--ink:#e8edf6;--ink2:#b4bfd2;--muted:#7b88a3;
+:root:not([data-theme="dark"]){
+  --bg:#f3f5f9;--bg2:#e9edf3;--surface:#ffffff;--surface2:#f6f8fb;--card:#ffffff;--card2:#f6f8fb;
+  --ink:#0f172a;--ink2:#334155;--muted:#64748b;--line:#e3e8ef;--line2:#d3dae4;--hi:transparent;
+  --accent:#2563eb;--accent2:#2563eb;--grad:linear-gradient(var(--accent),var(--accent));
+  --al:#059669;--al-bg:#e3f5ee;--sat:#dc2626;--sat-bg:#fdecec;--tut:#b45309;--tut-bg:#fdf3e1;
+  --strat:#059669;--bench:#2563eb;--cash:#64748b;--uni:#7c3aed;--gold:#c08a12;--usdc:#db2777;--e20:#2563eb;--e50:#ea580c;--e200:#9333ea;
+  --warn-bg:#fffaf0;--warn-line:#f1d9a6;
+  --shadow:0 1px 2px rgba(15,23,42,.05),0 6px 18px -6px rgba(15,23,42,.10);
+  color-scheme:light;
 }
-@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){
-  --c-home:#4f46e5;--c-piyasalar:#2563eb;--c-ekonomi:#c2700a;--c-haberler:#7c3aed;--c-takvim:#0d9488;--c-sinyal:#059669;
-  --c-spl:#e11d48;--c-sozluk:#db2777;--c-iletisim:#0284c7;
-  --c-doviz:#059669;--c-altin:#b7791f;--c-emtia:#ea580c;--c-kripto:#c2410c;
-  --bg:#f2f5fb;--bg2:#e8edf6;--surface:#ffffff;--surface2:#f5f7fc;--card:#ffffff;--card2:#f5f7fc;
-  --line:#dde3ee;--line2:#ccd5e3;--ink:#111827;--ink2:#374151;--muted:#64708a;
-}}
-:root[data-theme="light"]{
-  --c-home:#4f46e5;--c-piyasalar:#2563eb;--c-ekonomi:#c2700a;--c-haberler:#7c3aed;--c-takvim:#0d9488;--c-sinyal:#059669;
-  --c-spl:#e11d48;--c-sozluk:#db2777;--c-iletisim:#0284c7;
-  --c-doviz:#059669;--c-altin:#b7791f;--c-emtia:#ea580c;--c-kripto:#c2410c;
-  --bg:#f2f5fb;--bg2:#e8edf6;--surface:#ffffff;--surface2:#f5f7fc;--card:#ffffff;--card2:#f5f7fc;
-  --line:#dde3ee;--line2:#ccd5e3;--ink:#111827;--ink2:#374151;--muted:#64708a;
+:root[data-theme="dark"]{
+  --bg:#0b111c;--bg2:#0f1624;--surface:#111a29;--surface2:#162133;--card:#111a29;--card2:#162133;
+  --ink:#e8edf5;--ink2:#b5c0d0;--muted:#8090a6;--line:#1e2a3c;--line2:#2a3850;
+  --accent:#5b9bff;--accent2:#5b9bff;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px -8px rgba(0,0,0,.5);
 }
-/* Sayfanın vurgu rengi = bölüm rengi */
-body[data-page="home"]{--accent:var(--c-home)}
-body[data-page="piyasalar"]{--accent:var(--c-piyasalar)}
-body[data-page="ekonomi"]{--accent:var(--c-ekonomi)}
-body[data-page="haberler"]{--accent:var(--c-haberler)}
-body[data-page="takvim"]{--accent:var(--c-takvim)}
-body[data-page="sinyal"]{--accent:var(--c-sinyal)}
-body[data-page="sozluk"]{--accent:var(--c-sozluk)}
-body[data-page="iletisim"]{--accent:var(--c-iletisim)}
-/* Üst şerit: sayfa renginde ince çizgi */
-nav{border-top:3px solid var(--accent)}
-/* Menü: her sekmenin kendi rengi */
-nav .links a:hover,.mnav a:hover{color:var(--c)}
-nav .links a.on,.mnav a.on{border-bottom-color:var(--c);color:var(--ink)}
-nav .links a.hl{border-color:color-mix(in srgb,var(--c) 45%,transparent);color:var(--ink)}
-nav .links a.hl:hover{background:color-mix(in srgb,var(--c) 10%,transparent)}
-nav .links a.hl.on,.mnav a.hl.on{border-color:var(--c);background:color-mix(in srgb,var(--c) 14%,transparent)}
-.mnav a.hl{border-color:color-mix(in srgb,var(--c) 45%,transparent)}
-/* Başlık işaretleri */
-.ph h1::before,section > h2::before{content:"";display:inline-block;width:5px;height:.78em;margin-right:12px;border-radius:2px;background:var(--accent);vertical-align:baseline}
-/* Bölüm kartları: üst renk çizgisi ve başlık işareti */
-.card[data-sec]{--sc:var(--c-home);border-top:2px solid var(--sc)}
-.card[data-sec="piyasalar"]{--sc:var(--c-piyasalar)}.card[data-sec="ekonomi"]{--sc:var(--c-ekonomi)}
-.card[data-sec="haberler"]{--sc:var(--c-haberler)}.card[data-sec="takvim"]{--sc:var(--c-takvim)}
-.card[data-sec="sinyal"]{--sc:var(--c-sinyal)}.card[data-sec="home"]{--sc:var(--c-home)}
-.card[data-sec] h3.t a{color:var(--sc)}
-.card[data-sec] h3.t::before{content:"";width:8px;height:8px;border-radius:2px;background:var(--sc);flex:none;align-self:center;margin-right:-2px}
-/* Piyasa kartları: varlık türü rengi */
-.mk{border-left:3px solid var(--mc,var(--accent))}
-.mk .nm{color:var(--mc,var(--muted))}
-/* Göstergeler: renkli ama sakin */
-.tile .k{color:var(--c,var(--muted))}
-.subnav a.on{background:color-mix(in srgb,var(--accent) 14%,transparent);border-color:color-mix(in srgb,var(--accent) 50%,transparent);color:var(--ink)}
-.tabs button.on,.seg button.on{background:color-mix(in srgb,var(--accent) 16%,transparent);color:var(--ink);box-shadow:none}
-.qm{border-color:color-mix(in srgb,var(--accent) 50%,transparent);color:var(--accent)}
-.strip a{border-left:2px solid color-mix(in srgb,var(--accent) 60%,transparent)}
-th{background:color-mix(in srgb,var(--accent) 6%,var(--surface2))}
-.brand .mark{background:color-mix(in srgb,var(--accent) 14%,transparent);border-color:color-mix(in srgb,var(--accent) 40%,transparent)}
+/* Koyu bant değişkenleri (iki modda da aynı) */
+nav#top,.band,footer{
+  --bg:#0b1324;--ink:#f1f5f9;--ink2:#cbd5e1;--muted:#94a3b8;--line:rgba(255,255,255,.09);--line2:rgba(255,255,255,.18);
+  --surface:rgba(255,255,255,.05);--surface2:rgba(255,255,255,.10);--card:rgba(255,255,255,.05);
+  --al:#34d399;--sat:#f87171;--tut:#fbbf24;--accent:#60a5fa;color-scheme:dark;color:var(--ink);
+}
+:root[data-theme="dark"] nav#top,:root[data-theme="dark"] .band,:root[data-theme="dark"] footer{--bg:#060a12}
+nav#top{background:var(--bg);border-bottom:1px solid var(--line)}
+.band,footer{background:var(--bg);box-shadow:0 0 0 100vmax var(--bg);clip-path:inset(0 -100vmax)}
+.band + .band{clip-path:inset(-2px -100vmax 0)}
+/* Sayfa başlığı bandı */
+.ph.band{margin:0;padding:30px 0 26px}
+.ph.band h1{font-size:clamp(26px,3.4vw,34px);font-weight:720;letter-spacing:-.025em;color:#fff}
+.ph.band .sub{color:var(--muted)}
+.band.ov{padding-bottom:70px}
+.lift{position:relative;z-index:1;margin-top:-48px!important}
+.ph.ov + section,.ph.band + section{padding-top:0}
+.ph.ov + section{padding-top:0}
+/* Bant içindeki şerit (ana sayfa) */
+.strip.band{margin:0;padding-top:2px}
+.strip.band a{background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:8px}
+.strip.band a:hover{background:rgba(255,255,255,.11)}
+/* Menü */
+nav .links a{color:#aab6c9}
+nav .links a:hover{color:#fff}
+nav .links a.on{color:#fff;border-bottom-color:var(--accent)}
+nav .links a.hl{border:1px solid rgba(255,255,255,.22);color:#fff;background:transparent}
+nav .links a.hl:hover{background:rgba(255,255,255,.08)}
+nav .links a.hl.on{border-color:var(--accent);background:rgba(96,165,250,.16)}
+.mnav a{color:#aab6c9}.mnav a.on{color:#fff}
+.mnav a.hl{border-color:rgba(255,255,255,.22);color:#fff;background:transparent}
+.brand,.wm{color:#fff}
+.brand .mark{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.14)}
+nav .help{color:#cbd5e1;border-color:rgba(255,255,255,.18)}
+nav .help:hover{color:#fff;background:rgba(255,255,255,.08)}
+/* Sinyal sayfası alt menüsü: bandın devamı, yapışkan */
+.subnav.band{margin:0;padding:0 0 12px;border-bottom:0;background:var(--bg)}
+.subnav.band a{color:#aab6c9;border:1px solid transparent;border-radius:999px;padding:6px 14px}
+.subnav.band a:hover{color:#fff}
+.subnav.band a.on{color:#0b1324;background:#fff;border-color:#fff}
+.subnav.band + *{margin-top:22px}
+/* İçerik: beyaz kartlar, yumuşak gölge, ferah köşeler */
+.card,.tile,.stat,.step,.tbl,.mk,.faq details,details.more>summary,.chartcard,.detail{background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow)}
+.card,.tbl,.mk,.tile,.hero,.chartcard,.detail,.ipo-cards .card,.eco-cards .card,.cal-top .card{border-radius:12px}
+.mk{padding:16px 18px 10px}
+.mk:hover{border-color:var(--line2)}
+th{background:var(--surface2);color:var(--muted)}
+.tabs,.seg{background:var(--surface);border:1px solid var(--line);border-radius:9px}
+.tabs button.on,.seg button.on{background:var(--accent);color:#fff;box-shadow:none}
+.band .seg{background:rgba(255,255,255,.06)}
+.band .seg button{color:#cbd5e1}
+.band .seg button.on{background:#fff;color:#0b1324}
+.qm{border-color:var(--line2);color:var(--muted)}
+.qm:hover{border-color:var(--accent);color:var(--accent)}
+.band .qm{border-color:rgba(255,255,255,.3);color:#cbd5e1}
+.warn{border-radius:10px}
+.badge{border-radius:6px}
+input[type=search]{background-color:var(--card);border:1px solid var(--line);border-radius:9px}
+.av{border-radius:8px}
+/* Alt bilgi koyu */
+footer{margin-top:72px;border-top:0;padding:34px 0 48px}
+footer a{color:#cbd5e1}footer a:hover{color:#fff}
+footer .fb .wm{color:#fff}
+/* Hafif belirme */
+.rv{transform:translateY(6px);transition:opacity .35s ease,transform .35s ease}
+.rv.in{transform:none}
+@media(max-width:1120px){.subnav.band{top:100px}}
+@media(max-width:600px){.ph.band{padding:22px 0 20px}.band.ov{padding-bottom:58px}.lift{margin-top:-40px!important}}
