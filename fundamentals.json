@@ -2329,12 +2329,12 @@
    "eps": -3.62,
    "book": 29.003,
    "currency": "TRY",
-   "div_yield": 0.1,
+   "div_yield": 0.13,
    "roe": -0.17698999,
-   "mcap": 3796320000,
+   "mcap": 3109920000,
    "sector": "Consumer Cyclical",
    "industry": "Specialty Retail",
-   "fetched": "2026-11-17",
+   "fetched": "2026-11-25",
    "net_ttm": -602583748.0,
    "equity": 3828441468.0,
    "capital": 132000000.0,
@@ -2343,5 +2343,5 @@
    "net_dq": -280790279.0
   }
  },
- "updated": "2026-11-24"
+ "updated": "2026-11-25"
 }
